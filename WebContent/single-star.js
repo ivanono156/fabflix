@@ -4,7 +4,7 @@
  * Before this .js is loaded, the html skeleton is created.
  *
  * This .js performs three steps:
- *      1. Get parameter from request URL so it know which id to look for
+ *      1. Get parameter from request URL so it knows which id to look for
  *      2. Use jQuery to talk to backend API to get the json data.
  *      3. Populate the data to correct html elements.
  */
@@ -40,7 +40,6 @@ function handleResult(resultData) {
 
     console.log("handleResult: populating star info from resultData");
 
-    // populate the star info h3
     // find the empty h3 body by id "star_info"
     let starInfoElement = jQuery("#star_info");
 
@@ -50,7 +49,6 @@ function handleResult(resultData) {
 
     console.log("handleResult: populating movie table from resultData");
 
-    // Populate the star table
     // Find the empty table body by id "movie_table_body"
     let movieTableBodyElement = jQuery("#movie_table_body");
 
@@ -62,14 +60,14 @@ function handleResult(resultData) {
         let rowHTML = "";
         rowHTML += "<tr>";
         rowHTML +=
-            "<th>"
+            "<td>"
             // Add a link to each single-movie.html page
             + '<a href="single-movie.html?id=' + starMovies[i]["movie_id"] + '">'
             + starMovies[i]["movie_title"] // Display movie title as link text
             + '</a>'
-            + "</th>";
-        rowHTML += "<th>" + starMovies[i]["movie_year"] + "</th>";
-        rowHTML += "<th>" + starMovies[i]["movie_director"] + "</th>";
+            + "</td>";
+        rowHTML += "<td>" + starMovies[i]["movie_year"] + "</td>";
+        rowHTML += "<td>" + starMovies[i]["movie_director"] + "</td>";
         rowHTML += "</tr>";
 
         // Append the row created to the table body, which will refresh the page
@@ -78,7 +76,7 @@ function handleResult(resultData) {
 }
 
 /**
- * Once this .js is loaded, following scripts will be executed by the browser\
+ * Once this .js is loaded, following scripts will be executed by the browser
  */
 
 // Get id from URL

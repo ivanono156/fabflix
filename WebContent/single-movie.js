@@ -10,26 +10,26 @@
  */
 
 
-// /**
-//  * Retrieve parameter from request URL, matching by parameter name
-//  * @param target String
-//  * @returns {*}
-//  */
-// function getParameterByName(target) {
-//     // Get request URL
-//     let url = window.location.href;
-//     // Encode target parameter name to url encoding
-//     target = target.replace(/[\[\]]/g, "\\$&");
-//
-//     // Ues regular expression to find matched parameter value
-//     let regex = new RegExp("[?&]" + target + "(=([^&#]*)|&|#|$)"),
-//         results = regex.exec(url);
-//     if (!results) return null;
-//     if (!results[2]) return '';
-//
-//     // Return the decoded parameter value
-//     return decodeURIComponent(results[2].replace(/\+/g, " "));
-// }
+/**
+ * Retrieve parameter from request URL, matching by parameter name
+ * @param target String
+ * @returns {*}
+ */
+function getParameterByName(target) {
+    // Get request URL
+    let url = window.location.href;
+    // Encode target parameter name to url encoding
+    target = target.replace(/[\[\]]/g, "\\$&");
+
+    // Ues regular expression to find matched parameter value
+    let regex = new RegExp("[?&]" + target + "(=([^&#]*)|&|#|$)"),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+
+    // Return the decoded parameter value
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
+}
 
 /**
  * Handles the data returned by the API, read the jsonObject and populate data into html elements
@@ -44,9 +44,29 @@ function handleResult(resultData) {
     let movieInfoElement = jQuery("#movie_info");
 
     // append two html <p> created to the h3 body, which will refresh the page
-    movieInfoElement.append("<p>Movie Title: " + resultData[0]["movie_title"] + "</p>" +
-        "<p>Year Released: " + resultData[0]["movie_year"] + "</p>" +
-        "<p>Director: " + resultData[0]["movie_director"] + "</p>");
+    movieInfoElement.append("<p>Movie Title: " + resultData["movie_title"] + "</p>" +
+        "<p>Release Year: " + resultData["movie_year"] + "</p>" +
+        "<p>Director: " + resultData["movie_director"] + "</p>" +
+        "<p>Rating: " + resultData["movie_rating"] + "</p>");
+
+    console.log("handleResult: populating genre table from resultData");
+
+    // Find the empty table body by id "genre_table_body"
+    let genreTableBodyElement = jQuery("#genre_table_body");
+
+    // Json array containing this movie's genres
+    const genres = resultData["movie_genres"];
+
+    // Concatenate the html tags with resultData jsonObject to create table rows
+    for (const genreId in genres) {
+        let rowHTML = "";
+        rowHTML += "<tr>";
+        rowHTML += "<td>" + genres[genreId] + "</td>";  // Access the genre name property using the genre id
+        rowHTML += "</tr>";
+
+        // Append the row created to the table body, which will refresh the page
+        genreTableBodyElement.append(rowHTML);
+    }
 
     console.log("handleResult: populating star table from resultData");
 
@@ -54,24 +74,25 @@ function handleResult(resultData) {
     let starTableBodyElement = jQuery("#star_table_body");
 
     // Json array containing movies this star acted in
-    const stars = resultData[0]["stars"];
+    const stars = resultData["movie_stars"];
 
     // Concatenate the html tags with resultData jsonObject to create table rows
-    for (let i = 0; i < stars.length; i++) {
+    for (const starId in stars) {
         let rowHTML = "";
         rowHTML += "<tr>";
         rowHTML +=
-            "<th>"
+            "<td>"
             // Add a link to each single-star.html page
-            + '<a href="single-star.html?id=' + stars[i]["star_id"] + '">'
-            + stars[i]["star_name"] // Display star name as link text
+            + '<a href="single-star.html?id=' + starId + '">'
+            + stars[starId] // Display star name as link text
             + '</a>'
-            + "</th>";
+            + "</td>";
         rowHTML += "</tr>";
 
         // Append the row created to the table body, which will refresh the page
         starTableBodyElement.append(rowHTML);
     }
+
 }
 
 /**
