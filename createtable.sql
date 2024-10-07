@@ -1,3 +1,6 @@
+create database if not exists moviedb;
+use moviedb;
+
 create table movies (
 	id varchar(10) not null,
     title varchar(100) not null,
@@ -33,6 +36,14 @@ create table genres_in_movies (
     foreign key (movieId) references movies(id)
 );
 
+create table creditcards (
+	id varchar(20) not null,
+    firstName varchar(50) not null,
+    lastName varchar(50) not null,
+    expiration date not null,
+    primary key (id)
+);
+
 create table customers (
 	id int not null auto_increment,
     firstName varchar(50) not null,
@@ -53,14 +64,6 @@ create table sales (
     primary key (id),
     foreign key (customerId) references customers(id),
     foreign key (movieId) references movies(id)
-);
-
-create table creditcards (
-	id varchar(20) not null,
-    firstName varchar(50) not null,
-    lastName varchar(50) not null,
-    expiration date not null,
-    primary key (id)
 );
 
 create table ratings (
