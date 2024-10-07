@@ -47,13 +47,6 @@ public class SingleMovieServlet extends HttpServlet {
         // Get a connection from the database
         try (Connection conn = dataSource.getConnection()) {
             // Construct query
-            String query2 = "select * from stars as s, movies as m, genres as g, ratings as r, " +
-                    "stars_in_movies as sim, genres_in_movies as gim " +
-                    "where m.id = sim.movieId and s.id = sim.starId and " +
-                    "m.id = gim.movieId and gim.genreId = g.id and m.id = r.movieId " +
-                    "and m.id = ?";
-
-            // Optimized query using inner joins
             String query = "select * " +
                     "from (((((movies as m " +
                     "inner join stars_in_movies as sim on m.id = sim.movieId)" +

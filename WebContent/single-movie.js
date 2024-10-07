@@ -38,6 +38,9 @@ function getParameterByName(target) {
 
 function handleResult(resultData) {
 
+    // Setting webpage title
+    document.title = "Fabflix - " + resultData["movie_title"];
+
     console.log("handleResult: populating movie info from resultData");
 
     // find the empty h3 body by id "movie_info"
