@@ -48,7 +48,7 @@ public class StarsServlet extends HttpServlet {
             // Declare our statement
             Statement statement = conn.createStatement();
 
-            String query = "SELECT * from stars";
+            String query = "select * from stars limit 100";
 
             // Perform the query
             ResultSet rs = statement.executeQuery(query);
