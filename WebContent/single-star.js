@@ -38,6 +38,9 @@ function getParameterByName(target) {
 
 function handleResult(resultData) {
 
+    // Setting webpage title
+    document.title = "Fablix - " + resultData[0]["star_name"];
+
     console.log("handleResult: populating star info from resultData");
 
     // find the empty h3 body by id "star_info"

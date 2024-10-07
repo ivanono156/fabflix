@@ -46,8 +46,11 @@ public class SingleStarServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
 
         // Construct a query with parameter represented by "?"
-        String query = "select * from stars as s, stars_in_movies as sim, movies as m " +
-                "where m.id = sim.movieId and sim.starId = s.id and s.id = ?";
+        String query = "select * " +
+                "from ((stars as s " +
+                "inner join stars_in_movies as sim on s.id = sim.starId)" +
+                "inner join movies as m on sim.movieId = m.id)" +
+                "where s.id = ?";
 
         // Get a connection from dataSource and let resource manager close the connection after usage.
         try (Connection conn = dataSource.getConnection();
