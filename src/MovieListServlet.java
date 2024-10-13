@@ -47,24 +47,55 @@ public class MovieListServlet extends HttpServlet {
             // Construct query
 
             String query = "select m.id, m.title , m.year, m.director, " +
+                    //grouping the 3 genres into one genre column
                     "(select group_concat(distinct g.name order by g.name separator ', ') "
                     +"from genres g "
                     + "join genres_in_movies gim on g.id = gim.genreId "
                     + " where gim.movieId = m.id "
-                    + "limit 3) " + "as genres, "
-                    +"(select group_concat(distinct name order by name separator ',' ) "
-                    + "from (select name "
+                    + "limit 3) as genres, "
+
+                    +"(select s.name " // getting star1
                     + "from stars s "
                     + "join stars_in_movies sim on s.id = sim.starId "
                     + "where sim.movieId = m.id "
-                    + "limit 3) as limited_stars) " + "as stars, "
+                    + "limit 1 offset 0) as star1, "
+
+                    +"(select s.id " // getting star1 id
+                    + "from stars s "
+                    + "join stars_in_movies sim on s.id = sim.starId "
+                    + "where sim.movieId = m.id "
+                    + "limit 1 offset 0) as star1Id, "
+
+                    +"(select s.name " //star 2
+                    + "from stars s "
+                    + "join stars_in_movies sim on s.id = sim.starId "
+                    + "where sim.movieId = m.id "
+                    + "limit 1 offset 1) as star2, "
+
+                    +"(select s.id " //star2 id
+                    + "from stars s "
+                    + "join stars_in_movies sim on s.id = sim.starId "
+                    + "where sim.movieId = m.id "
+                    + "limit 1 offset 0) as star2Id, "
+
+                    +"(select s.name " // star 3
+                    + "from stars s "
+                    + "join stars_in_movies sim on s.id = sim.starId "
+                    + "where sim.movieId = m.id "
+                    + "limit 1 offset 2) as star3, "
+
+                    +"(select s.id " // star3 id
+                    + "from stars s "
+                    + "join stars_in_movies sim on s.id = sim.starId "
+                    + "where sim.movieId = m.id "
+                    + "limit 1 offset 0) as star3Id, "
+
                     + "r.rating "
                     + "from movies m "
                     + "join ratings r on m.id = r.movieId "
                     + "order by r.rating desc "
                     + "limit 20;";
-
-
+           
             // Declare statement
             try (PreparedStatement statement = conn.prepareStatement(query)){
 
@@ -84,7 +115,12 @@ public class MovieListServlet extends HttpServlet {
                         String movieRating = rs.getString("rating");
                         String movieGenres = rs.getString("genres");
                         //String movieStarsId = rs.getString("Id");
-                        String movieStarsName = rs.getString("stars");
+                        String movieStarName1 = rs.getString("star1");
+                        String movieStarName2 = rs.getString("star2");
+                        String movieStarName3 = rs.getString("star3");
+                        String movieStarId1 = rs.getString("star1Id");
+                        String movieStarId2 = rs.getString("star2Id");
+                        String movieStarId3 = rs.getString("star3Id");
 
                         //place the info into the json object
                         jsonObject.addProperty("movies_id", movieId);
@@ -94,7 +130,12 @@ public class MovieListServlet extends HttpServlet {
                         jsonObject.addProperty("movie_rating", movieRating);
                         jsonObject.addProperty("movie_genres", movieGenres);
                         //jsonObject.addProperty("movie_stars_id", movieStarsId);
-                        jsonObject.addProperty("movie_stars", movieStarsName);
+                        jsonObject.addProperty("movie_star1", movieStarName1);
+                        jsonObject.addProperty("movie_star2", movieStarName2);
+                        jsonObject.addProperty("movie_star3", movieStarName3);
+                        jsonObject.addProperty("movie_star1_id", movieStarId1);
+                        jsonObject.addProperty("movie_star2_id", movieStarId2);
+                        jsonObject.addProperty("movie_star3_id", movieStarId3);
 
                         jsonArray.add(jsonObject);
                     }
