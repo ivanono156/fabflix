@@ -49,9 +49,13 @@ function handleMovieResult(resultData) {
         rowHTML += "<td>" + resultData[i]["movie_year"] + "</td>";
         rowHTML += "<td>" + resultData[i]["movie_director"] + "</td>";
         rowHTML += "<td>" + resultData[i]["movie_genres"] + "</td>";
-        rowHTML += "<td><a href='single-star.html?id=" + resultData[i]["movie_star1_id"] +"'>" + resultData[i]["movie_star1"] + "</a>" +
-        " <a href='single-star.html?id=" + resultData[i]["movie_star2_id"] + "'>" + resultData[i]["movie_star2"] + "</a>" +
-        " <a href='single-star.html?id=" + resultData[i]["movie_star3_id"] + "'>" + resultData[i]["movie_star3"] + "</a></td>";
+        rowHTML += "<td>" +
+            "<ul>" +
+            "<li><a href='single-star.html?id=" + resultData[i]["movie_star1_id"] + "'>" + resultData[i]["movie_star1"] + "</a></li>" +
+            "<li><a href='single-star.html?id=" + resultData[i]["movie_star2_id"] + "'>" + resultData[i]["movie_star2"] + "</a></li>" +
+            "<li><a href='single-star.html?id=" + resultData[i]["movie_star3_id"] + "'>" + resultData[i]["movie_star3"] + "</a></li>" +
+            "</ul>" +
+            "</td>";
         rowHTML += "<td>" + resultData[i]["movie_rating"] + "</td>";
         rowHTML += "</tr>";
 
