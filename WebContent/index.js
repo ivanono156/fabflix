@@ -27,9 +27,10 @@ function handleStarResult(resultData) {
         let rowHTML = "";
         rowHTML += "<tr>";
         rowHTML +=
-            "<th>" +
-            // Add a link to single-star.html with id passed with GET url parameter
-            '<a href="single-star.html?id=' + resultData[i]['star_id'] + '">'
+            "<th>"
+            //
+            // gle-star.html with id passed with GET url parameter
+            '<a href="single-movie.html?id=' + resultData[i]['star_id'] + '">'
             + resultData[i]["star_name"] +     // display star_name for the link text
             '</a>' +
             "</th>";
