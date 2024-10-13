@@ -1,0 +1,25 @@
+h1 {
+    text-align: center;
+}
+
+h2 {
+    text-align: center;
+}
+
+h3 {
+    text-align: center;
+}
+
+p {
+    text-align: inherit;
+}
+
+/*body {
+    background-color: palegreen;
+    color: white;
+}
+
+table {
+    outline-style: ridge;
+    outline-color: black;
+}*/

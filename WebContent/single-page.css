@@ -1,0 +1,30 @@
+h1, h2, h3 {
+    color: ghostwhite;
+    text-align: center;
+}
+
+p {
+    color: ghostwhite;
+    text-align: inherit;
+}
+
+p.back-button {
+    text-align: left;
+    padding-left: 10px;
+}
+
+td, th {
+    color: ghostwhite;
+}
+
+body {
+    background-color: forestgreen;
+}
+
+a {
+    color: skyblue;
+}
+
+a:hover {
+    color: cornflowerblue;
+}
