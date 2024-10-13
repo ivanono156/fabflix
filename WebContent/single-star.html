@@ -16,15 +16,25 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
           integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 
+    <!-- Our CSS file -->
+    <link rel="stylesheet" href="single-page.css">
+
+    <!-- Icons from fontawesome.com -->
+    <script src="https://kit.fontawesome.com/8d5588e0cf.js" crossorigin="anonymous"></script>
+
     <title>Single Star</title>
 </head>
 <body>
-<h1>Fabflix - Single Star Page</h1>
-<h2><a href="movies.html">Back to Movies List</a></h2>
+
+<!-- H1 element for the star name -->
+<h1 id="star_name"></h1>
 
 <!-- H3 body is left empty here, will be populated with the data retrieved by single-star.js -->
 <!-- single-star.js will find this html element by its id "star_info" -->
 <h3 id="star_info"></h3>
+
+<!-- Jump back to the movie list page -->
+<p class="back-button"><a href="index.html"> <i class="fas fa-arrow-left"></i>Back to Movies List</a></p>
 
 <table id="movie_table" class="table table-striped">
     <thead>
