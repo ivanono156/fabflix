@@ -1,4 +1,5 @@
 import com.google.gson.JsonObject;
+import com.google.gson.JsonArray;
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -44,60 +45,62 @@ public class MovieListServlet extends HttpServlet {
         // Get a connection from the database
         try (Connection conn = dataSource.getConnection()) {
             // Construct query
-            String query = "select m.title, m.year, m.director, " +
-                    " select group_concat(g.name group by g.name limit 3) " +
-                    "from genres"
-                    + "join genres_in_movies ON genres.id = genres_in_movies.genre_id "
-                    + " where genres_in_movies.movieId = movies.id) as limit 3"
-                    +"group_concat(s.name group by s.name limit 3) as stars, r.rating"
-                    + "from movies m"
-                    + "join ratings r ON m.id = r.movieId"
-                    + "join genres_in_movies gim ON gim.id = m.genreId"
-                    + "join genre g ON g.id = gim.genreId"
-                    + "join stars_in_movies sim ON sim.movieId = m.id"
-                    + "join stars s ON s.id = sim.starId"
-                    + "group by m.title, m.year, m.director"
-                    + "order by r.rating desc " + "limit 20";
+
+            String query = "select m.id, m.title , m.year, m.director, " +
+                    "(select group_concat(distinct g.name order by g.name separator ', ') "
+                    +"from genres g "
+                    + "join genres_in_movies gim on g.id = gim.genreId "
+                    + " where gim.movieId = m.id "
+                    + "limit 3) " + "as genres, "
+                    +"(select group_concat(distinct name order by name separator ',' ) "
+                    + "from (select name "
+                    + "from stars s "
+                    + "join stars_in_movies sim on s.id = sim.starId "
+                    + "where sim.movieId = m.id "
+                    + "limit 3) as limited_stars) " + "as stars, "
+                    + "r.rating "
+                    + "from movies m "
+                    + "join ratings r on m.id = r.movieId "
+                    + "order by r.rating desc "
+                    + "limit 20;";
+
+
             // Declare statement
             try (PreparedStatement statement = conn.prepareStatement(query)){
 
                 // Perform the query
                 try (ResultSet rs = statement.executeQuery()) {
-                    JsonObject jsonObject = new JsonObject();
-                    JsonObject genres = new JsonObject();
-                    JsonObject stars = new JsonObject();
+                    //create array to hold the jsonObjects
+                    JsonArray jsonArray = new JsonArray();
 
                     // Iterate through each row of the result set
                     while (rs.next()) {
-                        // Get movie info
-                        String movieId = rs.getString("m.id");
-                        String movieTitle = rs.getString("m.title");
-                        String movieYear = rs.getString("m.year");
-                        String movieDirector = rs.getString("m.director");
-                        String movieRating = rs.getString("r.rating");
-                        // Get genre info
-                        String genreId = rs.getString("g.id");
-                        String genreName = rs.getString("g.name");
-                        // Get star info
-                        String starId = rs.getString("s.id");
-                        String starName = rs.getString("s.name");
+                        JsonObject jsonObject = new JsonObject();
+                        // Get info
+                        String movieId = rs.getString("id");
+                        String movieTitle = rs.getString("title");
+                        String movieYear = rs.getString("year");
+                        String movieDirector = rs.getString("director");
+                        String movieRating = rs.getString("rating");
+                        String movieGenres = rs.getString("genres");
+                        //String movieStarsId = rs.getString("Id");
+                        String movieStarsName = rs.getString("stars");
 
-                        jsonObject.addProperty("movie_id", movieId);
+                        //place the info into the json object
+                        jsonObject.addProperty("movies_id", movieId);
                         jsonObject.addProperty("movie_title", movieTitle);
                         jsonObject.addProperty("movie_year", movieYear);
                         jsonObject.addProperty("movie_director", movieDirector);
                         jsonObject.addProperty("movie_rating", movieRating);
-                        // Add genres to json object
-                        genres.addProperty(genreId, genreName);
-                        // Add stars to json object
-                        stars.addProperty(starId, starName);
+                        jsonObject.addProperty("movie_genres", movieGenres);
+                        //jsonObject.addProperty("movie_stars_id", movieStarsId);
+                        jsonObject.addProperty("movie_stars", movieStarsName);
+
+                        jsonArray.add(jsonObject);
                     }
 
-                    jsonObject.add("movie_genres", genres);
-                    jsonObject.add("movie_stars", stars);
-
                     // Write JSON string to output
-                    out.write(jsonObject.toString());
+                    out.write(jsonArray.toString());
                     // Set response status to 200 (OK)
                     response.setStatus(200);
                 }
