@@ -39,16 +39,21 @@ function getParameterByName(target) {
 function handleResult(resultData) {
 
     // Setting webpage title
-    document.title = "Fabflix - " + resultData["movie_title"];
+    document.title = resultData["movie_title"];
 
     console.log("handleResult: populating movie info from resultData");
+
+    // find the empty h1 body by id "movie_title"
+    let movieTitleElement = jQuery("#movie_title");
+
+    // add the movie title to the h1 element
+    movieTitleElement.append("<p>" + resultData["movie_title"] + "</p>");
 
     // find the empty h3 body by id "movie_info"
     let movieInfoElement = jQuery("#movie_info");
 
     // append two html <p> created to the h3 body, which will refresh the page
-    movieInfoElement.append("<p>Movie Title: " + resultData["movie_title"] + "</p>" +
-        "<p>Release Year: " + resultData["movie_year"] + "</p>" +
+    movieInfoElement.append("<p>Release Year: " + resultData["movie_year"] + "</p>" +
         "<p>Director: " + resultData["movie_director"] + "</p>" +
         "<p>Rating: " + resultData["movie_rating"] + "</p>");
 
