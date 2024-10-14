@@ -49,11 +49,11 @@ public class SingleMovieServlet extends HttpServlet {
             // Construct query
             String query = "select * " +
                     "from (((((movies as m " +
-                    "inner join stars_in_movies as sim on m.id = sim.movieId)" +
-                    "inner join stars as s on s.id = sim.starId)" +
-                    "inner join genres_in_movies as gim on gim.movieId = m.id)" +
-                    "inner join genres as g on gim.genreId = g.id)" +
-                    "inner join ratings as r on r.movieId = m.id)" +
+                    "inner join stars_in_movies as sim on m.id = sim.movieId) " +
+                    "inner join stars as s on s.id = sim.starId) " +
+                    "left join genres_in_movies as gim on gim.movieId = m.id) " +
+                    "left join genres as g on gim.genreId = g.id) " +
+                    "left join ratings as r on r.movieId = m.id) " +
                     "where m.id = ?";
 
             // Declare statement
