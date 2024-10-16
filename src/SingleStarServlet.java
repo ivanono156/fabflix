@@ -50,7 +50,8 @@ public class SingleStarServlet extends HttpServlet {
                 "from ((stars as s " +
                 "inner join stars_in_movies as sim on s.id = sim.starId) " +
                 "inner join movies as m on sim.movieId = m.id) " +
-                "where s.id = ?";
+                "where s.id = ? " +
+                "order by m.year desc, m.title";
 
         // Get a connection from dataSource and let resource manager close the connection after usage.
         try (Connection conn = dataSource.getConnection();
