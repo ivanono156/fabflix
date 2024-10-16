@@ -33,8 +33,20 @@
 <!-- single-movie.js will find this html element by its id "movie_info" -->
 <h3 id="movie_info"></h3>
 
-<!-- Jump back to the movie list page -->
-<p class="back-button"><a href="index.html"> <i class="fas fa-arrow-left"></i>Back to Movies List</a></p>
+<div>
+    <a href="shopping-cart.html" class="checkout-btn">Proceed to Checkout</a>
+</div>
+
+<div>
+    <!-- Jump back to the movie list page -->
+    <a href="index.html" class="back-btn">
+        <i class="fas fa-arrow-left"></i> Back to Movies List
+    </a>
+
+    <button type="button" id="add-to-cart" class="add-to-cart-btn">
+        Add to Shopping Cart <i class="fas fa-cart-plus"></i>
+    </button>
+</div>
 
 <table id="genres_table" class="table table-striped">
     <thead>
@@ -70,6 +82,8 @@
 <!-- Note the url does not contain a "/" in the beginning, which means the url is relative to current path
      otherwise the url is relative to the root path-->
 <script src="single-movie.js"></script>
+
+<script src="add-to-cart.js"></script>
 </body>
 
 </html>
