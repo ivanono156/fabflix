@@ -30,7 +30,7 @@ function handleMovieResult(resultData) {
         rowHTML += "<tr>";
 
         //add link the sing-movie page in the title column
-        rowHTML += "<td><a href='single-movie.html?id=" + resultData[i]["movies_id"]+ "'>" + resultData[i]["movie_title"] + "</a></td>";
+        rowHTML += "<td><a href='single-movie.html?id=" + resultData[i]["movies_id"] + "'>" + resultData[i]["movie_title"] + "</a></td>";
 
         //add link to star-star page in the star column
 
@@ -57,6 +57,10 @@ function handleMovieResult(resultData) {
             "</ul>" +
             "</td>";
         rowHTML += "<td>" + resultData[i]["movie_rating"] + "</td>";
+        rowHTML += "" +
+            "<td>" +
+            "<button type='button' id='add-to-cart' class='add-to-cart-btn'>Add to Cart</button>" +
+            "</td>";
         rowHTML += "</tr>";
 
         // Append the row created to the table body, which will refresh the page
