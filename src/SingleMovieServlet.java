@@ -47,14 +47,46 @@ public class SingleMovieServlet extends HttpServlet {
         // Get a connection from the database
         try (Connection conn = dataSource.getConnection()) {
             // Construct query
-            String query = "select * " +
+
+            String query1 = "select * " +
                     "from (((((movies as m " +
                     "inner join stars_in_movies as sim on m.id = sim.movieId) " +
                     "inner join stars as s on s.id = sim.starId) " +
                     "left join genres_in_movies as gim on gim.movieId = m.id) " +
                     "left join genres as g on gim.genreId = g.id) " +
                     "left join ratings as r on r.movieId = m.id) " +
-                    "where m.id = ?";
+                    "where m.id = ? " +
+                    "order by g.name";
+
+            String starsByMoviesPlayedQuery = "select s.id, s.name, count(s.id) as moviesPlayed " +
+                    "from stars as s inner join stars_in_movies as sim on s.id = sim.starId " +
+                    "group by (s.id) " +
+                    "order by moviesPlayed desc, s.name";
+
+            String genresInMovieQuery = "select g.id, g.name, m.id " +
+                    "from genres as g inner join genres_in_movies as gim on g.id = gim.genreId " +
+                    "inner join movies as m on gim.movieId = m.id " +
+                    "where m.id = ?" +
+                    "order by g.name";
+
+            String query = "select m.id, m.title, m.year, m.director, r.rating, " +
+                    "g.id, g.name, smp.id, smp.name, smp.moviesPlayed " +
+                    "from movies as m inner join stars_in_movies as sim on m.id = sim.movieId " +
+
+                    // Find how many movies each star played in (starMoviesPlayed as smp)
+                    "inner join (select s.id, s.name, count(s.id) as moviesPlayed " +
+                    "from stars as s inner join stars_in_movies as sim on s.id = sim.starId " +
+                    "group by (s.id)) as smp on sim.starId = smp.id " +
+
+                    // Find the genres in the movie
+                    "inner join genres_in_movies as gim on gim.movieId = m.id " +
+                    "inner join genres as g on g.id = gim.genreId " +
+
+                    // Find ratings for the movie
+                    "left join ratings as r on r.movieId = m.id " +
+                    "where m.id = ? " +
+                    "order by g.name, moviesPlayed desc, smp.name";
+
 
             // Declare statement
             try (PreparedStatement statement = conn.prepareStatement(query)) {
@@ -79,8 +111,8 @@ public class SingleMovieServlet extends HttpServlet {
                         String genreId = rs.getString("g.id");
                         String genreName = rs.getString("g.name");
                         // Get star info
-                        String starId = rs.getString("s.id");
-                        String starName = rs.getString("s.name");
+                        String starId = rs.getString("smp.id");
+                        String starName = rs.getString("smp.name");
 
                         jsonObject.addProperty("movie_id", movieId);
                         jsonObject.addProperty("movie_title", movieTitle);
