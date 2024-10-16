@@ -45,62 +45,49 @@ public class LoginServlet extends HttpServlet {
 
             JsonObject responseJsonObject = new JsonObject();
 
-            boolean success = false;
+            boolean success;
             String message;
+
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     // Email account is found; retrieve its associated password
                     String foundPassword = rs.getString("password");
 
                     if (foundPassword.equals(password)) {
-                        // Login success - Set this user into the session
+                        success = true;
+                        message = "success";
+                        // Set this user into the session
                         request.getSession().setAttribute("user", new User(email));
-
-                        responseJsonObject.addProperty("status", "success");
-                        responseJsonObject.addProperty("message", "success");
                     } else {
-                        // Login fail - password was incorrect
-
-                        responseJsonObject.addProperty("status", "fail");
-                        // Log to localhost log
-                        request.getServletContext().log("Login failed");
-                        responseJsonObject.addProperty("message", "incorrect password");
+                        success = false;
+                        message = "incorrect password";
                     }
-
                 } else {
-                    // Login fail - email was not found
+                    success = false;
+                    message = "email " + email + " not found";
+                }
+
+                if (success) {
+                    responseJsonObject.addProperty("status", "success");
+                    responseJsonObject.addProperty("message", message);
+                } else {
                     responseJsonObject.addProperty("status", "fail");
+                    responseJsonObject.addProperty("message", message);
                     // Log to localhost log
                     request.getServletContext().log("Login failed");
-
-                    responseJsonObject.addProperty("message", "email " + email + " doesn't exist");
                 }
-//
-//                if (success) {
-//                    // Login success
-//                } else {
-//                    // Login fail
-//                    responseJsonObject.addProperty("status", "fail");
-//                    // Log to localhost log
-//                    request.getServletContext().log("Login failed");
-//
-//                    responseJsonObject.addProperty("message", message);
-//                }
             }
+
             out.write(responseJsonObject.toString());
         } catch (Exception e) {
-            // Write error message JSON object to output
             JsonObject jsonObject = new JsonObject();
             jsonObject.addProperty("errorMessage", e.getMessage());
             out.write(jsonObject.toString());
 
-            // Log error to localhost log
             request.getServletContext().log("Error:", e);
-            // Set response status to 500 (Internal Server Error)
             response.setStatus(500);
         } finally {
             out.close();
         }
-
     }
 }
