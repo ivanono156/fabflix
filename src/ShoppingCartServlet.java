@@ -15,26 +15,30 @@ import java.util.Random;
 public class ShoppingCartServlet extends HttpServlet {
     private final String shoppingCartAttributeName = "cart_items";
 
-    // Handles GET requests to store session information
+    // Handles GET requests to display session information
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setContentType("application/json");
+
         HttpSession session = request.getSession();
 
-        ArrayList<CartItem> cartItems = (ArrayList<CartItem>) session.getAttribute(shoppingCartAttributeName);
-        if (cartItems == null) {
-            cartItems = new ArrayList<>();
+        ArrayList<CartItem> cart = (ArrayList<CartItem>) session.getAttribute(shoppingCartAttributeName);
+        if (cart == null) {
+            cart = new ArrayList<>();
         }
 
         // Log to localhost log
-        request.getServletContext().log("getting " + cartItems.size() + " items");
+        request.getServletContext().log("getting " + cart.size() + " items");
 
-        JsonObject responseJsonObject = createResponseJsonObject(cartItems);
+        JsonObject responseJsonObject = createResponseJsonObject(cart);
 
         // write all the data into the jsonObject
         response.getWriter().write(responseJsonObject.toString());
     }
 
-    // Handles POST requests to add items to the cart
+    // Handles POST requests to add items to the cart + returns session information
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setContentType("application/json");
+
         HttpSession session = request.getSession();
 
         String movieId = request.getParameter("id");
@@ -50,30 +54,30 @@ public class ShoppingCartServlet extends HttpServlet {
 
         CartItem newItem = new CartItem(movieId, movieTitle, movieQuantity, moviePrice, totalPrice);
 
-        ArrayList<CartItem> cartItems = (ArrayList<CartItem>) session.getAttribute(shoppingCartAttributeName);
-        if (cartItems == null) {
-            cartItems = new ArrayList<>();
-            addItemToCart(newItem, cartItems);
-            session.setAttribute(shoppingCartAttributeName, cartItems);
+        ArrayList<CartItem> cart = (ArrayList<CartItem>) session.getAttribute(shoppingCartAttributeName);
+        if (cart == null) {
+            cart = new ArrayList<>();
+            addItemToCart(newItem, cart);
+            session.setAttribute(shoppingCartAttributeName, cart);
         } else {
             // prevent corrupted states through sharing under multi-threads
             // will only be executed by one thread at a time
-            synchronized (cartItems) {
-                addItemToCart(newItem, cartItems);
+            synchronized (cart) {
+                addItemToCart(newItem, cart);
             }
         }
 
-        JsonObject responseJsonObject = createResponseJsonObject(cartItems);
+        JsonObject responseJsonObject = createResponseJsonObject(cart);
 
         response.getWriter().write(responseJsonObject.toString());
     }
 
     // Create a response json object and add the cart items to the json object
-    private JsonObject createResponseJsonObject(ArrayList<CartItem> cartItems) {
+    private JsonObject createResponseJsonObject(ArrayList<CartItem> cart) {
         JsonObject responseJsonObject = new JsonObject();
         JsonArray cartItemsJsonArray = new JsonArray();
 
-        for (CartItem item : cartItems) {
+        for (CartItem item : cart) {
             JsonObject itemJsonObject = new JsonObject();
             itemJsonObject.addProperty("movie_id", item.movieId);
             itemJsonObject.addProperty("movie_title", item.movieTitle);
@@ -85,23 +89,32 @@ public class ShoppingCartServlet extends HttpServlet {
         }
 
         responseJsonObject.add(shoppingCartAttributeName, cartItemsJsonArray);
+        responseJsonObject.addProperty("total_cart_price", getTotalPriceOfCart(cart));
+
         return responseJsonObject;
     }
 
-    private void addItemToCart(CartItem cartItem, ArrayList<CartItem> cartItems) {
-        Optional<CartItem> foundItem = cartItems.stream()
+    private void addItemToCart(CartItem cartItem, ArrayList<CartItem> cart) {
+        Optional<CartItem> foundItem = cart.stream()
                 .filter(item -> item.movieId.equals(cartItem.movieId))
                 .findFirst();
         if (foundItem.isPresent()) {
             foundItem.get().quantity += cartItem.quantity;
             foundItem.get().totalPrice = getTotalPriceOfItem(foundItem.get().quantity, foundItem.get().price);
         } else {
-            cartItems.add(cartItem);
+            cart.add(cartItem);
         }
     }
 
     private double getTotalPriceOfItem(int quantity, double price) {
         return (double) Math.round(quantity * price * 100) / 100;
+    }
+
+    private double getTotalPriceOfCart(ArrayList<CartItem> cart) {
+        double totalCartPrice = cart.stream()
+                .mapToDouble(item -> item.totalPrice)
+                .sum();
+        return (double) Math.round(totalCartPrice * 100) / 100;
     }
 
     static class CartItem {

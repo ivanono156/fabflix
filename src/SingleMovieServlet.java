@@ -15,11 +15,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-// Declaring a web servlet called SingleMovieServlet, which maps to url "/api/single-movie"
 @WebServlet(name = "SingleMovieServlet", urlPatterns = "/api/single-movie")
 public class SingleMovieServlet extends HttpServlet {
 
-    // Create a data source register in web.xml
     private DataSource dataSource;
 
     public void init(ServletConfig config) {
@@ -30,10 +28,6 @@ public class SingleMovieServlet extends HttpServlet {
         }
     }
 
-    /**
-     * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
-     * response)
-     */
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         // Response MIME type
         response.setContentType("application/json");

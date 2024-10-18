@@ -15,12 +15,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-// Declaring a WebServlet called SingleStarServlet, which maps to url "/api/single-star"
 @WebServlet(name = "SingleStarServlet", urlPatterns = "/api/single-star")
 public class SingleStarServlet extends HttpServlet {
     private static final long serialVersionUID = 2L;
 
-    // Create a dataSource which registered in web.xml
     private DataSource dataSource;
 
     public void init(ServletConfig config) {
@@ -31,10 +29,6 @@ public class SingleStarServlet extends HttpServlet {
         }
     }
 
-    /**
-     * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
-     * response)
-     */
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         // Response MIME type
         response.setContentType("application/json");

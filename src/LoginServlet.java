@@ -27,10 +27,9 @@ public class LoginServlet extends HttpServlet {
         }
     }
 
-    /**
-     * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-     */
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setContentType("application/json");
+
         String email = request.getParameter("email");
         String password = request.getParameter("password");
 
@@ -73,7 +72,6 @@ public class LoginServlet extends HttpServlet {
                 } else {
                     responseJsonObject.addProperty("status", "fail");
                     responseJsonObject.addProperty("message", message);
-                    // Log to localhost log
                     request.getServletContext().log("Login failed");
                 }
             }
