@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.Random;
 
 @WebServlet(name = "ShoppingCartServlet", urlPatterns = "/api/shopping-cart")
@@ -52,13 +53,13 @@ public class ShoppingCartServlet extends HttpServlet {
         ArrayList<CartItem> cartItems = (ArrayList<CartItem>) session.getAttribute(shoppingCartAttributeName);
         if (cartItems == null) {
             cartItems = new ArrayList<>();
-            cartItems.add(newItem);
+            addItemToCart(newItem, cartItems);
             session.setAttribute(shoppingCartAttributeName, cartItems);
         } else {
             // prevent corrupted states through sharing under multi-threads
             // will only be executed by one thread at a time
             synchronized (cartItems) {
-                cartItems.add(newItem);
+                addItemToCart(newItem, cartItems);
             }
         }
 
@@ -87,12 +88,23 @@ public class ShoppingCartServlet extends HttpServlet {
         return responseJsonObject;
     }
 
+    private void addItemToCart(CartItem cartItem, ArrayList<CartItem> cartItems) {
+        Optional<CartItem> foundItem = cartItems.stream()
+                .filter(item -> item.movieId.equals(cartItem.movieId))
+                .findFirst();
+        if (foundItem.isPresent()) {
+            foundItem.get().quantity += cartItem.quantity;
+        } else {
+            cartItems.add(cartItem);
+        }
+    }
+
     static class CartItem {
         private final String movieId;
         private final String movieTitle;
-        private final int quantity;
+        private int quantity;
         private final double price;
-        private final double totalPrice;
+        private double totalPrice;
 
         public CartItem(String movieId, String movieTitle, int quantity, double price, double totalPrice) {
             this.movieId = movieId;
