@@ -101,6 +101,12 @@ function handleResult(resultData) {
         starTableBodyElement.append(rowHTML);
     }
 
+    let movieDetailsDivElement = $("#movie-details");
+    movieDetailsDivElement.append("" +
+        "<input type='hidden' id='movie-id' name='id' value='" + resultData["movie_id"] + "'>" +
+        "<input type='hidden' id='movie-title' name='title' value='" + resultData["movie_title"] + "'>");
+        // FIXME: Include the movie's price
+
 }
 
 /**
