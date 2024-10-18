@@ -44,7 +44,7 @@ public class ShoppingCartServlet extends HttpServlet {
         Random rand = new Random();
         double min = 15.0;
         double max = 25.0;
-        double moviePrice = (min + (max - min) * rand.nextDouble()) * 100 / 100;
+        double moviePrice = (double) Math.round((min + (max - min) * rand.nextDouble()) * 100) / 100;
         double totalPrice = (double) Math.round(movieQuantity * moviePrice * 100) / 100;
 
         CartItem newItem = new CartItem(movieId, movieTitle, movieQuantity, moviePrice, totalPrice);
