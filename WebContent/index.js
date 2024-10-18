@@ -30,21 +30,8 @@ function handleMovieResult(resultData) {
         rowHTML += "<tr>";
 
         //add link the sing-movie page in the title column
-        rowHTML += "<td><a href='single-movie.html?id=" + resultData[i]["movies_id"] + "'>" + resultData[i]["movie_title"] + "</a></td>";
+        rowHTML += "<td><a href='single-movie.html?id=" + resultData[i]["movie_id"] + "'>" + resultData[i]["movie_title"] + "</a></td>";
 
-        //add link to star-star page in the star column
-
-
-        /*
-        rowHTML +=
-            "<th>"
-            //
-            // gle-star.html with id passed with GET url parameter
-            '<a href="single-movie.html?id=' + resultData[i]['star_id'] + '">'
-            + resultData[i]["star_name"] +     // display star_name for the link text
-            '</a>' +
-            "</th>";
-         */
         //adding in the rest of the column data
         rowHTML += "<td>" + resultData[i]["movie_year"] + "</td>";
         rowHTML += "<td>" + resultData[i]["movie_director"] + "</td>";
@@ -59,8 +46,12 @@ function handleMovieResult(resultData) {
         rowHTML += "<td>" + resultData[i]["movie_rating"] + "</td>";
         rowHTML += "" +
             "<td>" +
-            "<button type='button' id='add-to-cart' class='add-to-cart-btn'>Add to Cart</button>" +
-            "</td>";
+            "<form action='api/shopping-cart' target='_self' method='post' class='add-to-cart-btn'>" +
+                "<input type='hidden' id='movie-id' name='id' value='" + resultData[i]["movie_id"] + "'>" +
+                "<input type='hidden' id='movie-title' name='title' value='" + resultData[i]["movie_title"] + "'>" +
+                "<input type='submit' VALUE='Add to Cart'>" +
+            "</form>" +
+        "</td>";
         rowHTML += "</tr>";
 
         // Append the row created to the table body, which will refresh the page

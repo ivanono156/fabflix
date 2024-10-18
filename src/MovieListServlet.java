@@ -123,7 +123,7 @@ public class MovieListServlet extends HttpServlet {
                         String movieStarId3 = rs.getString("star3Id");
 
                         //place the info into the json object
-                        jsonObject.addProperty("movies_id", movieId);
+                        jsonObject.addProperty("movie_id", movieId);
                         jsonObject.addProperty("movie_title", movieTitle);
                         jsonObject.addProperty("movie_year", movieYear);
                         jsonObject.addProperty("movie_director", movieDirector);

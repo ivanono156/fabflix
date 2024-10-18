@@ -8,11 +8,6 @@ p {
     text-align: inherit;
 }
 
-p.back-button {
-    text-align: left;
-    padding-left: 10px;
-}
-
 td, th {
     color: ghostwhite;
 }
@@ -27,4 +22,24 @@ a {
 
 a:hover {
     color: cornflowerblue;
+}
+
+.back-btn {
+    text-align: left;
+    padding-left: 10px;
+    float: left;
+}
+
+.add-to-cart-btn {
+    background-color: white;
+    float: right;
+}
+
+.add-to-cart-btn:hover {
+    background-color: lightgrey;
+}
+
+.checkout-btn {
+    background-color: white;
+    color: black;
 }
