@@ -46,7 +46,7 @@ public class ShoppingCartServlet extends HttpServlet {
         double min = 15.0;
         double max = 25.0;
         double moviePrice = (double) Math.round((min + (max - min) * rand.nextDouble()) * 100) / 100;
-        double totalPrice = (double) Math.round(movieQuantity * moviePrice * 100) / 100;
+        double totalPrice = getTotalPriceOfItem(movieQuantity, moviePrice);
 
         CartItem newItem = new CartItem(movieId, movieTitle, movieQuantity, moviePrice, totalPrice);
 
@@ -94,9 +94,14 @@ public class ShoppingCartServlet extends HttpServlet {
                 .findFirst();
         if (foundItem.isPresent()) {
             foundItem.get().quantity += cartItem.quantity;
+            foundItem.get().totalPrice = getTotalPriceOfItem(foundItem.get().quantity, foundItem.get().price);
         } else {
             cartItems.add(cartItem);
         }
+    }
+
+    private double getTotalPriceOfItem(int quantity, double price) {
+        return (double) Math.round(quantity * price * 100) / 100;
     }
 
     static class CartItem {
