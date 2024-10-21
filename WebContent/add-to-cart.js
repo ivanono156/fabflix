@@ -5,16 +5,22 @@ function handleCartArray(resultData) {
     console.log(resultData);
 }
 
+function handleError() {
+    console.log("could not add movie to cart");
+}
+
 function addMovieToCart(submitEvent) {
     console.log("adding movie to cart");
 
     submitEvent.preventDefault();
 
     jQuery.ajax({
-        url: "api/shopping-cart",
+        dataType: "json",
         method: "POST",
+        url: "api/shopping-cart",
         data: addToCartBtn.serialize(),
-        success: (resultData) => handleCartArray(resultData)
+        success: (resultData) => handleCartArray(resultData),
+        error: handleError
     });
 }
 

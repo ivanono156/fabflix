@@ -43,9 +43,8 @@ public class ShoppingCartServlet extends HttpServlet {
 
         String movieId = request.getParameter("id");
         String movieTitle = request.getParameter("title");
-//        int movieQuantity = Integer.parseInt(request.getParameter("quantity"));
+        int movieQuantity = Integer.parseInt(request.getParameter("quantity"));
 //        double moviePrice = Double.parseDouble(request.getParameter("price"));
-        int movieQuantity = 1;
         Random rand = new Random();
         double min = 15.0;
         double max = 25.0;
@@ -57,13 +56,13 @@ public class ShoppingCartServlet extends HttpServlet {
         ArrayList<CartItem> cart = (ArrayList<CartItem>) session.getAttribute(shoppingCartAttributeName);
         if (cart == null) {
             cart = new ArrayList<>();
-            addItemToCart(newItem, cart);
+            editCart(newItem, cart);
             session.setAttribute(shoppingCartAttributeName, cart);
         } else {
             // prevent corrupted states through sharing under multi-threads
             // will only be executed by one thread at a time
             synchronized (cart) {
-                addItemToCart(newItem, cart);
+                editCart(newItem, cart);
             }
         }
 
@@ -94,15 +93,35 @@ public class ShoppingCartServlet extends HttpServlet {
         return responseJsonObject;
     }
 
-    private void addItemToCart(CartItem cartItem, ArrayList<CartItem> cart) {
+    private void editCart(CartItem newItem, ArrayList<CartItem> cart) throws IllegalArgumentException {
         Optional<CartItem> foundItem = cart.stream()
-                .filter(item -> item.movieId.equals(cartItem.movieId))
+                .filter(item -> item.movieId.equals(newItem.movieId))
                 .findFirst();
+
         if (foundItem.isPresent()) {
-            foundItem.get().quantity += cartItem.quantity;
+            // quantity will either be '1' for increase, '-1' for decrease, or '0' for remove/delete
+            switch (newItem.quantity) {
+                case -1:
+                    foundItem.get().quantity -= 1;
+                    break;
+                case 0:
+                    foundItem.get().quantity = 0;
+                    break;
+                case 1:
+                    foundItem.get().quantity += 1;
+                    break;
+                default:
+                    throw new IllegalArgumentException("Shopping Cart Servlet: Invalid quantity");
+            }
+
+            if (foundItem.get().quantity <= 0) {
+                cart.remove(foundItem.get());
+                return;
+            }
             foundItem.get().totalPrice = getTotalPriceOfItem(foundItem.get().quantity, foundItem.get().price);
         } else {
-            cart.add(cartItem);
+            // New item
+            cart.add(newItem);
         }
     }
 
