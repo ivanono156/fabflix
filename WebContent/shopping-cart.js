@@ -1,3 +1,8 @@
+const priceFormatter = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD"
+})
+
 function updateCart(submitEvent) {
     console.log("updating shopping cart");
 
@@ -22,10 +27,8 @@ function createButton(movieData, value) {
 
     return "<form action='#' method='post' class='add-to-cart-btn'>" +
                 "<input type='hidden' name='id' value='" + movieData["movie_id"] + "'>" +
-                "<input type='hidden' name='title' value='" + movieData["movie_title"] + "'>" +
                 // check ShoppingCartServlet.java for quantity values
                 "<input type='hidden' name='quantity' value='" + value + "'>" +
-                // FIXME: include movie's price "<input type='hidden' name='price' value='" + movieData["movie_price"] + "'>" +
                 "<input type='submit' value='" + buttonText + "'>" +
             "</form>";
 }
@@ -36,7 +39,7 @@ function handleSessionData(resultData) {
 
     fillShoppingCart(resultData["cart_items"]);
 
-    $("#total-cart-price").text("Total price: " + resultData["total_cart_price"]);
+    $("#total-cart-price").text("Total price: " + priceFormatter.format(resultData["total_cart_price"]));
 }
 
 function fillShoppingCart(resultDataArray) {
@@ -57,8 +60,8 @@ function fillShoppingCart(resultDataArray) {
             resultDataArray[i]["movie_quantity"] +
             createButton(resultDataArray[i], 1) +
             "</td>";
-        rowHTML += "<td>" + resultDataArray[i]["movie_price"] + "</td>";
-        rowHTML += "<td>" + resultDataArray[i]["total_price"] + "</td>";
+        rowHTML += "<td>" + priceFormatter.format(resultDataArray[i]["movie_price"]) + "</td>";
+        rowHTML += "<td>" + priceFormatter.format(resultDataArray[i]["total_price"]) + "</td>";
         rowHTML += "" +
             "<td>" +
             createButton(resultDataArray[i], 0) +

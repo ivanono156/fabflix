@@ -10,7 +10,7 @@
  */
 
 
-/**
+/*
  * Retrieve parameter from request URL, matching by parameter name
  * @param target String
  * @returns {*}
@@ -104,10 +104,8 @@ function handleResult(resultData) {
     let movieDetailsDivElement = $("#movie-details");
     movieDetailsDivElement.append("" +
         "<input type='hidden' name='id' value='" + resultData["movie_id"] + "'>" +
-        "<input type='hidden' name='title' value='" + resultData["movie_title"] + "'>" +
         // value of 1 means to increment quantity (per ShoppingCartServlet.java)
         "<input type='hidden' name='quantity' value='1'>");
-        // FIXME: Include the movie's price "<input type='hidden' name='price' value='" + resultData["movie_price"] + "'>"
 }
 
 /**

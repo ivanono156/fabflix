@@ -29,7 +29,7 @@ function addToCart(submitEvent) {
         method: "POST",
         url: "api/shopping-cart",
         data: $(this).serialize(),
-        success: (resultData) => handleSessionData(resultData),
+        success: (resultData) => handleAddToCartResult(resultData),
     });
 }
 
@@ -68,10 +68,8 @@ function handleMovieResult(resultData) {
             "<td>" +
             "<form action='#' method='post' class='add-to-cart-btn'>" +
                 "<input type='hidden' name='id' value='" + resultData[i]["movie_id"] + "'>" +
-                "<input type='hidden' name='title' value='" + resultData[i]["movie_title"] + "'>" +
                 // value of 1 means to increment quantity (per ShoppingCartServlet.java)
                 "<input type='hidden' name='quantity' value='1'>" +
-                // FIXME: include movie's price "<input type='hidden' name='price' value='" + resultData[i]["movie_price"] + "'>" +
                 "<input type='submit' VALUE='Add to Cart'>" +
             "</form>" +
         "</td>";

@@ -1,9 +1,14 @@
 let paymentForm = $("#payment-form");
 
+const priceFormatter = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD"
+})
+
 function getCartInfo(resultData) {
     console.log("retrieving cart info");
 
-    $("#total-cart-price").text("Total price: " + resultData["total_cart_price"]);
+    $("#total-cart-price").text("Total price: " + priceFormatter.format(resultData["total_cart_price"]));
 }
 
 function handlePayment(resultData) {
