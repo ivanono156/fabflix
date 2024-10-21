@@ -4,6 +4,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -14,6 +15,8 @@ import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.time.LocalDate;
+import java.util.ArrayList;
 
 @WebServlet(name = "PaymentServlet", urlPatterns = "/api/payment")
 public class PaymentServlet extends HttpServlet {
@@ -45,7 +48,7 @@ public class PaymentServlet extends HttpServlet {
 
             statement.setString(1, creditCardNumber);
 
-            boolean success;
+            boolean success = false;
 
             try (ResultSet rs = statement.executeQuery()) {
                 if (rs.next()) {
@@ -56,9 +59,37 @@ public class PaymentServlet extends HttpServlet {
                     success = cardFirstName.equals(firstName)
                             && cardLastName.equals(lastName)
                             && cardExpirationDate.equals(expirationDate);
-                } else {
-                    success = false;
                 }
+            }
+
+            int updatedRows = 0;
+            if (success) {
+                // Get shopping cart from session
+                HttpSession session = request.getSession();
+                ArrayList<ShoppingCartServlet.CartItem> cart =
+                        (ArrayList<ShoppingCartServlet.CartItem>) session.getAttribute(ShoppingCartServlet.shoppingCartAttributeName);
+
+                String insertQuery = "insert into sales (customerId, movieId, saleDate) " +
+                        "select c.id, ?, ?" +
+                        "from customers as c inner join creditcards as cc on c.ccid = cc.id " +
+                        "where cc.id = ?";
+
+                try (PreparedStatement insertStatement = conn.prepareStatement(insertQuery)) {
+                    for (ShoppingCartServlet.CartItem item : cart) {
+                        // Add sale to database
+                        String movieId = item.getMovieId();
+                        // FIXME: might wanna make a column in sales table that holds the quantity of each movie/sale?
+                        Date saleDate = Date.valueOf(LocalDate.now());
+
+                        insertStatement.setString(1, movieId);
+                        insertStatement.setDate(2, saleDate);
+                        insertStatement.setString(3, creditCardNumber);
+                        updatedRows += insertStatement.executeUpdate();
+                    }
+                }
+
+                // Clear the cart after purchase is completed
+                cart.clear();
             }
 
             String status = success ? "success" : "fail";
@@ -67,8 +98,9 @@ public class PaymentServlet extends HttpServlet {
             JsonObject responseJsonObject = new JsonObject();
             responseJsonObject.addProperty("status", status);
             responseJsonObject.addProperty("message", message);
+            responseJsonObject.addProperty("updated_rows", updatedRows);
 
-            if (!success) request.getServletContext().log("Login failed");
+            if (!success) request.getServletContext().log("Payment failed");
 
             out.write(responseJsonObject.toString());
         } catch (Exception e) {

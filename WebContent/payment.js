@@ -10,12 +10,11 @@ function handlePayment(resultData) {
     console.log("handle payment response");
 
     if (resultData["status"] === "success") {
-        console.log("payment received successfully. enjoy your non-existent prize.");
+        console.log("payment received successfully");
         $("#error-message").text("");
         window.location.replace("order-confirmation.html");
-        // show confirmation page
     } else {
-        console.log("fraud ? question mark ?");
+        console.log("payment was not received");
         console.log(resultData["message"]);
         $("#error-message").text(resultData["message"]);
     }
