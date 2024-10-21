@@ -13,6 +13,26 @@
  * Handles the data returned by the API, read the jsonObject and populate data into html elements
  * @param resultData jsonObject
  */
+
+function handleAddToCartResult(resultData) {
+    console.log("Added movie to cart successfully");
+    console.log(resultData);
+}
+
+function addToCart(submitEvent) {
+    console.log("adding movie to shopping cart");
+
+    submitEvent.preventDefault();
+
+    jQuery.ajax({
+        dataType: "json",
+        method: "POST",
+        url: "api/shopping-cart",
+        data: $(this).serialize(),
+        success: (resultData) => handleSessionData(resultData),
+    });
+}
+
 function handleMovieResult(resultData) {
     console.log("handleMovieResult: populating movie table from resultData");
 
@@ -46,7 +66,7 @@ function handleMovieResult(resultData) {
         rowHTML += "<td>" + resultData[i]["movie_rating"] + "</td>";
         rowHTML += "" +
             "<td>" +
-            "<form action='api/shopping-cart' target='_self' method='post' class='add-to-cart-btn'>" +
+            "<form action='#' method='post' class='add-to-cart-btn'>" +
                 "<input type='hidden' name='id' value='" + resultData[i]["movie_id"] + "'>" +
                 "<input type='hidden' name='title' value='" + resultData[i]["movie_title"] + "'>" +
                 // value of 1 means to increment quantity (per ShoppingCartServlet.java)
@@ -60,6 +80,9 @@ function handleMovieResult(resultData) {
         // Append the row created to the table body, which will refresh the page
         movieTableBodyElement.append(rowHTML);
     }
+
+    // Bind add to cart function to all add to cart buttons
+    $(".add-to-cart-btn").submit(addToCart);
 }
 
 
