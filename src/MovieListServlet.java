@@ -46,13 +46,50 @@ public class MovieListServlet extends HttpServlet {
         try (Connection conn = dataSource.getConnection()) {
             // Construct query
 
-            String query = "select m.id, m.title , m.year, m.director, " +
-                    //grouping the 3 genres into one genre column
-                    "(select group_concat(distinct g.name order by g.name separator ', ') "
-                    +"from genres g "
+            String query = "select m.id, m.title , m.year, m.director, "
+
+                    //Selecting the first genre name
+                    + "(select g.name "
+                    + "from genres g "
                     + "join genres_in_movies gim on g.id = gim.genreId "
-                    + " where gim.movieId = m.id "
-                    + "limit 3) as genres, "
+                    + "where gim.movieId = m.id "
+                    + "limit 1 offset 0) as genre1, "
+
+                    //Selecting the second genre name
+                    + "(select g.name "
+                    + "from genres g "
+                    + "join genres_in_movies gim on g.id = gim.genreId "
+                    + "where gim.movieId = m.id "
+                    + "limit 1 offset 1) as genre2, "
+
+                    //Selecting the third genre name
+                    + "(select g.name "
+                    + "from genres g "
+                    + "join genres_in_movies gim on g.id = gim.genreId "
+                    + "where gim.movieId = m.id "
+                    + "limit 1 offset 2) as genre3, "
+
+                    //Selecting the first genre id
+                    + "(select g.id "
+                    + "from genres g "
+                    + "join genres_in_movies gim on g.id = gim.genreId "
+                    + "where gim.movieId = m.id "
+                    + "limit 1 offset 0) as genre1Id, "
+
+                    //Selecting the second genre id
+                    + "(select g.id "
+                    + "from genres g "
+                    + "join genres_in_movies gim on g.id = gim.genreId "
+                    + "where gim.movieId = m.id "
+                    + "limit 1 offset 1) as genre2Id, "
+
+                    //Selecting the third genre id
+                    + "(select g.id "
+                    + "from genres g "
+                    + "join genres_in_movies gim on g.id = gim.genreId "
+                    + "where gim.movieId = m.id "
+                    + "limit 1 offset 2) as genre3Id, "
+
 
                     +"(select s.name " // getting star1
                     + "from stars s "
@@ -76,7 +113,7 @@ public class MovieListServlet extends HttpServlet {
                     + "from stars s "
                     + "join stars_in_movies sim on s.id = sim.starId "
                     + "where sim.movieId = m.id "
-                    + "limit 1 offset 0) as star2Id, "
+                    + "limit 1 offset 1) as star2Id, "
 
                     +"(select s.name " // star 3
                     + "from stars s "
@@ -88,7 +125,7 @@ public class MovieListServlet extends HttpServlet {
                     + "from stars s "
                     + "join stars_in_movies sim on s.id = sim.starId "
                     + "where sim.movieId = m.id "
-                    + "limit 1 offset 0) as star3Id, "
+                    + "limit 1 offset 2) as star3Id, "
 
                     + "r.rating "
                     + "from movies m "
@@ -113,7 +150,7 @@ public class MovieListServlet extends HttpServlet {
                         String movieYear = rs.getString("year");
                         String movieDirector = rs.getString("director");
                         String movieRating = rs.getString("rating");
-                        String movieGenres = rs.getString("genres");
+                        //String movieGenres = rs.getString("genres");
                         //String movieStarsId = rs.getString("Id");
                         String movieStarName1 = rs.getString("star1");
                         String movieStarName2 = rs.getString("star2");
@@ -122,13 +159,20 @@ public class MovieListServlet extends HttpServlet {
                         String movieStarId2 = rs.getString("star2Id");
                         String movieStarId3 = rs.getString("star3Id");
 
+                        String movieGenreName1 = rs.getString("genre1");
+                        String movieGenreName2 = rs.getString("genre2");
+                        String movieGenreName3 = rs.getString("genre3");
+                        String movieGenreId1 = rs.getString("genre1Id");
+                        String movieGenreId2 = rs.getString("genre2Id");
+                        String movieGenreId3 = rs.getString("genre3Id");
+
                         //place the info into the json object
                         jsonObject.addProperty("movie_id", movieId);
                         jsonObject.addProperty("movie_title", movieTitle);
                         jsonObject.addProperty("movie_year", movieYear);
                         jsonObject.addProperty("movie_director", movieDirector);
                         jsonObject.addProperty("movie_rating", movieRating);
-                        jsonObject.addProperty("movie_genres", movieGenres);
+                        //jsonObject.addProperty("movie_genres", movieGenres);
                         //jsonObject.addProperty("movie_stars_id", movieStarsId);
                         jsonObject.addProperty("movie_star1", movieStarName1);
                         jsonObject.addProperty("movie_star2", movieStarName2);
@@ -136,6 +180,13 @@ public class MovieListServlet extends HttpServlet {
                         jsonObject.addProperty("movie_star1_id", movieStarId1);
                         jsonObject.addProperty("movie_star2_id", movieStarId2);
                         jsonObject.addProperty("movie_star3_id", movieStarId3);
+
+                        jsonObject.addProperty("movie_genre_name1", movieGenreName1);
+                        jsonObject.addProperty("movie_genre_name2", movieGenreName2);
+                        jsonObject.addProperty("movie_genre_name3", movieGenreName3);
+                        jsonObject.addProperty("movie_genre_id1", movieGenreId1);
+                        jsonObject.addProperty("movie_genre_id2", movieGenreId2);
+                        jsonObject.addProperty("movie_genre_id3", movieGenreId3);
 
                         jsonArray.add(jsonObject);
                     }
