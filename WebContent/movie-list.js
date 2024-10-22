@@ -48,7 +48,10 @@ function handleMovieResult(resultData) {
         //adding in the rest of the column data
         rowHTML += "<td>" + resultData[i]["movie_year"] + "</td>";
         rowHTML += "<td>" + resultData[i]["movie_director"] + "</td>";
-        rowHTML += "<td>" + resultData[i]["movie_genres"] + "</td>";
+        rowHTML += "<td>" +
+            "<ul>" +
+            "<li><a href=''</a></li>"
+            + "</td>";
         rowHTML += "<td>" +
             "<ul>" +
             "<li><a href='single-star.html?id=" + resultData[i]["movie_star1_id"] + "'>" + resultData[i]["movie_star1"] + "</a></li>" +
