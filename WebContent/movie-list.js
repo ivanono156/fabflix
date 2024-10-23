@@ -30,8 +30,14 @@ function getParameterByName(target) {
  */
 
 function handleAddToCartResult(resultData) {
+    alert("Successfully added movie to cart!")
     console.log("Added movie to cart successfully");
     console.log(resultData);
+}
+
+function handleCartError() {
+    alert("Could not add movie to cart!")
+    console.log("could not add movie to cart");
 }
 
 function addToCart(submitEvent) {
@@ -45,6 +51,7 @@ function addToCart(submitEvent) {
         url: "api/shopping-cart",
         data: $(this).serialize(),
         success: (resultData) => handleAddToCartResult(resultData),
+        error: handleCartError
     });
 }
 

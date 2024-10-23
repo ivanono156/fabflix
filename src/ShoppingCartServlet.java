@@ -90,7 +90,7 @@ public class ShoppingCartServlet extends HttpServlet {
 
     private JsonArray getCartItemsArray(ArrayList<CartItem> cart, ArrayList<BigDecimal> prices) {
         JsonArray cartItemsJsonArray = new JsonArray();
-        String query  = "select * from movies where id = ?";
+        String query  = "select title, price from movies where id = ?";
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement statement = conn.prepareStatement(query)) {

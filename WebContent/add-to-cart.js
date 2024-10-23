@@ -1,16 +1,18 @@
 let addToCartBtn = $("#add-to-cart");
 
 function handleCartArray(resultData) {
+    alert("Successfully added movie to cart!")
     console.log("movie was successfully added to cart");
     console.log(resultData);
 }
 
-function handleError() {
+function handleCartError() {
+    alert("Could not add movie to cart!")
     console.log("could not add movie to cart");
 }
 
 function addMovieToCart(submitEvent) {
-    console.log("adding movie to cart");
+    console.log("adding movie to shopping cart");
 
     submitEvent.preventDefault();
 
@@ -20,7 +22,7 @@ function addMovieToCart(submitEvent) {
         url: "api/shopping-cart",
         data: addToCartBtn.serialize(),
         success: (resultData) => handleCartArray(resultData),
-        error: handleError
+        error: handleCartError
     });
 }
 
