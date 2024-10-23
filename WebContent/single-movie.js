@@ -69,7 +69,13 @@ function handleResult(resultData) {
     for (const genreId in genres) {
         let rowHTML = "";
         rowHTML += "<tr>";
-        rowHTML += "<td>" + genres[genreId] + "</td>";  // Access the genre name property using the genre id
+        rowHTML +=
+            "<td>"
+            // Add a link to browse by genre
+            + '<a href="movie-list.html?gid=' + genreId + '">'
+            + genres[genreId] // Display genre name
+            + '</a>'
+            + "</td>";
         rowHTML += "</tr>";
 
         // Append the row created to the table body, which will refresh the page
@@ -92,7 +98,7 @@ function handleResult(resultData) {
             "<td>"
             // Add a link to each single-star.html page
             + '<a href="single-star.html?id=' + starId + '">'
-            + stars[starId] // Display star name as link text
+            + stars[starId] // Display star name
             + '</a>'
             + "</td>";
         rowHTML += "</tr>";

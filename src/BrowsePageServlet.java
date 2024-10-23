@@ -46,7 +46,7 @@ public class BrowsePageServlet extends HttpServlet {
         try (Connection conn = dataSource.getConnection()) {
             // Construct query
 
-            String query = "select g.name from genres g;";
+            String query = "select g.id, g.name from genres g order by g.name;";
 
             // Declare statement
             try (PreparedStatement statement = conn.prepareStatement(query)){
@@ -59,9 +59,12 @@ public class BrowsePageServlet extends HttpServlet {
                     // Iterate through each row of the result set
                     while (rs.next()) {
                         JsonObject jsonObject = new JsonObject();
-                         String genreName = rs.getString("name");
-                         jsonObject.addProperty("genre", genreName);
-                         jsonArray.add(jsonObject);
+                        String genreId = rs.getString("id");
+                        String genreName = rs.getString("name");
+
+                        jsonObject.addProperty("genreId", genreId);
+                        jsonObject.addProperty("genreName", genreName);
+                        jsonArray.add(jsonObject);
                     }
 
                     // Write JSON string to output

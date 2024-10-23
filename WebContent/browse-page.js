@@ -28,13 +28,13 @@ function handleBrowseResult(resultData) {
     // Iterate through resultData, number of genres 23
     //resultData is the jsonArray of movie objects
     for (let i = 0; i < resultData.length; i++) {
-        genreRowHTML += "<td><a href='movie-list?id=" + resultData[i] + " " + "'>" + resultData[i]["genre"] + "</a></td>";
+        genreRowHTML += "<td><a href='movie-list.html?gid=" + resultData[i]["genreId"] + "'>" + resultData[i]["genreName"] + "</a></td>";
     }
     genreRowHTML += "</tr>";
 
 
     //append the row to the body
-    genres_Table_Element.append(rowHTML);
+    genres_Table_Element.append(genreRowHTML);
 }
 
 

@@ -37,6 +37,8 @@ public class MovieListServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         // Response MIME type
         response.setContentType("application/json");
+
+        String genreId = request.getParameter("gid");
         // Retrieve parameter id from the url
         // Log message can be found in localhost log
         // Output stream to STDOUT
@@ -46,7 +48,7 @@ public class MovieListServlet extends HttpServlet {
         try (Connection conn = dataSource.getConnection()) {
             // Construct query
 
-            String query = "select m.id, m.title , m.year, m.director, "
+            String selectQuery = "select m.id, m.title , m.year, m.director, "
 
                     //Selecting the first genre name
                     + "(select g.name "
@@ -129,12 +131,25 @@ public class MovieListServlet extends HttpServlet {
 
                     + "r.rating "
                     + "from movies m "
-                    + "join ratings r on m.id = r.movieId "
-                    + "order by r.rating desc "
-                    + "limit 20;";
+                    + "join ratings r on m.id = r.movieId ";
+                    String searchQuery = "";
+                    String orderQuery = "order by r.rating desc ";
+                    String limitQuery = "limit 20;";
+
+                    if (genreId != null) {
+                        searchQuery = "inner join genres_in_movies gim on m.id = gim.movieId " +
+                                "inner join genres g on gim.genreId = g.id where g.id = ? ";
+                    }
+
+                    String query = selectQuery + searchQuery + orderQuery + limitQuery;
+
+                    System.out.println(query);
            
             // Declare statement
             try (PreparedStatement statement = conn.prepareStatement(query)){
+                if (genreId != null) {
+                    statement.setInt(1, Integer.parseInt(genreId));
+                }
 
                 // Perform the query
                 try (ResultSet rs = statement.executeQuery()) {
@@ -144,6 +159,7 @@ public class MovieListServlet extends HttpServlet {
                     // Iterate through each row of the result set
                     while (rs.next()) {
                         JsonObject jsonObject = new JsonObject();
+                        JsonObject movieGenres = new JsonObject();
                         // Get info
                         String movieId = rs.getString("id");
                         String movieTitle = rs.getString("title");
@@ -162,9 +178,19 @@ public class MovieListServlet extends HttpServlet {
                         String movieGenreName1 = rs.getString("genre1");
                         String movieGenreName2 = rs.getString("genre2");
                         String movieGenreName3 = rs.getString("genre3");
+
                         String movieGenreId1 = rs.getString("genre1Id");
+                        if (!rs.wasNull()) {
+                            movieGenres.addProperty(movieGenreId1, movieGenreName1);
+                        }
                         String movieGenreId2 = rs.getString("genre2Id");
+                        if (!rs.wasNull()) {
+                            movieGenres.addProperty(movieGenreId2, movieGenreName2);
+                        }
                         String movieGenreId3 = rs.getString("genre3Id");
+                        if (!rs.wasNull()) {
+                            movieGenres.addProperty(movieGenreId3, movieGenreName3);
+                        }
 
                         //place the info into the json object
                         jsonObject.addProperty("movie_id", movieId);
@@ -181,12 +207,13 @@ public class MovieListServlet extends HttpServlet {
                         jsonObject.addProperty("movie_star2_id", movieStarId2);
                         jsonObject.addProperty("movie_star3_id", movieStarId3);
 
-                        jsonObject.addProperty("movie_genre_name1", movieGenreName1);
-                        jsonObject.addProperty("movie_genre_name2", movieGenreName2);
-                        jsonObject.addProperty("movie_genre_name3", movieGenreName3);
-                        jsonObject.addProperty("movie_genre_id1", movieGenreId1);
-                        jsonObject.addProperty("movie_genre_id2", movieGenreId2);
-                        jsonObject.addProperty("movie_genre_id3", movieGenreId3);
+//                        jsonObject.addProperty("movie_genre_name1", movieGenreName1);
+//                        jsonObject.addProperty("movie_genre_name2", movieGenreName2);
+//                        jsonObject.addProperty("movie_genre_name3", movieGenreName3);
+//                        jsonObject.addProperty("movie_genre_id1", movieGenreId1);
+//                        jsonObject.addProperty("movie_genre_id2", movieGenreId2);
+//                        jsonObject.addProperty("movie_genre_id3", movieGenreId3);
+                        jsonObject.add("genres", movieGenres);
 
                         jsonArray.add(jsonObject);
                     }

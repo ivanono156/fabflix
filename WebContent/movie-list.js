@@ -8,6 +8,21 @@
  *      2. Populate the data to correct html elements.
  */
 
+function getParameterByName(target) {
+    // Get request URL
+    let url = window.location.href;
+    // Encode target parameter name to url encoding
+    target = target.replace(/[\[\]]/g, "\\$&");
+
+    // Ues regular expression to find matched parameter value
+    let regex = new RegExp("[?&]" + target + "(=([^&#]*)|&|#|$)"),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+
+    // Return the decoded parameter value
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
+}
 
 /**
  * Handles the data returned by the API, read the jsonObject and populate data into html elements
@@ -49,16 +64,21 @@ function handleMovieResult(resultData) {
         let rowHTML = "";
         rowHTML += "<tr>";
 
+        let genresHTML = "<td><ul>";
+        let genres = resultData[i]["genres"];
+        for (const genreId in genres) {
+            let genreName = genres[genreId]
+            genresHTML += "<li><a href='movie-list.html?gid=" + genreId + "'>" + genreName + "</a></li>";
+        }
+        genresHTML += "</ul></td>";
+
         //add link the sing-movie page in the title column
         rowHTML += "<td><a href='single-movie.html?id=" + resultData[i]["movie_id"] + "'>" + resultData[i]["movie_title"] + "</a></td>";
 
         //adding in the rest of the column data
         rowHTML += "<td>" + resultData[i]["movie_year"] + "</td>";
         rowHTML += "<td>" + resultData[i]["movie_director"] + "</td>";
-        rowHTML += "<td>" +
-            "<ul>" +
-            "<li><a href=''</a></li>"
-            + "</td>";
+        rowHTML += genresHTML;
         rowHTML += "<td>" +
             "<ul>" +
             "<li><a href='single-star.html?id=" + resultData[i]["movie_star1_id"] + "'>" + resultData[i]["movie_star1"] + "</a></li>" +
@@ -91,10 +111,16 @@ function handleMovieResult(resultData) {
  * Once this .js is loaded, following scripts will be executed by the browser
  */
 
+let genreId = getParameterByName("gid");
+let genreParam = "";
+if (genreId != null) {
+    genreParam = "?gid=" + genreId;
+}
+
 // Makes the HTTP GET request and registers on success callback function handleStarResult
 jQuery.ajax({
     dataType: "json", // Setting return data type
     method: "GET", // Setting request method
-    url: "api/movie-list", // Setting request url, which is mapped by StarsServlet in Stars.java
+    url: "api/movie-list" + genreParam, // Setting request url, which is mapped by StarsServlet in Stars.java
     success: (resultData) => handleMovieResult(resultData) // Setting callback function to handle data returned successfully by the StarsServlet
 });
