@@ -76,7 +76,7 @@ public class ShoppingCartServlet extends HttpServlet {
     // Handles POST requests to add items to the cart + returns session information
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
-        
+
         PrintWriter out = response.getWriter();
 
         HttpSession session = request.getSession();
