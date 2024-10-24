@@ -21,12 +21,11 @@ import java.util.ArrayList;
 
 @WebServlet(name="OrderConfirmationServlet", urlPatterns = "/api/order-confirmation")
 public class OrderConfirmationServlet extends HttpServlet {
-
     private static final long serialVersionUID = 2L;
 
     private DataSource dataSource;
 
-    private final static String salesQuery = "select s.id, m.title, m.price, s.quantity " +
+    private static final String salesQuery = "select s.id, m.title, m.price, s.quantity " +
             "from sales as s inner join movies as m on s.movieId = m.id " +
             "where s.id = ?";
 

@@ -21,6 +21,15 @@ public class SingleStarServlet extends HttpServlet {
 
     private DataSource dataSource;
 
+    // Construct a query with parameter represented by "?"
+    private static final String singleStarQuery = "select * " +
+                "from ((stars as s " +
+                "inner join stars_in_movies as sim on s.id = sim.starId) " +
+                "inner join movies as m on sim.movieId = m.id) " +
+                "where s.id = ? " +
+                "order by m.year desc, m.title";
+
+    @Override
     public void init(ServletConfig config) {
         try {
             dataSource = (DataSource) new InitialContext().lookup("java:comp/env/jdbc/moviedb");
@@ -29,6 +38,7 @@ public class SingleStarServlet extends HttpServlet {
         }
     }
 
+    @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         // Response MIME type
         response.setContentType("application/json");
@@ -39,18 +49,10 @@ public class SingleStarServlet extends HttpServlet {
         // Output stream to STDOUT
         PrintWriter out = response.getWriter();
 
-        // Construct a query with parameter represented by "?"
-        String query = "select * " +
-                "from ((stars as s " +
-                "inner join stars_in_movies as sim on s.id = sim.starId) " +
-                "inner join movies as m on sim.movieId = m.id) " +
-                "where s.id = ? " +
-                "order by m.year desc, m.title";
-
         // Get a connection from dataSource and let resource manager close the connection after usage.
         try (Connection conn = dataSource.getConnection();
              // Declare our statement
-             PreparedStatement statement = conn.prepareStatement(query)) {
+             PreparedStatement statement = conn.prepareStatement(singleStarQuery)) {
 
             // Set the parameter represented by "?" in the query to the id we get from url,
             // num 1 indicates the first "?" in the query

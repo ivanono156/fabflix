@@ -17,24 +17,9 @@ import java.sql.ResultSet;
 
 @WebServlet(name = "SingleMovieServlet", urlPatterns = "/api/single-movie")
 public class SingleMovieServlet extends HttpServlet {
+    private static final long serialVersionUID = 2L;
 
-    private DataSource dataSource;
-
-    public void init(ServletConfig config) {
-        try {
-            dataSource = (DataSource) new InitialContext().lookup("java:comp/env/jdbc/moviedb");
-        } catch (NamingException e) {
-            e.printStackTrace();
-        }
-    }
-
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        response.setContentType("application/json");
-        String id = request.getParameter("id");
-        request.getServletContext().log("getting id " + id);
-        PrintWriter out = response.getWriter();
-
-        String query = "select m.id, m.title, m.year, m.director, r.rating, " +
+    private static final String singleMovieQuery = "select m.id, m.title, m.year, m.director, r.rating, " +
                 "g.id, g.name, smp.id, smp.name, smp.moviesPlayed " +
                 "from movies as m inner join stars_in_movies as sim on m.id = sim.movieId " +
 
@@ -57,8 +42,26 @@ public class SingleMovieServlet extends HttpServlet {
                 "where m.id = ? " +
                 "order by g.name, moviesPlayed desc, smp.name";
 
+    private DataSource dataSource;
+
+    @Override
+    public void init(ServletConfig config) {
+        try {
+            dataSource = (DataSource) new InitialContext().lookup("java:comp/env/jdbc/moviedb");
+        } catch (NamingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setContentType("application/json");
+        String id = request.getParameter("id");
+        request.getServletContext().log("getting id " + id);
+        PrintWriter out = response.getWriter();
+
         try (Connection conn = dataSource.getConnection();
-             PreparedStatement statement = conn.prepareStatement(query)) {
+             PreparedStatement statement = conn.prepareStatement(singleMovieQuery)) {
             statement.setString(1, id);
             statement.setString(2, id);
 

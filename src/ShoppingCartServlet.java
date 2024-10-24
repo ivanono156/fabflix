@@ -22,8 +22,13 @@ import java.util.Optional;
 public class ShoppingCartServlet extends HttpServlet {
     public static final String shoppingCartAttributeName = "cart_items";
 
+    private static final long serialVersionUID = 2L;
+
     private DataSource dataSource;
 
+    private static final String movieDataQuery = "select title, price from movies where id = ?";
+
+    @Override
     public void init(ServletConfig config) {
         try {
             dataSource = (DataSource) new InitialContext().lookup("java:comp/env/jdbc/moviedb");
@@ -32,6 +37,7 @@ public class ShoppingCartServlet extends HttpServlet {
         }
     }
 
+    @Override
     // Handles GET requests to display session information
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
@@ -53,6 +59,7 @@ public class ShoppingCartServlet extends HttpServlet {
         response.setStatus(HttpServletResponse.SC_OK);
     }
 
+    @Override
     // Handles POST requests to add items to the cart + returns session information
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
@@ -93,10 +100,9 @@ public class ShoppingCartServlet extends HttpServlet {
 
     private JsonArray getCartItemsArray(ArrayList<CartItem> cart, ArrayList<BigDecimal> prices) {
         JsonArray cartItemsJsonArray = new JsonArray();
-        String query  = "select title, price from movies where id = ?";
 
         try (Connection conn = dataSource.getConnection();
-             PreparedStatement statement = conn.prepareStatement(query)) {
+             PreparedStatement statement = conn.prepareStatement(movieDataQuery)) {
 
             for (CartItem item : cart) {
                 statement.setString(1, item.movieId);

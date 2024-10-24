@@ -18,10 +18,19 @@ import java.util.ArrayList;
 
 @WebServlet(name = "PaymentServlet", urlPatterns = "/api/payment")
 public class PaymentServlet extends HttpServlet {
+    public static String salesIdsAttributeName = "sales";
+
+    private static final long serialVersionUID = 2L;
 
     private DataSource dataSource;
 
-    public static String salesIdsAttributeName = "sales";
+    private static final String creditCardQuery = "select * from creditcards " +
+            "where id = ? and firstName = ? and lastName = ? and expiration = ?";
+
+    private static final String insertSaleQuery = "insert into sales (customerId, movieId, saleDate, quantity) " +
+            "values (?, ?, ?, ?)";
+
+
 
     @Override
     public void init(ServletConfig config) {
@@ -43,28 +52,18 @@ public class PaymentServlet extends HttpServlet {
 
         PrintWriter out = response.getWriter();
 
-        String query = "select * from creditcards where id = ?";
-
         try (Connection conn = dataSource.getConnection();
-             PreparedStatement statement = conn.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
+             PreparedStatement statement = conn.prepareStatement(creditCardQuery)) {
 
             statement.setString(1, creditCardNumber);
+            statement.setString(2, firstName);
+            statement.setString(3, lastName);
+            statement.setDate(4, expirationDate);
 
-            boolean success = false;
-
+            boolean success;
             try (ResultSet rs = statement.executeQuery()) {
-                if (rs.next()) {
-                    String cardFirstName = rs.getString("firstName");
-                    String cardLastName = rs.getString("lastName");
-                    Date cardExpirationDate = rs.getDate("expiration");
-
-                    success = cardFirstName.equals(firstName)
-                            && cardLastName.equals(lastName)
-                            && cardExpirationDate.equals(expirationDate);
-                }
+                success = rs.next();
             }
-
-            JsonObject responseJsonObject = new JsonObject();
 
             // Get shopping cart from session
             HttpSession session = request.getSession();
@@ -73,15 +72,7 @@ public class PaymentServlet extends HttpServlet {
 
             if (cart == null) { success = false; }
 
-            if (success) {
-
-                ArrayList<String> saleIds = addSalesToDatabase(conn, ((User)session.getAttribute("user")).getId(), cart);
-                // For retrieving the sales made in this transaction in the order confirmation page
-                session.setAttribute(salesIdsAttributeName, saleIds);
-
-                JsonArray salesJsonArray = createSalesJsonArray(saleIds);
-                responseJsonObject.add("sales", salesJsonArray);
-            }
+            JsonObject responseJsonObject = new JsonObject();
 
             String status = success ? "success" : "fail";
             String message = success ? "Payment successful." : "Payment failed. Please try again.";
@@ -89,28 +80,39 @@ public class PaymentServlet extends HttpServlet {
             responseJsonObject.addProperty("status", status);
             responseJsonObject.addProperty("message", message);
 
+            if (success) {
+                ArrayList<String> saleIds = addSalesToDatabase(conn, ((User)session.getAttribute("user")).getId(), cart);
+                // For retrieving the sales made in this transaction in the order confirmation page
+                session.setAttribute(salesIdsAttributeName, saleIds);
+
+                JsonArray salesJsonArray = createSalesJsonArray(saleIds);
+
+                responseJsonObject.add("sales", salesJsonArray);
+            }
+
             if (!success) request.getServletContext().log("Payment failed");
 
             out.write(responseJsonObject.toString());
+
+            // Set response status to 200 (OK)
+            response.setStatus(HttpServletResponse.SC_OK);
         } catch (Exception e) {
             JsonObject jsonObject = new JsonObject();
             jsonObject.addProperty("errorMessage", e.getMessage());
             out.write(jsonObject.toString());
 
             request.getServletContext().log("Error:", e);
-            response.setStatus(500);
+            // Set response status to 500 (Internal Server Error)
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         } finally {
             out.close();
         }
     }
 
     private ArrayList<String> addSalesToDatabase(Connection conn, int customerId, ArrayList<ShoppingCartServlet.CartItem> cart) throws SQLException {
-
-        String insertQuery = "insert into sales (customerId, movieId, saleDate, quantity) values (?, ?, ?, ?)";
-
         ArrayList<String> salesIdsArray = new ArrayList<>();
 
-        try (PreparedStatement insertStatement = conn.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement insertStatement = conn.prepareStatement(insertSaleQuery, PreparedStatement.RETURN_GENERATED_KEYS)) {
             // Add each movie to the database (each movie = 1 sale)
             for (ShoppingCartServlet.CartItem item : cart) {
                 String movieId = item.getMovieId();

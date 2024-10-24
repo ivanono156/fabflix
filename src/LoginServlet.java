@@ -16,9 +16,13 @@ import java.sql.ResultSet;
 
 @WebServlet(name = "LoginServlet", urlPatterns = "/api/login")
 public class LoginServlet extends HttpServlet {
+    private static final long serialVersionUID = 2L;
 
     private DataSource dataSource;
 
+    private static final String credentialsQuery = "select * from customers where email = ?";
+
+    @Override
     public void init(ServletConfig config) {
         try {
             dataSource = (DataSource) new InitialContext().lookup("java:comp/env/jdbc/moviedb");
@@ -27,6 +31,7 @@ public class LoginServlet extends HttpServlet {
         }
     }
 
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
 
@@ -35,10 +40,8 @@ public class LoginServlet extends HttpServlet {
 
         PrintWriter out = response.getWriter();
 
-        String query = "select * from customers where email = ?";
-
         try (Connection conn = dataSource.getConnection();
-            PreparedStatement ps = conn.prepareStatement(query)) {
+            PreparedStatement ps = conn.prepareStatement(credentialsQuery)) {
 
             ps.setString(1, email);
 
