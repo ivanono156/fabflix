@@ -118,16 +118,21 @@ function handleMovieResult(resultData) {
  * Once this .js is loaded, following scripts will be executed by the browser
  */
 
+let searchParams = {
+    pagenumber: 1, //pagenumber: getParameterByName("pagenumber"),
+    display: 50, //display: getParameterByName("display")
+}
+
 let genreId = getParameterByName("gid");
-let genreParam = "";
 if (genreId != null) {
-    genreParam = "?gid=" + genreId;
+    searchParams["gid"] = genreId;  // add gid parameter to url
 }
 
 // Makes the HTTP GET request and registers on success callback function handleStarResult
 jQuery.ajax({
     dataType: "json", // Setting return data type
     method: "GET", // Setting request method
-    url: "api/movie-list" + genreParam, // Setting request url, which is mapped by StarsServlet in Stars.java
-    success: (resultData) => handleMovieResult(resultData) // Setting callback function to handle data returned successfully by the StarsServlet
+    url: "api/movie-list", // Setting request url
+    data: searchParams, // Setting search query data
+    success: (resultData) => handleMovieResult(resultData) // Setting callback function to handle data returned successfully
 });

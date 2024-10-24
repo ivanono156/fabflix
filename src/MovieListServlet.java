@@ -39,6 +39,13 @@ public class MovieListServlet extends HttpServlet {
         response.setContentType("application/json");
 
         String genreId = request.getParameter("gid");
+
+        // Pagination params
+        // limit; how many movies will be displayed on each page
+        String display = request.getParameter("display");
+        // offset; page 1 = offset 0
+        String pageNumber = request.getParameter("pagenumber");
+
         // Retrieve parameter id from the url
         // Log message can be found in localhost log
         // Output stream to STDOUT
@@ -132,9 +139,10 @@ public class MovieListServlet extends HttpServlet {
                     + "r.rating "
                     + "from movies m "
                     + "join ratings r on m.id = r.movieId ";
+
                     String searchQuery = "";
                     String orderQuery = "order by r.rating desc ";
-                    String limitQuery = "limit 20;";
+                    String limitQuery = "limit ? offset ?;";
 
                     if (genreId != null) {
                         searchQuery = "inner join genres_in_movies gim on m.id = gim.movieId " +
@@ -147,9 +155,15 @@ public class MovieListServlet extends HttpServlet {
            
             // Declare statement
             try (PreparedStatement statement = conn.prepareStatement(query)){
+                int params = 1;
                 if (genreId != null) {
-                    statement.setInt(1, Integer.parseInt(genreId));
+                    statement.setInt(params++, Integer.parseInt(genreId));
                 }
+                // Set the limit & offset params for pagination
+                int limit = Integer.parseInt(display);
+                statement.setInt(params++, limit);
+                int offset = (Integer.parseInt(pageNumber) - 1) * limit;
+                statement.setInt(params, offset);
 
                 // Perform the query
                 try (ResultSet rs = statement.executeQuery()) {
@@ -166,8 +180,7 @@ public class MovieListServlet extends HttpServlet {
                         String movieYear = rs.getString("year");
                         String movieDirector = rs.getString("director");
                         String movieRating = rs.getString("rating");
-                        //String movieGenres = rs.getString("genres");
-                        //String movieStarsId = rs.getString("Id");
+
                         String movieStarName1 = rs.getString("star1");
                         String movieStarName2 = rs.getString("star2");
                         String movieStarName3 = rs.getString("star3");
@@ -198,8 +211,7 @@ public class MovieListServlet extends HttpServlet {
                         jsonObject.addProperty("movie_year", movieYear);
                         jsonObject.addProperty("movie_director", movieDirector);
                         jsonObject.addProperty("movie_rating", movieRating);
-                        //jsonObject.addProperty("movie_genres", movieGenres);
-                        //jsonObject.addProperty("movie_stars_id", movieStarsId);
+
                         jsonObject.addProperty("movie_star1", movieStarName1);
                         jsonObject.addProperty("movie_star2", movieStarName2);
                         jsonObject.addProperty("movie_star3", movieStarName3);
@@ -207,12 +219,6 @@ public class MovieListServlet extends HttpServlet {
                         jsonObject.addProperty("movie_star2_id", movieStarId2);
                         jsonObject.addProperty("movie_star3_id", movieStarId3);
 
-//                        jsonObject.addProperty("movie_genre_name1", movieGenreName1);
-//                        jsonObject.addProperty("movie_genre_name2", movieGenreName2);
-//                        jsonObject.addProperty("movie_genre_name3", movieGenreName3);
-//                        jsonObject.addProperty("movie_genre_id1", movieGenreId1);
-//                        jsonObject.addProperty("movie_genre_id2", movieGenreId2);
-//                        jsonObject.addProperty("movie_genre_id3", movieGenreId3);
                         jsonObject.add("genres", movieGenres);
 
                         jsonArray.add(jsonObject);
