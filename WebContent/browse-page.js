@@ -27,7 +27,7 @@ function handleBrowseResult(resultData) {
     genreRowHTML += "<tr>";
     // Iterate through resultData, number of genres 23
     for (let i = 0; i < resultData.length; i++) {
-        genreRowHTML += "<td><a href='movie-list.html?pagenumber=1&display=50gid=" + resultData[i]["genreId"] + "'>" + resultData[i]["genreName"] + "</a></td>";
+        genreRowHTML += "<td><a href='movie-list.html?pagenumber=1&display=50&gid=" + resultData[i]["genreId"] + "'>" + resultData[i]["genreName"] + "</a></td>";
     }
     genreRowHTML += "</tr>";
 

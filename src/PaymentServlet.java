@@ -67,8 +67,8 @@ public class PaymentServlet extends HttpServlet {
 
             // Get shopping cart from session
             HttpSession session = request.getSession();
-            ArrayList<ShoppingCartServlet.CartItem> cart =
-                    (ArrayList<ShoppingCartServlet.CartItem>) session.getAttribute(ShoppingCartServlet.shoppingCartAttributeName);
+            ArrayList<CartItem> cart =
+                    (ArrayList<CartItem>) session.getAttribute(ShoppingCartServlet.shoppingCartAttributeName);
 
             if (cart == null) { success = false; }
 
@@ -109,12 +109,12 @@ public class PaymentServlet extends HttpServlet {
         }
     }
 
-    private ArrayList<String> addSalesToDatabase(Connection conn, int customerId, ArrayList<ShoppingCartServlet.CartItem> cart) throws SQLException {
+    private ArrayList<String> addSalesToDatabase(Connection conn, int customerId, ArrayList<CartItem> cart) throws SQLException {
         ArrayList<String> salesIdsArray = new ArrayList<>();
 
         try (PreparedStatement insertStatement = conn.prepareStatement(insertSaleQuery, PreparedStatement.RETURN_GENERATED_KEYS)) {
             // Add each movie to the database (each movie = 1 sale)
-            for (ShoppingCartServlet.CartItem item : cart) {
+            for (CartItem item : cart) {
                 String movieId = item.getMovieId();
                 Date saleDate = Date.valueOf(LocalDate.now());
                 int quantity = item.getQuantity();

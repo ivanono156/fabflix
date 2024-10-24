@@ -105,18 +105,18 @@ public class ShoppingCartServlet extends HttpServlet {
              PreparedStatement statement = conn.prepareStatement(movieDataQuery)) {
 
             for (CartItem item : cart) {
-                statement.setString(1, item.movieId);
+                statement.setString(1, item.getMovieId());
 
                 try (ResultSet rs = statement.executeQuery()) {
                     while (rs.next()) {
                         String movieTitle = rs.getString("title");
                         BigDecimal moviePrice = rs.getBigDecimal("price");
-                        BigDecimal totalPrice = getTotalPriceOfItem(item.quantity, moviePrice);
+                        BigDecimal totalPrice = getTotalPriceOfItem(item.getQuantity(), moviePrice);
 
                         JsonObject itemJsonObject = new JsonObject();
-                        itemJsonObject.addProperty("movie_id", item.movieId);
+                        itemJsonObject.addProperty("movie_id", item.getMovieId());
                         itemJsonObject.addProperty("movie_title", movieTitle);
-                        itemJsonObject.addProperty("movie_quantity", item.quantity);
+                        itemJsonObject.addProperty("movie_quantity", item.getQuantity());
                         itemJsonObject.addProperty("movie_price", moviePrice);
                         itemJsonObject.addProperty("total_price", totalPrice);
 
@@ -133,26 +133,29 @@ public class ShoppingCartServlet extends HttpServlet {
 
     private void editCart(String movieId, int quantity, ArrayList<CartItem> cart) throws IllegalArgumentException {
         Optional<CartItem> foundItem = cart.stream()
-                .filter(item -> item.movieId.equals(movieId))
+                .filter(item -> item.getMovieId().equals(movieId))
                 .findFirst();
 
         if (foundItem.isPresent()) {
-            // quantity will either be '1' for increase, '-1' for decrease, or '0' for remove/delete
+            // quantity will either be '1' for increment, '-1' for decrement, or '0' for clear/remove/delete
             switch (quantity) {
                 case -1:
-                    foundItem.get().quantity -= 1;
+//                    foundItem.get().quantity -= 1;
+                    foundItem.get().decrementQuantity();
                     break;
                 case 0:
-                    foundItem.get().quantity = 0;
+//                    foundItem.get().quantity = 0;
+                    foundItem.get().clearQuantity();
                     break;
                 case 1:
-                    foundItem.get().quantity += 1;
+//                    foundItem.get().quantity += 1;
+                    foundItem.get().incrementQuantity();
                     break;
                 default:
                     throw new IllegalArgumentException("Shopping Cart Servlet: Invalid quantity");
             }
 
-            if (foundItem.get().quantity <= 0) {
+            if (foundItem.get().getQuantity() <= 0) {
                 cart.remove(foundItem.get());
             }
 
@@ -170,23 +173,5 @@ public class ShoppingCartServlet extends HttpServlet {
     private BigDecimal getTotalPriceOfCart(ArrayList<BigDecimal> prices) {
         return prices.stream()
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-    }
-
-    static class CartItem {
-        private final String movieId;
-        private int quantity;
-
-        public CartItem(String movieId, int quantity) {
-            this.movieId = movieId;
-            this.quantity = quantity;
-        }
-
-        public String getMovieId() {
-            return this.movieId;
-        }
-
-        public int getQuantity() {
-            return this.quantity;
-        }
     }
 }
