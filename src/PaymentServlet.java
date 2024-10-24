@@ -45,6 +45,10 @@ public class PaymentServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
 
+        // Get shopping cart from session
+        HttpSession session = request.getSession();
+        ArrayList<CartItem> cart = (ArrayList<CartItem>) session.getAttribute(ShoppingCartServlet.shoppingCartAttributeName);
+
         String firstName = request.getParameter("fname");
         String lastName = request.getParameter("lname");
         String creditCardNumber = request.getParameter("ccn");
@@ -62,15 +66,8 @@ public class PaymentServlet extends HttpServlet {
 
             boolean success;
             try (ResultSet rs = statement.executeQuery()) {
-                success = rs.next();
+                success = rs.next() && cart != null;
             }
-
-            // Get shopping cart from session
-            HttpSession session = request.getSession();
-            ArrayList<CartItem> cart =
-                    (ArrayList<CartItem>) session.getAttribute(ShoppingCartServlet.shoppingCartAttributeName);
-
-            if (cart == null) { success = false; }
 
             JsonObject responseJsonObject = new JsonObject();
 
@@ -81,7 +78,8 @@ public class PaymentServlet extends HttpServlet {
             responseJsonObject.addProperty("message", message);
 
             if (success) {
-                ArrayList<String> saleIds = addSalesToDatabase(conn, ((User)session.getAttribute("user")).getId(), cart);
+                User user = (User)session.getAttribute("user");
+                ArrayList<String> saleIds = addSalesToDatabase(conn, user.getId(), cart);
                 // For retrieving the sales made in this transaction in the order confirmation page
                 session.setAttribute(salesIdsAttributeName, saleIds);
 

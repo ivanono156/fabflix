@@ -140,15 +140,12 @@ public class ShoppingCartServlet extends HttpServlet {
             // quantity will either be '1' for increment, '-1' for decrement, or '0' for clear/remove/delete
             switch (quantity) {
                 case -1:
-//                    foundItem.get().quantity -= 1;
                     foundItem.get().decrementQuantity();
                     break;
                 case 0:
-//                    foundItem.get().quantity = 0;
                     foundItem.get().clearQuantity();
                     break;
                 case 1:
-//                    foundItem.get().quantity += 1;
                     foundItem.get().incrementQuantity();
                     break;
                 default:
