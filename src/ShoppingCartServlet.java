@@ -11,10 +11,12 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Optional;
 
@@ -42,6 +44,8 @@ public class ShoppingCartServlet extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
 
+        PrintWriter out = response.getWriter();
+
         HttpSession session = request.getSession();
 
         ArrayList<CartItem> cart = (ArrayList<CartItem>) session.getAttribute(shoppingCartAttributeName);
@@ -51,18 +55,29 @@ public class ShoppingCartServlet extends HttpServlet {
 
         request.getServletContext().log("getting " + cart.size() + " items");
 
-        JsonObject responseJsonObject = getResponseJsonObject(cart);
+        try {
+            JsonObject responseJsonObject = getResponseJsonObject(cart);
+            out.write(responseJsonObject.toString());
 
-        response.getWriter().write(responseJsonObject.toString());
+            response.setStatus(HttpServletResponse.SC_OK);
+        } catch (SQLException e) {
+            JsonObject errorJsonObject = new JsonObject();
+            errorJsonObject.addProperty("error", e.getMessage());
+            out.write(errorJsonObject.toString());
 
-        // Set response status to 200 (OK)
-        response.setStatus(HttpServletResponse.SC_OK);
+            request.getServletContext().log("Error:", e);
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        } finally {
+            out.close();
+        }
     }
 
     @Override
     // Handles POST requests to add items to the cart + returns session information
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
+        
+        PrintWriter out = response.getWriter();
 
         HttpSession session = request.getSession();
 
@@ -82,13 +97,23 @@ public class ShoppingCartServlet extends HttpServlet {
             }
         }
 
-        JsonObject responseJsonObject = getResponseJsonObject(cart);
+        try {
+            JsonObject responseJsonObject = getResponseJsonObject(cart);
+            out.write(responseJsonObject.toString());
+        } catch (SQLException e) {
+            JsonObject errorJsonObject = new JsonObject();
+            errorJsonObject.addProperty("error", e.getMessage());
+            out.write(errorJsonObject.toString());
 
-        response.getWriter().write(responseJsonObject.toString());
+            request.getServletContext().log("Error:", e);
+        } finally {
+            out.close();
+        }
     }
 
-    private JsonObject getResponseJsonObject (ArrayList<CartItem> cart) {
+    private JsonObject getResponseJsonObject (ArrayList<CartItem> cart) throws SQLException {
         JsonObject responseJsonObject = new JsonObject();
+
         ArrayList<BigDecimal> prices = new ArrayList<>();
         JsonArray cartItemsJsonArray = getCartItemsArray(cart, prices);
 
@@ -98,7 +123,7 @@ public class ShoppingCartServlet extends HttpServlet {
         return responseJsonObject;
     }
 
-    private JsonArray getCartItemsArray(ArrayList<CartItem> cart, ArrayList<BigDecimal> prices) {
+    private JsonArray getCartItemsArray(ArrayList<CartItem> cart, ArrayList<BigDecimal> prices) throws SQLException {
         JsonArray cartItemsJsonArray = new JsonArray();
 
         try (Connection conn = dataSource.getConnection();
@@ -125,9 +150,8 @@ public class ShoppingCartServlet extends HttpServlet {
                     }
                 }
             }
-        } catch (Exception e) {
-
         }
+
         return cartItemsJsonArray;
     }
 

@@ -60,7 +60,7 @@ public class LoginServlet extends HttpServlet {
                         success = true;
                         message = "success";
                         // Set this user into the session
-                        request.getSession().setAttribute("user", new User(email, id));
+                        request.getSession().setAttribute("user", new User(id));
                     } else {
                         success = false;
                         message = "incorrect password";

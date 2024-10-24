@@ -25,7 +25,7 @@ function createButton(movieData, value) {
     else if (value === 1) {buttonText = "+";}
     else {buttonText = "THIS SHOULD NOT APPEAR!!! YOU MESSED UP";}
 
-    return "<form action='#' method='post' class='add-to-cart-btn'>" +
+    return "<form action='#' method='post' class='update-cart-btn'>" +
                 "<input type='hidden' name='id' value='" + movieData["movie_id"] + "'>" +
                 // check ShoppingCartServlet.java for quantity values
                 "<input type='hidden' name='quantity' value='" + value + "'>" +
@@ -63,9 +63,9 @@ function fillShoppingCart(resultDataArray) {
         rowHTML += "<td>" + resultDataArray[i]["movie_title"] + "</td>";
         rowHTML += "" +
             "<td>" +
-            createButton(resultDataArray[i], -1) +
+            createButton(resultDataArray[i], +1) +
             resultDataArray[i]["movie_quantity"] +
-            createButton(resultDataArray[i], 1) +
+            createButton(resultDataArray[i], -1) +
             "</td>";
         rowHTML += "<td>" + priceFormatter.format(resultDataArray[i]["movie_price"]) + "</td>";
         rowHTML += "<td>" + priceFormatter.format(resultDataArray[i]["total_price"]) + "</td>";
@@ -79,7 +79,7 @@ function fillShoppingCart(resultDataArray) {
     }
 
     // Bind update cart function to all add to cart buttons
-    $(".add-to-cart-btn").submit(updateCart);
+    $(".update-cart-btn").submit(updateCart);
 }
 
 jQuery.ajax({
