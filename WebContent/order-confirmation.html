@@ -15,7 +15,30 @@
 
 <h1>Your order has been placed!</h1>
 
+<!-- Show a confirmation page that contains order details including sale ID, movies purchased and the quantities, and total price -->
+<table id="sales-table" class="table table-striped">
+    <thead>
+    <tr>
+        <th>Sale Id</th>
+        <th>Movie</th>
+        <th>Quantity</th>
+        <th>Price</th>
+        <th>Total Price</th>
+    </tr>
+    </thead>
+    <tbody id="sales-table-body"></tbody>
+</table>
+
+<h3 id="total-cart-price"></h3>
+
 <a href="index.html">Back to Home Page/Movie List</a>
+
+<!-- Load jQuery and Bootstrap JS -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
+<script src="order-confirmation.js"></script>
 
 </body>
 </html>

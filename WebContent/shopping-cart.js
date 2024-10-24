@@ -40,6 +40,13 @@ function handleSessionData(resultData) {
     fillShoppingCart(resultData["cart_items"]);
 
     $("#total-cart-price").text("Total price: " + priceFormatter.format(resultData["total_cart_price"]));
+
+    let proceedToPaymentButton = $("#proceed-to-payment-btn");
+    if (resultData["total_cart_price"] > 0) {
+        proceedToPaymentButton.html("<a href='payment.html'>Proceed to payment</a>");
+    } else {
+        proceedToPaymentButton.html("");
+    }
 }
 
 function fillShoppingCart(resultDataArray) {

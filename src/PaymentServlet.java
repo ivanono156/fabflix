@@ -1,3 +1,4 @@
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.annotation.WebServlet;
@@ -11,10 +12,7 @@ import javax.naming.NamingException;
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
@@ -23,6 +21,9 @@ public class PaymentServlet extends HttpServlet {
 
     private DataSource dataSource;
 
+    public static String salesIdsAttributeName = "sales";
+
+    @Override
     public void init(ServletConfig config) {
         try {
             dataSource = (DataSource) new InitialContext().lookup("java:comp/env/jdbc/moviedb");
@@ -31,6 +32,7 @@ public class PaymentServlet extends HttpServlet {
         }
     }
 
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
 
@@ -44,7 +46,7 @@ public class PaymentServlet extends HttpServlet {
         String query = "select * from creditcards where id = ?";
 
         try (Connection conn = dataSource.getConnection();
-             PreparedStatement statement = conn.prepareStatement(query)) {
+             PreparedStatement statement = conn.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
 
             statement.setString(1, creditCardNumber);
 
@@ -62,43 +64,30 @@ public class PaymentServlet extends HttpServlet {
                 }
             }
 
-            int updatedRows = 0;
+            JsonObject responseJsonObject = new JsonObject();
+
+            // Get shopping cart from session
+            HttpSession session = request.getSession();
+            ArrayList<ShoppingCartServlet.CartItem> cart =
+                    (ArrayList<ShoppingCartServlet.CartItem>) session.getAttribute(ShoppingCartServlet.shoppingCartAttributeName);
+
+            if (cart == null) { success = false; }
+
             if (success) {
-                // Get shopping cart from session
-                HttpSession session = request.getSession();
-                ArrayList<ShoppingCartServlet.CartItem> cart =
-                        (ArrayList<ShoppingCartServlet.CartItem>) session.getAttribute(ShoppingCartServlet.shoppingCartAttributeName);
 
-                String insertQuery = "insert into sales (customerId, movieId, saleDate) " +
-                        "select c.id, ?, ?" +
-                        "from customers as c inner join creditcards as cc on c.ccid = cc.id " +
-                        "where cc.id = ?";
+                ArrayList<String> saleIds = addSalesToDatabase(conn, ((User)session.getAttribute("user")).getId(), cart);
+                // For retrieving the sales made in this transaction in the order confirmation page
+                session.setAttribute(salesIdsAttributeName, saleIds);
 
-                try (PreparedStatement insertStatement = conn.prepareStatement(insertQuery)) {
-                    for (ShoppingCartServlet.CartItem item : cart) {
-                        // Add sale to database
-                        String movieId = item.getMovieId();
-                        // FIXME: might wanna make a column in sales table that holds the quantity of each movie/sale?
-                        Date saleDate = Date.valueOf(LocalDate.now());
-
-                        insertStatement.setString(1, movieId);
-                        insertStatement.setDate(2, saleDate);
-                        insertStatement.setString(3, creditCardNumber);
-                        updatedRows += insertStatement.executeUpdate();
-                    }
-                }
-
-                // Clear the cart after purchase is completed
-                cart.clear();
+                JsonArray salesJsonArray = createSalesJsonArray(saleIds);
+                responseJsonObject.add("sales", salesJsonArray);
             }
 
             String status = success ? "success" : "fail";
             String message = success ? "Payment successful." : "Payment failed. Please try again.";
 
-            JsonObject responseJsonObject = new JsonObject();
             responseJsonObject.addProperty("status", status);
             responseJsonObject.addProperty("message", message);
-            responseJsonObject.addProperty("updated_rows", updatedRows);
 
             if (!success) request.getServletContext().log("Payment failed");
 
@@ -115,4 +104,50 @@ public class PaymentServlet extends HttpServlet {
         }
     }
 
+    private ArrayList<String> addSalesToDatabase(Connection conn, int customerId, ArrayList<ShoppingCartServlet.CartItem> cart) throws SQLException {
+
+        String insertQuery = "insert into sales (customerId, movieId, saleDate, quantity) values (?, ?, ?, ?)";
+
+        ArrayList<String> salesIdsArray = new ArrayList<>();
+
+        try (PreparedStatement insertStatement = conn.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS)) {
+            // Add each movie to the database (each movie = 1 sale)
+            for (ShoppingCartServlet.CartItem item : cart) {
+                String movieId = item.getMovieId();
+                Date saleDate = Date.valueOf(LocalDate.now());
+                int quantity = item.getQuantity();
+
+                insertStatement.setInt(1, customerId);
+                insertStatement.setString(2, movieId);
+                insertStatement.setDate(3, saleDate);
+                insertStatement.setInt(4, quantity);
+
+                int rowsAffected = insertStatement.executeUpdate();
+                if (rowsAffected > 0) {
+                    try (ResultSet generatedKeys = insertStatement.getGeneratedKeys()) {
+                        if (generatedKeys.next()) {
+                            // Get sale info
+                            String saleId = generatedKeys.getString(1);
+                            salesIdsArray.add(saleId);
+                        }
+                    }
+                }
+            }
+        }
+
+        // Clear the cart after purchase is completed
+        cart.clear();
+
+        return salesIdsArray;
+    }
+
+    private JsonArray createSalesJsonArray(ArrayList<String> salesIds) {
+        JsonArray salesJsonArray = new JsonArray();
+
+        for (String saleId : salesIds) {
+            salesJsonArray.add(saleId);
+        }
+
+        return salesJsonArray;
+    }
 }

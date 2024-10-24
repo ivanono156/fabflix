@@ -35,7 +35,7 @@ public class LoginServlet extends HttpServlet {
 
         PrintWriter out = response.getWriter();
 
-        String query = "select password from customers where email = ?";
+        String query = "select * from customers where email = ?";
 
         try (Connection conn = dataSource.getConnection();
             PreparedStatement ps = conn.prepareStatement(query)) {
@@ -51,12 +51,13 @@ public class LoginServlet extends HttpServlet {
                 if (rs.next()) {
                     // Email account is found; retrieve its associated password
                     String foundPassword = rs.getString("password");
+                    int id = rs.getInt("id");
 
                     if (foundPassword.equals(password)) {
                         success = true;
                         message = "success";
                         // Set this user into the session
-                        request.getSession().setAttribute("user", new User(email));
+                        request.getSession().setAttribute("user", new User(email, id));
                     } else {
                         success = false;
                         message = "incorrect password";
