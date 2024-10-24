@@ -39,7 +39,7 @@ function getParameterByName(target) {
 function handleResult(resultData) {
 
     // Setting webpage title
-    document.title = resultData[0]["star_name"];
+    document.title = resultData["star_name"];
 
     console.log("handleResult: populating star info from resultData");
 
@@ -47,13 +47,13 @@ function handleResult(resultData) {
     let starNameElement = jQuery("#star_name");
 
     // add the star name to the h1 element
-    starNameElement.append("<p>" + resultData[0]["star_name"] + "</p>")
+    starNameElement.append("<p>" + resultData["star_name"] + "</p>");
 
     // find the empty h3 body by id "star_info"
     let starInfoElement = jQuery("#star_info");
 
     // append two html <p> created to the h3 body, which will refresh the page
-    starInfoElement.append("<p>Date Of Birth: " + resultData[0]["star_dob"] + "</p>");
+    starInfoElement.append("<p>Date Of Birth: " + resultData["star_dob"] + "</p>");
 
     console.log("handleResult: populating movie table from resultData");
 
@@ -61,7 +61,7 @@ function handleResult(resultData) {
     let movieTableBodyElement = jQuery("#movie_table_body");
 
     // Json array containing movies this star acted in
-    const starMovies = resultData[0]["star_movies"];
+    const starMovies = resultData["star_movies"];
 
     // Concatenate the html tags with resultData jsonObject to create table rows
     for (let i = 0; i < starMovies.length; i++) {

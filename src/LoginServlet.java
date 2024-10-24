@@ -84,7 +84,8 @@ public class LoginServlet extends HttpServlet {
             out.write(jsonObject.toString());
 
             request.getServletContext().log("Error:", e);
-            response.setStatus(500);
+            // Set response status to 500 (Internal Server Error)
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         } finally {
             out.close();
         }

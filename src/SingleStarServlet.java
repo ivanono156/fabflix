@@ -58,7 +58,10 @@ public class SingleStarServlet extends HttpServlet {
 
             // Perform the query
             try (ResultSet rs = statement.executeQuery()) {
-                JsonArray jsonArray = new JsonArray();
+                JsonObject starJsonObject = new JsonObject();
+
+                // Create a json array for movies this star has acted in
+                JsonArray starMoviesJsonArray = new JsonArray();
 
                 // Iterate through each row of rs
                 while (rs.next()) {
@@ -68,45 +71,34 @@ public class SingleStarServlet extends HttpServlet {
                     String birthYear = rs.getString("birthYear");
                     String starDob = rs.wasNull() ? "N/A" : birthYear;
 
-                    // Create a json array for movies this star has acted in
-                    JsonArray starMovies = new JsonArray();
-                    do {
-                        // If this result set contains info for another star, stop looping
-                        if (!rs.getString("starId").equals(starId)) {
-                            // Rollback the cursor to the previous star to prepare for the next loop
-                            rs.previous();
-                            break;
-                        }
-                        // Extract info for each movie
-                        JsonObject movieData = new JsonObject();
-                        String movieId = rs.getString("movieId");
-                        String movieTitle = rs.getString("title");
-                        String movieYear = rs.getString("year");
-                        String movieDirector = rs.getString("director");
+                    // Extract info for each movie
+                    String movieId = rs.getString("movieId");
+                    String movieTitle = rs.getString("title");
+                    String movieYear = rs.getString("year");
+                    String movieDirector = rs.getString("director");
 
-                        movieData.addProperty("movie_id", movieId);
-                        movieData.addProperty("movie_title", movieTitle);
-                        movieData.addProperty("movie_year", movieYear);
-                        movieData.addProperty("movie_director", movieDirector);
+                    // Add info to star json object
+                    starJsonObject.addProperty("star_id", starId);
+                    starJsonObject.addProperty("star_name", starName);
+                    starJsonObject.addProperty("star_dob", starDob);
 
-                        // Add each movie to the json array of movies
-                        starMovies.add(movieData);
-                    } while (rs.next());
+                    // Create a json object for each movie
+                    JsonObject movieJsonObject = new JsonObject();
+                    movieJsonObject.addProperty("movie_id", movieId);
+                    movieJsonObject.addProperty("movie_title", movieTitle);
+                    movieJsonObject.addProperty("movie_year", movieYear);
+                    movieJsonObject.addProperty("movie_director", movieDirector);
 
-                    // Create a JsonObject based on the data we retrieve from rs
-                    JsonObject jsonObject = new JsonObject();
-                    jsonObject.addProperty("star_id", starId);
-                    jsonObject.addProperty("star_name", starName);
-                    jsonObject.addProperty("star_dob", starDob);
-                    jsonObject.add("star_movies", starMovies);
-
-                    jsonArray.add(jsonObject);
+                    // Add each movie to the json array of movies
+                    starMoviesJsonArray.add(movieJsonObject);
                 }
 
+                starJsonObject.add("star_movies", starMoviesJsonArray);
+
                 // Write JSON string to output
-                out.write(jsonArray.toString());
+                out.write(starJsonObject.toString());
                 // Set response status to 200 (OK)
-                response.setStatus(200);
+                response.setStatus(HttpServletResponse.SC_OK);
             }
         } catch (Exception e) {
             // Write error message JSON object to output
@@ -117,7 +109,7 @@ public class SingleStarServlet extends HttpServlet {
             // Log error to localhost log
             request.getServletContext().log("Error:", e);
             // Set response status to 500 (Internal Server Error)
-            response.setStatus(500);
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         } finally {
             out.close();
         }

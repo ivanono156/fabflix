@@ -48,6 +48,9 @@ public class ShoppingCartServlet extends HttpServlet {
         JsonObject responseJsonObject = getResponseJsonObject(cart);
 
         response.getWriter().write(responseJsonObject.toString());
+
+        // Set response status to 200 (OK)
+        response.setStatus(HttpServletResponse.SC_OK);
     }
 
     // Handles POST requests to add items to the cart + returns session information
