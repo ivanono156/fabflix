@@ -23,11 +23,14 @@
 </head>
 <body>
 
-<h1>Welcome to Fabflix</h1>
+<ul class="top-nav">
+    <li><a href="index.html">Home Page</a></li>
+    <li><a href="shopping-cart.html" class="checkout-btn">Proceed to Checkout</a></li>
+</ul>
 
-<div>
-    <a href="shopping-cart.html" class="checkout-btn">Proceed to Checkout</a>
-</div>
+<div class="main-page-content">
+
+<h1>Welcome to Fabflix</h1>
 
 <h2>Top Movies</h2>
 
@@ -50,6 +53,8 @@
     <!-- Again, id "star_table_body" is useful for jQuery to find this html element -->
     <tbody id="movie_list_body"></tbody>
 </table>
+
+</div>
 
 <!-- Load jQuery and Bootstrap JS -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>

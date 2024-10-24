@@ -26,16 +26,19 @@
 </head>
 <body>
 
+<ul class="top-nav">
+    <li><a href="index.html">Home Page</a></li>
+    <li><a href="shopping-cart.html" class="checkout-btn">Proceed to Checkout</a></li>
+</ul>
+
+<div class="main-page-content">
+
 <!-- H1 element for the star name -->
 <h1 id="star_name"></h1>
 
 <!-- H3 body is left empty here, will be populated with the data retrieved by single-star.js -->
 <!-- single-star.js will find this html element by its id "star_info" -->
 <h3 id="star_info"></h3>
-
-<div>
-    <a href="shopping-cart.html" class="checkout-btn">Proceed to Checkout</a>
-</div>
 
 <div>
     <!-- Jump back to the movie list page -->
@@ -57,6 +60,8 @@
     <!-- single-star.js will find this html element by its id "movie_table_body" -->
     <tbody id="movie_table_body"></tbody>
 </table>
+
+</div>
 
 <!-- Load jQuery and Bootstrap JS -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>

@@ -26,14 +26,15 @@
 </head>
 <body>
 
-<!-- H1 element for the movie title -->
+<ul class="top-nav">
+    <li><a href="index.html">Home Page</a></li>
+    <li><a href="shopping-cart.html" class="checkout-btn">Proceed to Checkout</a></li>
+</ul>
+
+<div class="main-page-content">
 
 <!-- H3 body is left empty here, will be populated with the data retrieved from single-movie.js -->
 <!-- single-movie.js will find this html element by its id "movie_info" -->
-
-<!-- Jump back to the movie list page -->
-<p class="back-button"><a href="movie-list.html"> <i class="fas fa-arrow-left"></i>Back to Movies List</a></p>
-
 
 <table id="genres_table" class="table table-striped">
     <thead>
@@ -59,6 +60,8 @@
     <!-- single-movie.js will find this html element by its id "star_table_body" -->
     <tbody id="titles_table_body"></tbody>
 </table>
+
+</div>
 
 <!-- Load jQuery and Bootstrap JS -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>

@@ -16,12 +16,53 @@ body {
     background-color: darkgreen;
 }
 
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+form {
+    color: ghostwhite;
+}
+
 a {
     color: skyblue;
 }
 
 a:hover {
     color: cornflowerblue;
+}
+
+ul.top-nav {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #0a1c02;
+    position: fixed;
+    top: 0;
+    width: 100%;
+}
+
+ul.top-nav li {
+    float: left;
+}
+
+ul.top-nav li a {
+    display: block;
+    color: ghostwhite;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+ul.top-nav li a.active {
+    background-color: #008f3a;
+}
+
+.main-page-content {
+    margin-top: 50px;
 }
 
 .back-btn {
@@ -37,9 +78,4 @@ a:hover {
 
 .add-to-cart-btn:hover {
     background-color: lightgrey;
-}
-
-.checkout-btn {
-    background-color: white;
-    color: black;
 }
