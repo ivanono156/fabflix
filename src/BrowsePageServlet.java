@@ -45,17 +45,15 @@ public class BrowsePageServlet extends HttpServlet {
         // Get a connection from the database
         try (Connection conn = dataSource.getConnection()) {
             // Construct query
+            String genresQuery = "select g.id, g.name from genres g order by g.name;";
 
-            String query = "select g.id, g.name from genres g order by g.name;";
+            //create array to hold the jsonObjects
+            JsonArray genresJsonArray = new JsonArray();
 
             // Declare statement
-            try (PreparedStatement statement = conn.prepareStatement(query)){
-
+            try (PreparedStatement statement = conn.prepareStatement(genresQuery)){
                 // Perform the query
                 try (ResultSet rs = statement.executeQuery()) {
-                    //create array to hold the jsonObjects
-                    JsonArray jsonArray = new JsonArray();
-
                     // Iterate through each row of the result set
                     while (rs.next()) {
                         JsonObject jsonObject = new JsonObject();
@@ -64,15 +62,35 @@ public class BrowsePageServlet extends HttpServlet {
 
                         jsonObject.addProperty("genreId", genreId);
                         jsonObject.addProperty("genreName", genreName);
-                        jsonArray.add(jsonObject);
+                        genresJsonArray.add(jsonObject);
                     }
-
-                    // Write JSON string to output
-                    out.write(jsonArray.toString());
-                    // Set response status to 200 (OK)
-                    response.setStatus(200);
                 }
             }
+
+            String titlesQuery = "select distinct substring(title, 1, 1) as start_char from movies order by start_char";
+
+            JsonArray titlesJsonArray = new JsonArray();
+
+            try (PreparedStatement statement = conn.prepareStatement(titlesQuery);
+                 ResultSet rs = statement.executeQuery()) {
+                while (rs.next()) {
+                    String titleStartChar = rs.getString("start_char");
+                    if (Character.isLetterOrDigit(titleStartChar.charAt(0))) {
+                        // only return alphanumerical characters
+                        titlesJsonArray.add(titleStartChar);
+                    }
+                }
+            }
+
+            JsonObject jsonObject = new JsonObject();
+
+            jsonObject.add("genres", genresJsonArray);
+            jsonObject.add("titles", titlesJsonArray);
+
+            // Write JSON string to output
+            out.write(jsonObject.toString());
+            // Set response status to 200 (OK)
+            response.setStatus(200);
         } catch (Exception e) {
             // Write error message JSON object to output
             JsonObject jsonObject = new JsonObject();

@@ -9,7 +9,7 @@
  */
 
 
-/**
+/*
  * Handles the data returned by the API, read the jsonObject and populate data into html elements
  * @param resultData jsonObject
  */
@@ -19,20 +19,40 @@ function handleBrowseResult(resultData) {
     // Populate the movie table
     // Find the empty table body by id "star_table_body"
     let genres_Table_Element = jQuery("#genre_table_body");
-    let titles_Table_Element = jQuery("#titles_table_body");
 
     genres_Table_Element.empty();
+
+    let genres = resultData["genres"];
 
     let genreRowHTML = "";
     genreRowHTML += "<tr>";
     // Iterate through resultData, number of genres 23
-    for (let i = 0; i < resultData.length; i++) {
-        genreRowHTML += "<td><a href='movie-list.html?pagenumber=1&display=50&gid=" + resultData[i]["genreId"] + "'>" + resultData[i]["genreName"] + "</a></td>";
+    for (let i = 0; i < genres.length; i++) {
+        genreRowHTML += "<td><a href='movie-list.html?pagenumber=1&display=50&gid=" + genres[i]["genreId"] + "'>" + genres[i]["genreName"] + "</a></td>";
     }
     genreRowHTML += "</tr>";
 
     //append the row to the body
     genres_Table_Element.append(genreRowHTML);
+
+    let titles_Table_Element = jQuery("#titles_table_body");
+
+    let titles = resultData["titles"];
+
+    let titlesRowHTML = "";
+    titlesRowHTML += "<tr>";
+    for (let i = 0; i < titles.length; i++) {
+        titlesRowHTML += "<td>" +
+            "<a href='movie-list.html?pagenumber=1&display=50&title-starts-with=" + titles[i] + "'>" + titles[i] + "</a>" +
+            "</td>";
+    }
+
+    // add the "*" character too
+    titlesRowHTML += "<td><a href='movie-list.html?pagenumber=1&display=50&title-starts-with=non-alnum'>*</a></td>";
+
+    titlesRowHTML += "</tr>";
+
+    titles_Table_Element.append(titlesRowHTML);
 }
 
 
