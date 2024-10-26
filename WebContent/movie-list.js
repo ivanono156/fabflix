@@ -147,44 +147,44 @@ if (titleId != null) {
 }
 */
 let title_name = getParameterByName("title_entry");
-if(title_name !=null){
+if(title_name !== ""){
     searchParams["title_entry"] = title_name;
 }
 
 let year = getParameterByName("year_entry");
-if(year !=null){
+if(year !== ""){
     searchParams["year_entry"] = year;
 }
 
 let director_name = getParameterByName("director_entry");
-if(director_name !=null){
+if(director_name !== ""){
     searchParams["director_entry"] = director_name;
 }
 
 let star_name = getParameterByName("star_entry");
-if(star_name !=null){
+if(star_name !== ""){
     searchParams["star_entry"] = star_name;
 }
 
-if(title_name != null || year != null || director_name != null || star_name != null){
-    jQuery.ajax({
-        dataType: "json", // Setting return data type
-        method: "GET", // Setting request method
-        url: "api/search-page", // Setting request url
-        data: searchParams, // Setting search query data
-        success: (resultData) => handleMovieResult(resultData) // Setting callback function to handle data returned successfully
-    });
-}
+// if(title_name != null || year != null || director_name != null || star_name != null){
+//     jQuery.ajax({
+//         dataType: "json", // Setting return data type
+//         method: "GET", // Setting request method
+//         url: "api/search-page", // Setting request url
+//         data: searchParams, // Setting search query data
+//         success: (resultData) => handleMovieResult(resultData) // Setting callback function to handle data returned successfully
+//     });
+// }
 
-else{
-    jQuery.ajax({
-        dataType: "json", // Setting return data type
-        method: "GET", // Setting request method
-        url: "api/movie-list", // Setting request url
-        data: searchParams, // Setting search query data
-        success: (resultData) => handleMovieResult(resultData) // Setting callback function to handle data returned successfully
-    });
-}
+// else{
+jQuery.ajax({
+    dataType: "json", // Setting return data type
+    method: "GET", // Setting request method
+    url: "api/movie-list", // Setting request url
+    data: searchParams, // Setting search query data
+    success: (resultData) => handleMovieResult(resultData) // Setting callback function to handle data returned successfully
+});
+// }
 /*
 // Makes the HTTP GET request and registers on success callback function handleStarResult
 jQuery.ajax({

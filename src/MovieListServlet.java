@@ -14,6 +14,7 @@ import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
 
 // Declaring a web servlet called movie list servlet, which maps to url "/api/movie-list"
 @WebServlet(name = "MovieListServlet", urlPatterns = "/api/movie-list")
@@ -39,7 +40,9 @@ public class MovieListServlet extends HttpServlet {
         response.setContentType("application/json");
 
         String genreId = request.getParameter("gid");
+
         String titleStartsWith = request.getParameter("title-starts-with");
+
         String title_name = request.getParameter("title_entry");
         String year = request.getParameter("year_entry");
         String director_name = request.getParameter("director_entry");
@@ -60,123 +63,142 @@ public class MovieListServlet extends HttpServlet {
         try (Connection conn = dataSource.getConnection()) {
             // Construct query
 
-            String selectQuery = "select m.id, m.title , m.year, m.director, "
+            String selectQuery = "select distinct m.id, m.title , m.year, m.director, "
 
-                    //Selecting the first genre name
-                    + "(select g.name "
-                    + "from genres g "
-                    + "join genres_in_movies gim on g.id = gim.genreId "
-                    + "where gim.movieId = m.id "
-                    + "limit 1 offset 0) as genre1, "
+                //Selecting the first genre name
+                + "(select g.name "
+                + "from genres g "
+                + "join genres_in_movies gim on g.id = gim.genreId "
+                + "where gim.movieId = m.id "
+                + "limit 1 offset 0) as genre1, "
 
-                    //Selecting the second genre name
-                    + "(select g.name "
-                    + "from genres g "
-                    + "join genres_in_movies gim on g.id = gim.genreId "
-                    + "where gim.movieId = m.id "
-                    + "limit 1 offset 1) as genre2, "
+                //Selecting the second genre name
+                + "(select g.name "
+                + "from genres g "
+                + "join genres_in_movies gim on g.id = gim.genreId "
+                + "where gim.movieId = m.id "
+                + "limit 1 offset 1) as genre2, "
 
-                    //Selecting the third genre name
-                    + "(select g.name "
-                    + "from genres g "
-                    + "join genres_in_movies gim on g.id = gim.genreId "
-                    + "where gim.movieId = m.id "
-                    + "limit 1 offset 2) as genre3, "
+                //Selecting the third genre name
+                + "(select g.name "
+                + "from genres g "
+                + "join genres_in_movies gim on g.id = gim.genreId "
+                + "where gim.movieId = m.id "
+                + "limit 1 offset 2) as genre3, "
 
-                    //Selecting the first genre id
-                    + "(select g.id "
-                    + "from genres g "
-                    + "join genres_in_movies gim on g.id = gim.genreId "
-                    + "where gim.movieId = m.id "
-                    + "limit 1 offset 0) as genre1Id, "
+                //Selecting the first genre id
+                + "(select g.id "
+                + "from genres g "
+                + "join genres_in_movies gim on g.id = gim.genreId "
+                + "where gim.movieId = m.id "
+                + "limit 1 offset 0) as genre1Id, "
 
-                    //Selecting the second genre id
-                    + "(select g.id "
-                    + "from genres g "
-                    + "join genres_in_movies gim on g.id = gim.genreId "
-                    + "where gim.movieId = m.id "
-                    + "limit 1 offset 1) as genre2Id, "
+                //Selecting the second genre id
+                + "(select g.id "
+                + "from genres g "
+                + "join genres_in_movies gim on g.id = gim.genreId "
+                + "where gim.movieId = m.id "
+                + "limit 1 offset 1) as genre2Id, "
 
-                    //Selecting the third genre id
-                    + "(select g.id "
-                    + "from genres g "
-                    + "join genres_in_movies gim on g.id = gim.genreId "
-                    + "where gim.movieId = m.id "
-                    + "limit 1 offset 2) as genre3Id, "
+                //Selecting the third genre id
+                + "(select g.id "
+                + "from genres g "
+                + "join genres_in_movies gim on g.id = gim.genreId "
+                + "where gim.movieId = m.id "
+                + "limit 1 offset 2) as genre3Id, "
 
 
-                    +"(select s.name " // getting star1
-                    + "from stars s "
-                    + "join stars_in_movies sim on s.id = sim.starId "
-                    + "where sim.movieId = m.id "
-                    + "limit 1 offset 0) as star1, "
+                +"(select s.name " // getting star1
+                + "from stars s "
+                + "join stars_in_movies sim on s.id = sim.starId "
+                + "where sim.movieId = m.id "
+                + "limit 1 offset 0) as star1, "
 
-                    +"(select s.id " // getting star1 id
-                    + "from stars s "
-                    + "join stars_in_movies sim on s.id = sim.starId "
-                    + "where sim.movieId = m.id "
-                    + "limit 1 offset 0) as star1Id, "
+                +"(select s.id " // getting star1 id
+                + "from stars s "
+                + "join stars_in_movies sim on s.id = sim.starId "
+                + "where sim.movieId = m.id "
+                + "limit 1 offset 0) as star1Id, "
 
-                    +"(select s.name " //star 2
-                    + "from stars s "
-                    + "join stars_in_movies sim on s.id = sim.starId "
-                    + "where sim.movieId = m.id "
-                    + "limit 1 offset 1) as star2, "
+                +"(select s.name " //star 2
+                + "from stars s "
+                + "join stars_in_movies sim on s.id = sim.starId "
+                + "where sim.movieId = m.id "
+                + "limit 1 offset 1) as star2, "
 
-                    +"(select s.id " //star2 id
-                    + "from stars s "
-                    + "join stars_in_movies sim on s.id = sim.starId "
-                    + "where sim.movieId = m.id "
-                    + "limit 1 offset 1) as star2Id, "
+                +"(select s.id " //star2 id
+                + "from stars s "
+                + "join stars_in_movies sim on s.id = sim.starId "
+                + "where sim.movieId = m.id "
+                + "limit 1 offset 1) as star2Id, "
 
-                    +"(select s.name " // star 3
-                    + "from stars s "
-                    + "join stars_in_movies sim on s.id = sim.starId "
-                    + "where sim.movieId = m.id "
-                    + "limit 1 offset 2) as star3, "
+                +"(select s.name " // star 3
+                + "from stars s "
+                + "join stars_in_movies sim on s.id = sim.starId "
+                + "where sim.movieId = m.id "
+                + "limit 1 offset 2) as star3, "
 
-                    +"(select s.id " // star3 id
-                    + "from stars s "
-                    + "join stars_in_movies sim on s.id = sim.starId "
-                    + "where sim.movieId = m.id "
-                    + "limit 1 offset 2) as star3Id, "
+                +"(select s.id " // star3 id
+                + "from stars s "
+                + "join stars_in_movies sim on s.id = sim.starId "
+                + "where sim.movieId = m.id "
+                + "limit 1 offset 2) as star3Id, "
 
-                    + "r.rating "
-                    + "from movies m "
-                    + "join ratings r on m.id = r.movieId ";
+                + "r.rating "
+                + "from movies m "
+                + "join ratings r on m.id = r.movieId ";
 
-                    String searchQuery = "";
-                    String orderQuery = "order by r.rating desc ";
-                    String limitQuery = "limit ? offset ?;";
+            String searchQuery = "";
+            String orderQuery = "order by r.rating desc ";
+            String limitQuery = "limit ? offset ?;";
 
-                    if (genreId != null) {
-                        searchQuery = "inner join genres_in_movies gim on m.id = gim.movieId " +
-                                "inner join genres g on gim.genreId = g.id where g.id = ? ";
-                    } else if (titleStartsWith != null) {
-                        searchQuery += "where m.title like ? ";
-                    }
-                    String searchPageQuery = "";
-                    if(title_name!=null || year != null || director_name != null || star_name != null) {
-                        searchPageQuery = "join stars_in_movies sim ON sim.movieId = m.id " +
-                                "join stars s ON sim.starId = s.id where sim.movieId = m.id ";
-                    }
+            if (genreId != null) {
+                searchQuery = "inner join genres_in_movies gim on m.id = gim.movieId " +
+                        "inner join genres g on gim.genreId = g.id where g.id = ? ";
+            } else if (titleStartsWith != null) {
+                if (titleStartsWith.equalsIgnoreCase("non-alnum")) {
+                    searchQuery = "where substring(m.title, 1, 1) REGEXP '[^a-z0-9]+' ";
+                } else {
+                    searchQuery = "where m.title like ? ";
+                }
+            } else {
+//                    String searchPageQuery = "";
+                if ((title_name != null && !title_name.isEmpty())
+                        || (year != null && !year.isEmpty())
+                        || (director_name != null && !director_name.isEmpty())
+                        || (star_name != null && !star_name.isEmpty())) {
+                    searchQuery = "inner join stars_in_movies sim on m.id = sim.movieId " +
+                            "inner join stars s on sim.starId = s.id " +
+                            "where ";
+                }
 
-                    if(!title_name.isEmpty()){
-                        searchPageQuery += " and m. title like ?";
-                    }
-                    if(!year.isEmpty()){
-                        searchPageQuery += " and m.year = ?";
-                    }
-                    if(!director_name.isEmpty()){
-                        searchPageQuery += " and m.director like ?";
-                    }
-                    if(!star_name.isEmpty()){
-                        searchPageQuery += " and s.name like ?";
-                    }
+                ArrayList<String> queryArgs = new ArrayList<>();
 
-                    String query = selectQuery + searchQuery + searchPageQuery + orderQuery + limitQuery;
+                if (title_name != null && !title_name.isEmpty()) {
+                    queryArgs.add("m. title like ? ");
+                }
+                if (year != null && !year.isEmpty()) {
+//                    searchQuery += "and m.year = ? ";
+                    queryArgs.add("m.year = ? ");
+                }
+                if (director_name != null && !director_name.isEmpty()) {
+//                    searchQuery += "and m.director like ? ";
+                    queryArgs.add("m.director like ? ");
+                }
+                if (star_name != null && !star_name.isEmpty()) {
+//                    searchQuery += "and s.name like ? ";
+//                    queryArgs.add("(select s.name from stars s " +
+//                            "inner join stars_in_movies sim on s.id = sim.starId " +
+//                            "where sim.movieId = m.id) as s like ? ");
+                     queryArgs.add("s.name like ? ");
+                }
 
-                    System.out.println(query);
+                searchQuery += String.join("and ", queryArgs);
+            }
+
+            String query = selectQuery + searchQuery /*+ searchPageQuery */+ orderQuery + limitQuery;
+
+            System.out.println(query);
            
             // Declare statement
             try (PreparedStatement statement = conn.prepareStatement(query)){
@@ -184,22 +206,26 @@ public class MovieListServlet extends HttpServlet {
                 if (genreId != null) {
                     statement.setInt(params++, Integer.parseInt(genreId));
                 } else if (titleStartsWith != null) {
-                    statement.setString(params++, titleStartsWith + "%");
+                    if (!titleStartsWith.equalsIgnoreCase("non-alnum")) {
+                        statement.setString(params++, titleStartsWith + "%");
+                    }
+                } else {
+                    if (title_name != null && !title_name.isEmpty()) {
+                        statement.setString(params++, "%" + title_name + "%");
+                    }
+                    if (year != null && !year.isEmpty()) {
+                        statement.setInt(params++, Integer.parseInt(year));
+                    }
+                    if (director_name != null && !director_name.isEmpty()) {
+                        statement.setString(params++, "%" + director_name + "%");
+                    }
+                    if (star_name != null && !star_name.isEmpty()) {
+                        statement.setString(params++, "%" + star_name + "%");
+                    }
                 }
 
 
-                if(!title_name.isEmpty()){
-                    statement.setString(params++, "%" + title_name + "%");
-                }
-                if(!year.isEmpty()){
-                    statement.setInt(params++, Integer.parseInt(year));
-                }
-                if(!director_name.isEmpty()){
-                    statement.setString(params++, "%" + director_name + "%");
-                }
-                if(!star_name.isEmpty()){
-                    statement.setString(params++, "%" + star_name + "%");
-                }
+
                 // Set the limit & offset params for pagination
                 int limit = Integer.parseInt(display);
                 statement.setInt(params++, limit);

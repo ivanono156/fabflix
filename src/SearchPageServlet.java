@@ -136,22 +136,22 @@ public class SearchPageServlet extends HttpServlet {
 
                         jsonObject.add("genres", movieGenres);
 
-                        jsonArray.add(jsonObject);
-                        JsonObject obj = new JsonObject();
-                        String movieTitle = rs.getString("title");
-                        String movieYear = rs.getString("year");
-                        String movieId = rs.getString("movieId");
-                        String movieDirector = rs.getString("director");
-                        String movieStarName = rs.getString("name");
+                        array.add(jsonObject);
+//                        JsonObject obj = new JsonObject();
+//                        String movieTitle = rs.getString("title");
+//                        String movieYear = rs.getString("year");
+//                        String movieId = rs.getString("movieId");
+//                        String movieDirector = rs.getString("director");
+//                        String movieStarName = rs.getString("name");
+//
+//
+//                        obj.addProperty("movieTitle", movieTitle);
+//                        obj.addProperty("movieYear", movieYear);
+//                        obj.addProperty("movieId", movieId);
+//                        obj.addProperty("movieDirector", movieDirector);
+//                        obj.addProperty("movieStar", movieStarName);
 
-
-                        obj.addProperty("movieTitle", movieTitle);
-                        obj.addProperty("movieYear", movieYear);
-                        obj.addProperty("movieId", movieId);
-                        obj.addProperty("movieDirector", movieDirector);
-                        obj.addProperty("movieStar", movieStarName);
-
-                        array.add(obj);
+//                        array.add(obj);
                     }
                     // Write JSON string to output
                     out.write(array.toString());
