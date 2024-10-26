@@ -40,6 +40,10 @@ public class MovieListServlet extends HttpServlet {
 
         String genreId = request.getParameter("gid");
         String titleStartsWith = request.getParameter("title-starts-with");
+        String title_name = request.getParameter("title_entry");
+        String year = request.getParameter("year_entry");
+        String director_name = request.getParameter("director_entry");
+        String star_name = request.getParameter("star_entry");
 
         // Pagination params
         // limit; how many movies will be displayed on each page
@@ -146,13 +150,31 @@ public class MovieListServlet extends HttpServlet {
                     String limitQuery = "limit ? offset ?;";
 
                     if (genreId != null) {
-                        searchQuery += "inner join genres_in_movies gim on m.id = gim.movieId " +
+                        searchQuery = "inner join genres_in_movies gim on m.id = gim.movieId " +
                                 "inner join genres g on gim.genreId = g.id where g.id = ? ";
                     } else if (titleStartsWith != null) {
                         searchQuery += "where m.title like ? ";
                     }
+                    String searchPageQuery = "";
+                    if(title_name!=null || year != null || director_name != null || star_name != null) {
+                        searchPageQuery = "join stars_in_movies sim ON sim.movieId = m.id " +
+                                "join stars s ON sim.starId = s.id where sim.movieId = m.id ";
+                    }
 
-                    String query = selectQuery + searchQuery + orderQuery + limitQuery;
+                    if(!title_name.isEmpty()){
+                        searchPageQuery += " and m. title like ?";
+                    }
+                    if(!year.isEmpty()){
+                        searchPageQuery += " and m.year = ?";
+                    }
+                    if(!director_name.isEmpty()){
+                        searchPageQuery += " and m.director like ?";
+                    }
+                    if(!star_name.isEmpty()){
+                        searchPageQuery += " and s.name like ?";
+                    }
+
+                    String query = selectQuery + searchQuery + searchPageQuery + orderQuery + limitQuery;
 
                     System.out.println(query);
            
@@ -163,6 +185,20 @@ public class MovieListServlet extends HttpServlet {
                     statement.setInt(params++, Integer.parseInt(genreId));
                 } else if (titleStartsWith != null) {
                     statement.setString(params++, titleStartsWith + "%");
+                }
+
+
+                if(!title_name.isEmpty()){
+                    statement.setString(params++, "%" + title_name + "%");
+                }
+                if(!year.isEmpty()){
+                    statement.setInt(params++, Integer.parseInt(year));
+                }
+                if(!director_name.isEmpty()){
+                    statement.setString(params++, "%" + director_name + "%");
+                }
+                if(!star_name.isEmpty()){
+                    statement.setString(params++, "%" + star_name + "%");
                 }
                 // Set the limit & offset params for pagination
                 int limit = Integer.parseInt(display);

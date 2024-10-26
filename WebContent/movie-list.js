@@ -55,6 +55,7 @@ function addToCart(submitEvent) {
     });
 }
 
+
 function handleMovieResult(resultData) {
     console.log("handleMovieResult: populating movie table from resultData");
 
@@ -139,7 +140,52 @@ if (titleStartsWith != null) {
 } else {
     sessionStorage.removeItem("title-starts-with")
 }
+/*
+let titleId = getParameterByName("title_entry");
+if (titleId != null) {
+    searchParams["title_entry"] = titleId;  // add gid parameter to url
+}
+*/
+let title_name = getParameterByName("title_entry");
+if(title_name !=null){
+    searchParams["title_entry"] = title_name;
+}
 
+let year = getParameterByName("year_entry");
+if(year !=null){
+    searchParams["year_entry"] = year;
+}
+
+let director_name = getParameterByName("director_entry");
+if(director_name !=null){
+    searchParams["director_entry"] = director_name;
+}
+
+let star_name = getParameterByName("star_entry");
+if(star_name !=null){
+    searchParams["star_entry"] = star_name;
+}
+
+if(title_name != null || year != null || director_name != null || star_name != null){
+    jQuery.ajax({
+        dataType: "json", // Setting return data type
+        method: "GET", // Setting request method
+        url: "api/search-page", // Setting request url
+        data: searchParams, // Setting search query data
+        success: (resultData) => handleMovieResult(resultData) // Setting callback function to handle data returned successfully
+    });
+}
+
+else{
+    jQuery.ajax({
+        dataType: "json", // Setting return data type
+        method: "GET", // Setting request method
+        url: "api/movie-list", // Setting request url
+        data: searchParams, // Setting search query data
+        success: (resultData) => handleMovieResult(resultData) // Setting callback function to handle data returned successfully
+    });
+}
+/*
 // Makes the HTTP GET request and registers on success callback function handleStarResult
 jQuery.ajax({
     dataType: "json", // Setting return data type
@@ -148,3 +194,5 @@ jQuery.ajax({
     data: searchParams, // Setting search query data
     success: (resultData) => handleMovieResult(resultData) // Setting callback function to handle data returned successfully
 });
+
+*/
