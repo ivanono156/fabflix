@@ -15,26 +15,32 @@
 
     <title>Login to Fabflix</title>
 </head>
+
 <body>
+
 <h2>Login to Fabflix</h2>
+
 <!-- Set the method to POST to avoid showing the email/password in the URL
      The default action is disabled to allow your own implementation. -->
-<form id="login_form" method="post" action="#">
-    <label for="email"><b>Email:</b></label>
-    <input name="email" placeholder="Enter Email" type="email" id="email"><br>
+<div class="login-form">
+    <form id="login-form" method="post" action="#">
+        <label for="email"><b>Email:</b></label>
+        <input name="email" placeholder="Enter Email" type="email" id="email"><br>
 
-    <label for="password"><b>Password:</b></label>
-    <input name="password" placeholder="Enter Password" type="password" id="password"><br>
+        <label for="password"><b>Password:</b></label>
+        <input name="password" placeholder="Enter Password" type="password" id="password"><br>
 
-    <input type="submit" value="Login">
-</form>
+        <input type="submit" value="Login">
+    </form>
+</div>
 
 <div id="login_error_message"></div>
 
 <!-- include jQuery-->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-<!-- include our own JS file -->
-<script src="./login.js"></script>
+
+<script src="login.js"></script>
 
 </body>
+
 </html>

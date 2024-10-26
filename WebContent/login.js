@@ -1,4 +1,4 @@
-let login_form = $("#login_form");
+let login_form = $("#login-form");
 
 function handleLoginResult(resultData) {
 
