@@ -28,7 +28,7 @@ function handleBrowseResult(resultData) {
     genreRowHTML += "<tr>";
     // Iterate through resultData, number of genres 23
     for (let i = 0; i < genres.length; i++) {
-        genreRowHTML += "<td><a href='movie-list.html?pagenumber=1&display=50&gid=" + genres[i]["genreId"] + "'>" + genres[i]["genreName"] + "</a></td>";
+        genreRowHTML += "<td><a href='movie-list.html?pagenumber=1&display=" + getSessionDisplay() + "&gid=" + genres[i]["genreId"] + "'>" + genres[i]["genreName"] + "</a></td>";
     }
     genreRowHTML += "</tr>";
 
@@ -43,12 +43,12 @@ function handleBrowseResult(resultData) {
     titlesRowHTML += "<tr>";
     for (let i = 0; i < titles.length; i++) {
         titlesRowHTML += "<td>" +
-            "<a href='movie-list.html?pagenumber=1&display=50&title-starts-with=" + titles[i] + "'>" + titles[i] + "</a>" +
+            "<a href='movie-list.html?pagenumber=1&display=" + getSessionDisplay() + "&title-starts-with=" + titles[i] + "'>" + titles[i] + "</a>" +
             "</td>";
     }
 
     // add the "*" character too
-    titlesRowHTML += "<td><a href='movie-list.html?pagenumber=1&display=50&title-starts-with=non-alnum'>*</a></td>";
+    titlesRowHTML += "<td><a href='movie-list.html?pagenumber=1&display=" + getSessionDisplay() + "&title-starts-with=non-alnum'>*</a></td>";
 
     titlesRowHTML += "</tr>";
 

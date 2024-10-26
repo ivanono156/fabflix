@@ -39,6 +39,7 @@ public class MovieListServlet extends HttpServlet {
         response.setContentType("application/json");
 
         String genreId = request.getParameter("gid");
+        String titleStartsWith = request.getParameter("title-starts-with");
 
         // Pagination params
         // limit; how many movies will be displayed on each page
@@ -145,8 +146,10 @@ public class MovieListServlet extends HttpServlet {
                     String limitQuery = "limit ? offset ?;";
 
                     if (genreId != null) {
-                        searchQuery = "inner join genres_in_movies gim on m.id = gim.movieId " +
+                        searchQuery += "inner join genres_in_movies gim on m.id = gim.movieId " +
                                 "inner join genres g on gim.genreId = g.id where g.id = ? ";
+                    } else if (titleStartsWith != null) {
+                        searchQuery += "where m.title like ? ";
                     }
 
                     String query = selectQuery + searchQuery + orderQuery + limitQuery;
@@ -158,6 +161,8 @@ public class MovieListServlet extends HttpServlet {
                 int params = 1;
                 if (genreId != null) {
                     statement.setInt(params++, Integer.parseInt(genreId));
+                } else if (titleStartsWith != null) {
+                    statement.setString(params++, titleStartsWith + "%");
                 }
                 // Set the limit & offset params for pagination
                 int limit = Integer.parseInt(display);

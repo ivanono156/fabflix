@@ -81,6 +81,12 @@ function handleResult(resultData) {
         // Append the row created to the table body, which will refresh the page
         movieTableBodyElement.append(rowHTML);
     }
+
+    let backToMovieListElement = $("#back-to-movie-list");
+
+    let href = "movie-list.html?" + getSessionDataAsUrl();
+
+    backToMovieListElement.append('<a href="' + href + '" class="back-btn">Back to Movies List</a>');
 }
 
 /**

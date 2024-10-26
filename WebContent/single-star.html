@@ -19,9 +19,6 @@
     <!-- Our CSS file -->
     <link rel="stylesheet" href="design.css">
 
-    <!-- Icons from fontawesome.com -->
-    <script src="https://kit.fontawesome.com/8d5588e0cf.js" crossorigin="anonymous"></script>
-
     <title>Single Star</title>
 </head>
 <body>
@@ -42,9 +39,7 @@
 
 <div>
     <!-- Jump back to the movie list page -->
-    <a href="movie-list.html" class="back-btn">
-        <i class="fas fa-arrow-left"></i> Back to Movies List
-    </a>
+    <div id="back-to-movie-list"></div>
 </div>
 
 <table id="movie_table" class="table table-striped">
@@ -72,6 +67,7 @@
 <!-- The path is relative to single-star.html, since these two files are in the same directory -->
 <!-- Note the url does not contain a "/" in the beginning, which means the url is relative to current path
      otherwise the url is relative to the root path-->
+<script src="session-data.js"></script>
 <script src="single-star.js"></script>
 </body>
 

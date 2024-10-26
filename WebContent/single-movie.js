@@ -112,6 +112,12 @@ function handleResult(resultData) {
         "<input type='hidden' name='id' value='" + resultData["movie_id"] + "'>" +
         // value of 1 means to increment quantity (per ShoppingCartServlet.java)
         "<input type='hidden' name='quantity' value='1'>");
+
+    let backToMovieListElement = $("#back-to-movie-list");
+
+    let href = "movie-list.html?" + getSessionDataAsUrl();
+
+    backToMovieListElement.append('<a href="' + href + '" class="back-btn">Back to Movies List</a>');
 }
 
 /**

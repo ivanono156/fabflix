@@ -119,13 +119,25 @@ function handleMovieResult(resultData) {
  */
 
 let searchParams = {
-    pagenumber: 1, //pagenumber: getParameterByName("pagenumber"),
-    display: 50, //display: getParameterByName("display")
+    pagenumber: getSessionPageNumber(),
+    display: getSessionDisplay()
 }
 
 let genreId = getParameterByName("gid");
+// let genreId = getParameterByName(genreKeyName)
 if (genreId != null) {
     searchParams["gid"] = genreId;  // add gid parameter to url
+    sessionStorage.setItem("gid", genreId);
+} else {
+    sessionStorage.removeItem("gid");
+}
+
+let titleStartsWith = getParameterByName("title-starts-with");
+if (titleStartsWith != null) {
+    searchParams["title-starts-with"] = titleStartsWith;  // add gid parameter to url
+    sessionStorage.setItem("title-starts-with", titleStartsWith);
+} else {
+    sessionStorage.removeItem("title-starts-with")
 }
 
 // Makes the HTTP GET request and registers on success callback function handleStarResult
