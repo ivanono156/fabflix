@@ -24,6 +24,7 @@ function handleLoginResult(resultData) {
  * @param resultData jsonObject
  */
 // Ensure the script runs after the DOM is fully loaded
+
 document.addEventListener("DOMContentLoaded", function() {
     // Get the form element by its ID (replace 'searchForm' with your actual form ID)
     const form = document.getElementById("search-page-searches");
@@ -31,21 +32,40 @@ document.addEventListener("DOMContentLoaded", function() {
     form.addEventListener("submit", function(event) {
         event.preventDefault(); // Prevent the default form submission
 
-        // Get values from form fields (replace with your actual input names)
-        //const genre = document.getElementById("genre").value; // Example field
-        //const title = document.getElementById("title").value; // Example field
+        const formData = new FormData(form);
+        const title = formData.get('title_entry');
+        const year= formData.get('year_entry');
+        const director = formData.get('director_entry');
+        const star = formData.get('star_entry');
 
+        let redirectUrl = 'movie-list.html?'
         // Construct the redirect URL with query parameters
-        let redirectUrl = `movie-list.html?`;
-/*
-        if (genre) {
-            redirectUrl += `gid=${encodeURIComponent(genre)}&`;
-        }
+
         if (title) {
             redirectUrl += `title_entry=${encodeURIComponent(title)}&`;
         }
-*/
+        if (year) {
+            redirectUrl += `title_entry=${encodeURIComponent(year)}&`;
+        }
+        if (director) {
+            redirectUrl += `title_entry=${encodeURIComponent(director)}&`;
+        }
+        if (star) {
+            redirectUrl += `title_entry=${encodeURIComponent(star)}&`;
+        }
+        if (redirectUrl.endsWith('&')) {
+            redirectUrl = redirectUrl.slice(0, -1);
+        }
         // Redirect to the constructed URL
         window.location.href = redirectUrl;
     });
 });
+/*
+jQuery.ajax({
+    dataType: "json", // Setting return data type
+    method: "GET", // Setting request method
+    url: "api/search-page", // Setting request url, which is mapped by StarsServlet in Stars.java
+    success: (resultData) => handleSearchResult(resultData) // Setting callback function to handle data returned successfully by the StarsServlet
+});
+
+ */

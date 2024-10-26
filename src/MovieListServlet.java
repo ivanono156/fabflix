@@ -153,25 +153,8 @@ public class MovieListServlet extends HttpServlet {
                                 "inner join genres g on gim.genreId = g.id where g.id = ? ";
                     }
                     String searchPageQuery = "";
-                    if(title_name!=null || year != null || director_name != null || star_name != null) {
-                        searchPageQuery = "join stars_in_movies sim ON sim.movieId = m.id " +
-                                "join stars s ON sim.starId = s.id where sim.movieId = m.id ";
-                    }
 
-                    if(!title_name.isEmpty()){
-                        searchPageQuery += " and m. title like ?";
-                    }
-                    if(!year.isEmpty()){
-                        searchPageQuery += " and m.year = ?";
-                    }
-                    if(!director_name.isEmpty()){
-                        searchPageQuery += " and m.director like ?";
-                    }
-                    if(!star_name.isEmpty()){
-                        searchPageQuery += " and s.name like ?";
-                    }
-
-                    String query = selectQuery + searchQuery + searchPageQuery + orderQuery + limitQuery;
+                    String query = selectQuery + searchQuery + orderQuery + limitQuery;
 
                     System.out.println(query);
            
@@ -182,19 +165,6 @@ public class MovieListServlet extends HttpServlet {
                     statement.setInt(params++, Integer.parseInt(genreId));
                 }
 
-
-                if(!title_name.isEmpty()){
-                    statement.setString(params++, "%" + title_name + "%");
-                }
-                if(!year.isEmpty()){
-                    statement.setInt(params++, Integer.parseInt(year));
-                }
-                if(!director_name.isEmpty()){
-                    statement.setString(params++, "%" + director_name + "%");
-                }
-                if(!star_name.isEmpty()){
-                    statement.setString(params++, "%" + star_name + "%");
-                }
                 // Set the limit & offset params for pagination
                 int limit = Integer.parseInt(display);
                 statement.setInt(params++, limit);

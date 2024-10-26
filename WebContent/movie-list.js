@@ -182,5 +182,4 @@ jQuery.ajax({
     data: searchParams, // Setting search query data
     success: (resultData) => handleMovieResult(resultData) // Setting callback function to handle data returned successfully
 });
-
 */
