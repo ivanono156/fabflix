@@ -147,23 +147,35 @@ if (titleId != null) {
 }
 */
 let title_name = getParameterByName("title_entry");
-if(title_name !== ""){
+if (title_name != null && title_name !== "") {
     searchParams["title_entry"] = title_name;
+    sessionStorage.setItem("title_entry", title_name);
+} else {
+    sessionStorage.removeItem("title_entry")
 }
 
 let year = getParameterByName("year_entry");
-if(year !== ""){
+if (year != null && year !== "") {
     searchParams["year_entry"] = year;
+    sessionStorage.setItem("year_entry", year);
+} else {
+    sessionStorage.removeItem("year_entry")
 }
 
 let director_name = getParameterByName("director_entry");
-if(director_name !== ""){
+if (director_name != null && director_name !== "") {
     searchParams["director_entry"] = director_name;
+    sessionStorage.setItem("director_entry", director_name);
+} else {
+    sessionStorage.removeItem("director_entry")
 }
 
 let star_name = getParameterByName("star_entry");
-if(star_name !== ""){
+if (star_name != null && star_name !== "") {
     searchParams["star_entry"] = star_name;
+    sessionStorage.setItem("star_entry", star_name);
+} else {
+    sessionStorage.removeItem("star_entry")
 }
 
 // if(title_name != null || year != null || director_name != null || star_name != null){

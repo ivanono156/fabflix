@@ -1,7 +1,14 @@
+// used in all movie list pages
 const pageNumberKeyName = "pagenumber";
 const displayKeyName = "display";
+// browse page parameters
 const genreKeyName = "gid";
 const titleStartsWithKeyName = "title-starts-with";
+// search page parameters
+const searchByTitleKeyName = "title_entry";
+const searchByYearKeyName = "year_entry";
+const searchByDirectorKeyName = "director_entry";
+const searchByStarKeyName = "star_entry";
 
 
 function getSessionPageNumber() {
@@ -22,12 +29,39 @@ function getSessionDisplay() {
     return parseInt(sessionDisplay);
 }
 
-function getSessionGenreId() {
+function getBrowseByGenreSessionData() {
     return sessionStorage.getItem(genreKeyName);
 }
 
-function getSessionTitleStartsWith() {
+function getTitleStartsWithSessionData() {
     return sessionStorage.getItem(titleStartsWithKeyName);
+}
+
+function getSearchByTitleSessionData() {
+    return sessionStorage.getItem(searchByTitleKeyName);
+}
+
+function getSearchByYearSessionData() {
+    return sessionStorage.getItem(searchByYearKeyName);
+}
+
+function getSearchByDirectorSessionData() {
+    return sessionStorage.getItem(searchByDirectorKeyName);
+}
+
+function getSearchByStarSessionData() {
+    return sessionStorage.getItem(searchByStarKeyName);
+}
+
+function setParamSessionData (keyName, searchParams) {
+    let value = getParameterByName(keyName);
+    if (value != null && value !== "") {
+        searchParams[keyName] = value;
+        sessionStorage.setItem(keyName, value);
+    } else {
+        sessionStorage.removeItem(keyName);
+    }
+    return searchParams;
 }
 
 function createUrlParams(key, value) {
@@ -37,8 +71,8 @@ function createUrlParams(key, value) {
 function getSessionDataAsUrl() {
     let sessionPageNumber = getSessionPageNumber();
     let sessionDisplay = getSessionDisplay();
-    let sessionGenreId = getSessionGenreId();
-    let sessionTitleStartsWith = getSessionTitleStartsWith();
+    let sessionGenreId = getBrowseByGenreSessionData();
+    let sessionTitleStartsWith = getTitleStartsWithSessionData();
 
     let urlString = createUrlParams(pageNumberKeyName, sessionPageNumber) + "&" + createUrlParams(displayKeyName, sessionDisplay)
 
@@ -46,6 +80,27 @@ function getSessionDataAsUrl() {
         urlString += "&" + createUrlParams(genreKeyName, sessionGenreId);
     } else if (sessionTitleStartsWith != null) {
         urlString += "&" + createUrlParams(titleStartsWithKeyName, sessionTitleStartsWith);
+    } else {
+        // search page session data
+        let title = getSearchByTitleSessionData();
+        if (title != null) {
+            urlString += "&" + createUrlParams(searchByTitleKeyName, title);
+        }
+
+        let year = getSearchByYearSessionData()
+        if (year != null) {
+            urlString += "&" + createUrlParams(searchByYearKeyName, year);
+        }
+
+        let director = getSearchByDirectorSessionData();
+        if (director != null) {
+            urlString += "&" + createUrlParams(searchByDirectorKeyName, director);
+        }
+
+        let star = getSearchByStarSessionData()
+        if (star != null) {
+            urlString += "&" + createUrlParams(searchByStarKeyName, star);
+        }
     }
 
     return urlString;
