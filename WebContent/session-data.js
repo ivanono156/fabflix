@@ -9,6 +9,8 @@ const searchByTitleKeyName = "title_entry";
 const searchByYearKeyName = "year_entry";
 const searchByDirectorKeyName = "director_entry";
 const searchByStarKeyName = "star_entry";
+const searchBySortField = "sort_field";
+const searchBySortOrder = "sort_order";
 
 
 function getSessionPageNumber() {
@@ -53,6 +55,15 @@ function getSearchByStarSessionData() {
     return sessionStorage.getItem(searchByStarKeyName);
 }
 
+function getSearchBySortFieldSessionData(){
+    return sessionStorage.getItem(searchBySortField);
+}
+
+function getSearchBySortOrderSessionData(){
+    return sessionStorage.getItem(searchBySortOrder);
+}
+
+
 function createUrlParams(key, value) {
     return key + "=" + value;
 }
@@ -76,7 +87,7 @@ function getSessionDataAsUrl() {
             urlString += "&" + createUrlParams(searchByTitleKeyName, title);
         }
 
-        let year = getSearchByYearSessionData()
+        let year = getSearchByYearSessionData();
         if (year != null) {
             urlString += "&" + createUrlParams(searchByYearKeyName, year);
         }
@@ -86,9 +97,19 @@ function getSessionDataAsUrl() {
             urlString += "&" + createUrlParams(searchByDirectorKeyName, director);
         }
 
-        let star = getSearchByStarSessionData()
+        let star = getSearchByStarSessionData();
         if (star != null) {
             urlString += "&" + createUrlParams(searchByStarKeyName, star);
+        }
+
+        let sortField = getSearchBySortFieldSessionData();
+        if(sortField != null) {
+            urlString += "&" + createUrlParams(searchBySortField, sortField);
+        }
+
+        let sortOrder = getSearchBySortOrderSessionData();
+        if(sortOrder != null){
+            urlString += "&" + createUrlParams(searchBySortOrder, sortOrder);
         }
     }
 
