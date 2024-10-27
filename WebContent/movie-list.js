@@ -141,7 +141,7 @@ let director_name = getParameterByName(searchByDirectorKeyName);
 let star_name = getParameterByName(searchByStarKeyName);
 
 //for browsepage reads the letter the user selected in the url
-let search_letter = getParameterByName(titleStartsWithKeyName);
+let search_letter = getParameterByName("search_title_entry");
 
 if(title_name != null || year != null || director_name != null || star_name != null){
     console.log("search page servlet executed");

@@ -62,7 +62,7 @@ ul.top-nav li a.active {
 }
 
 .main-page-content {
-    margin-top: 50px;
+    margin-top: 60px;
 }
 
 .login-form {
@@ -76,16 +76,17 @@ ul.top-nav li a.active {
 
 #genres_grid.grid-container {
     display: grid;
-    grid-template-columns: auto auto auto;
+    grid-template-columns: repeat(3, auto);
 }
 
 #titles_grid.grid-container {
     display: grid;
-    grid-template-columns: auto auto auto auto auto auto auto auto auto auto;
+    grid-template-columns: repeat(10, auto);
 }
 
 .grid-item {
     text-align: center;
+    place-items: center;
 }
 
 .back-btn {
