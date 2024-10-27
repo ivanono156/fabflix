@@ -42,6 +42,10 @@ public class MovieListServlet extends HttpServlet {
         String genreId = request.getParameter("gid");
 
         String titleStartsWith = request.getParameter("title-starts-with");
+        String sortFieldEntry = request.getParameter("sort_field");
+        String sortOrderEntry = request.getParameter("sort_order");
+        String sortFieldEntry2 = request.getParameter("sort_field2");
+        String sortOrderEntry2 = request.getParameter("sort_order2");
 
         // Pagination params
         // limit; how many movies will be displayed on each page
@@ -65,6 +69,7 @@ public class MovieListServlet extends HttpServlet {
         // Get a connection from the database
         try (Connection conn = dataSource.getConnection()) {
             // Construct query
+
             String selectQuery = "select distinct m.id, m.title , m.year, m.director, "
 
                 //Selecting the first genre name
@@ -155,10 +160,11 @@ public class MovieListServlet extends HttpServlet {
             String limitQuery = "limit ? offset ?;";
 
             String orderQuery = "order by ";
-            if (sortFieldEntry.equalsIgnoreCase("title")) {
-                orderQuery += "m.title " + sortOrderEntry + ", r.rating " + sortOrderEntry + " ";
-            } else {
-                orderQuery += "r.rating " + sortOrderEntry + ", m.title " + sortOrderEntry + " ";
+            if (sortFieldEntry != null && sortFieldEntry2!= null && sortOrderEntry != null && sortOrderEntry2 != null) {
+                orderQuery += "m.title " + sortOrderEntry + ", r.rating " + sortOrderEntry2 + " ";
+            }
+            else{
+                orderQuery += "r.rating desc ";
             }
 
             if (genreId != null) {

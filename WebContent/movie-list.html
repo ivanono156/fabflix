@@ -35,7 +35,7 @@
 <h2>Movies</h2>
     <form id="update_movie_list_form" action="#" method="GET">
         <label for="display">Movies per page:</label>
-        <select id="display" onchange="updateDisplayCount()">
+        <select id="display" name="display">
             <option value="10">10</option>
             <option value="25">25</option>
             <option value="50">50</option>
@@ -44,11 +44,19 @@
         <label for="sort_field">Sort by:</label>
         <select id="sort_field" name="sort_field">
             <option value="title">Title</option>
-            <option value="rating">Rating</option>
         </select>
 
         <label for="sort_order">Order:</label>
         <select id="sort_order" name="sort_order">
+            <option value="asc">Ascending</option>
+            <option value="desc">Descending</option>
+        </select>
+        <label for="sort_field_2">Sort by:</label>
+        <select id="sort_field_2" name="sort_field2">
+            <option value="rating">Rating</option>
+        </select>
+        <label for="sort_order_2">Order:</label>
+        <select id="sort_order_2" name="sort_order2">
             <option value="asc">Ascending</option>
             <option value="desc">Descending</option>
         </select>
@@ -75,9 +83,9 @@
     <tbody id="movie_list_body"></tbody>
 </table>
     <div class="pagination">
-        <button id="prev" onclick="changePage(-1)">Previous</button>
-        <span id="pageNumber">1</span>
-        <button id="next" onclick="changePage(1)">Next</button>
+        <button id="prev-button" onclick="changePage(-1)">Previous</button>
+        <span id="pageNumber"">1</span>
+        <button id="next-button" onclick="changePage(1)">Next</button>
     </div>
 
 </div>
