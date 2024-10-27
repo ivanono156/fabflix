@@ -32,11 +32,14 @@ document.addEventListener("DOMContentLoaded", function() {
     form.addEventListener("submit", function(event) {
         event.preventDefault(); // Prevent the default form submission
 
-        const formData = new FormData(form);
-        const title = formData.get('title_entry');
-        const year= formData.get('year_entry');
-        const director = formData.get('director_entry');
-        const star = formData.get('star_entry');
+
+        const title = form.elements['title_entry'].value;
+        const year= form.elements['year_entry'].value;
+        const director = form.elements['director_entry'].value;
+        const star = form.elements['star_entry'].value;
+
+        console.log("Title:", title);
+        console.log("Director:", director);
 
         let redirectUrl = 'movie-list.html?'
         // Construct the redirect URL with query parameters
@@ -45,13 +48,13 @@ document.addEventListener("DOMContentLoaded", function() {
             redirectUrl += `title_entry=${encodeURIComponent(title)}&`;
         }
         if (year) {
-            redirectUrl += `title_entry=${encodeURIComponent(year)}&`;
+            redirectUrl += `year_entry=${encodeURIComponent(year)}&`;
         }
         if (director) {
-            redirectUrl += `title_entry=${encodeURIComponent(director)}&`;
+            redirectUrl += `director_entry=${encodeURIComponent(director)}&`;
         }
         if (star) {
-            redirectUrl += `title_entry=${encodeURIComponent(star)}&`;
+            redirectUrl += `star_entry=${encodeURIComponent(star)}&`;
         }
         if (redirectUrl.endsWith('&')) {
             redirectUrl = redirectUrl.slice(0, -1);

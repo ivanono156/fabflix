@@ -155,6 +155,7 @@ if(star_name !=null){
 }
 
 if(title_name != null || year != null || director_name != null || star_name != null){
+    console.log("search page servlet executed");
     jQuery.ajax({
         dataType: "json", // Setting return data type
         method: "GET", // Setting request method
@@ -173,13 +174,3 @@ else{
         success: (resultData) => handleMovieResult(resultData) // Setting callback function to handle data returned successfully
     });
 }
-/*
-// Makes the HTTP GET request and registers on success callback function handleStarResult
-jQuery.ajax({
-    dataType: "json", // Setting return data type
-    method: "GET", // Setting request method
-    url: "api/movie-list", // Setting request url
-    data: searchParams, // Setting search query data
-    success: (resultData) => handleMovieResult(resultData) // Setting callback function to handle data returned successfully
-});
-*/
