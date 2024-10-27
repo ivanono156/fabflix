@@ -60,8 +60,8 @@ public class BrowsePageServlet extends HttpServlet {
                         String genreId = rs.getString("id");
                         String genreName = rs.getString("name");
 
-                        jsonObject.addProperty("genreId", genreId);
-                        jsonObject.addProperty("genreName", genreName);
+                        jsonObject.addProperty("genre_id", genreId);
+                        jsonObject.addProperty("genre_name", genreName);
                         genresJsonArray.add(jsonObject);
                     }
                 }
@@ -77,18 +77,29 @@ public class BrowsePageServlet extends HttpServlet {
                     String titleStartChar = rs.getString("start_char");
                     if (Character.isLetterOrDigit(titleStartChar.charAt(0))) {
                         // only return alphanumerical characters
-                        titlesJsonArray.add(titleStartChar);
+                        JsonObject jsonObject = new JsonObject();
+                        jsonObject.addProperty("title_id", titleStartChar);
+                        jsonObject.addProperty("title_name", titleStartChar);
+
+                        titlesJsonArray.add(jsonObject);
                     }
                 }
+
+                // Finally, add the special character "*"
+                JsonObject jsonObject = new JsonObject();
+                jsonObject.addProperty("title_id", "non-alnum");
+                jsonObject.addProperty("title_name", "*");
+
+                titlesJsonArray.add(jsonObject);
             }
 
-            JsonObject jsonObject = new JsonObject();
+            JsonObject browseOptionsJsonObject = new JsonObject();
 
-            jsonObject.add("genres", genresJsonArray);
-            jsonObject.add("titles", titlesJsonArray);
+            browseOptionsJsonObject.add("genres", genresJsonArray);
+            browseOptionsJsonObject.add("titles", titlesJsonArray);
 
             // Write JSON string to output
-            out.write(jsonObject.toString());
+            out.write(browseOptionsJsonObject.toString());
             // Set response status to 200 (OK)
             response.setStatus(200);
         } catch (Exception e) {
