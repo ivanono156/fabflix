@@ -51,16 +51,16 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     function setDefaultValues() {
-        let display = getParameterByName('display');
+        //let display = getParameterByName('display');
         let sort_field = getParameterByName('sort_field');
         let sort_order = getParameterByName('sort_order');
         let field2 = getParameterByName('sort_field2');
         let order2 = getParameterByName('sort_order2');
-
+/*
         if (display) {
             form.elements['display'].value = display;
         }
-
+*/
         if (sort_field) {
             form.elements['sort_field'].value = sort_field;
         }
@@ -90,7 +90,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
         if(display){
             redirectUrl += `display=${encodeURIComponent(display)}&`;
-            form.elements['display'].value = display;
         }
         if(field){
             redirectUrl += `sort_field=${encodeURIComponent(field)}&`;
