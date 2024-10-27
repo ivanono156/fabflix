@@ -38,46 +38,15 @@ document.addEventListener("DOMContentLoaded", function() {
 
     form.addEventListener("submit", function(event) {
         event.preventDefault();
-
-        // Redirect URL starts with the current page number
-        let redirectUrl = `movie-list.html?page-number=${pageNumber}&`;
-
-        let display = form.elements['display'].value;
-
-        let field = form.elements['sort_field'].value;
-        let order = form.elements['sort_order'].value;
-        let field2 = form.elements['sort_field2'].value;
-        let order2 = form.elements['sort_order2'].value;
-
-        // Construct the redirect URL with query parameters
-        if(display){
-            redirectUrl += `display=${encodeURIComponent(display)}&`;
-        }
-
-        if(field){
-            redirectUrl += `sort_field=${encodeURIComponent(field)}&`;
-        }
-        if(order){
-            redirectUrl += `sort_order=${encodeURIComponent(order)}&`;
-        }
-        if(field2){
-            redirectUrl += `sort_field2=${encodeURIComponent(field2)}&`;
-        }
-        if(order2){
-            redirectUrl += `sort_order2=${encodeURIComponent(order2)}&`;
-        }
-        if (redirectUrl.endsWith('&')) {
-            redirectUrl = redirectUrl.slice(0, -1);
-        }
-
-        // Redirect to the constructed URL
-        window.location.href = redirectUrl;
+        setDefaultValues();
+        redirect();
     });
 
     // Function to change page number
     function changePage(direction) {
         pageNumber += direction;
         if (pageNumber < 1) pageNumber = 1; // Prevent going to a negative page
+        setDefaultValues();
         redirect();
     }
 
@@ -85,8 +54,8 @@ document.addEventListener("DOMContentLoaded", function() {
         let display = getParameterByName('display');
         let sort_field = getParameterByName('sort_field');
         let sort_order = getParameterByName('sort_order');
-        let field2 = form.elements['sort_field2'].value;
-        let order2 = form.elements['sort_order2'].value;
+        let field2 = getParameterByName('sort_field2');
+        let order2 = getParameterByName('sort_order2');
 
         if (display) {
             form.elements['display'].value = display;
