@@ -78,7 +78,8 @@ function handleMovieResult(resultData) {
         let genres = resultData[i]["genres"];
         for (const genreId in genres) {
             let genreName = genres[genreId]
-            genresHTML += "<li><a href='movie-list.html?page-number=1&display=" + getSessionDisplay() + "&gid=" + genreId + "'>" + genreName + "</a></li>";
+            genresHTML += "<li><a href='movie-list.html?" + createDefaultMovieListUrl()
+                + "&" + createUrlParams(genreKeyName, genreId) + "'>" + genreName + "</a></li>";
         }
         genresHTML += "</ul></td>";
 
@@ -126,10 +127,15 @@ if (displayAmount == null) {
     console.log("movie-list.js: display amount is missing from the url!");
 }
 
+// Pagination params
 setSearchParamData(pageNumberKeyName);
 setSearchParamData(displayKeyName);
+setSearchParamData(titleSortOrderKeyName);
+setSearchParamData(ratingSortOrderKeyName);
+// Browse params
 setSearchParamData(genreKeyName);
 setSearchParamData(titleStartsWithKeyName);
+// Search params
 setSearchParamData(searchByTitleKeyName);
 setSearchParamData(searchByYearKeyName);
 setSearchParamData(searchByDirectorKeyName);

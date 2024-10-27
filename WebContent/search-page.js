@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", function() {
         const director = form.elements['director_entry'].value;
         const star = form.elements['star_entry'].value;
 
-        let redirectUrl = 'movie-list.html?page-number=1&display=' + getSessionDisplay() + '&';
+        let redirectUrl = 'movie-list.html?' + createDefaultMovieListUrl() + '&';
         // Construct the redirect URL with query parameters
         if (title) {
             redirectUrl += `title_entry=${encodeURIComponent(title)}&`;

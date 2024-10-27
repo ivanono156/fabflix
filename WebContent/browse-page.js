@@ -6,8 +6,8 @@ function handleBrowseResult(resultData) {
     let genres = resultData["genres"];
     for (let i = 0; i < genres.length; i++) {
         let genreRowHTML = "<div class='grid-item'>"
-            + "<a href='movie-list.html?page-number=1&display=" + getSessionDisplay()
-            + "&gid=" + genres[i]["genre_id"] + "'>" + genres[i]["genre_name"] + "</a>"
+            + "<a href='movie-list.html?" + createDefaultMovieListUrl()
+            + "&" + createUrlParams(genreKeyName, genres[i]["genre_id"]) + "'>" + genres[i]["genre_name"] + "</a>"
             + "</div>";
         genres_Table_Element.append(genreRowHTML);
     }
@@ -19,8 +19,8 @@ function handleBrowseResult(resultData) {
     let titles = resultData["titles"];
     for (let i = 0; i < titles.length; i++) {
         let titlesRowHTML = "<div class='grid-item'>"
-            + "<a href='movie-list.html?page-number=1&display=" + getSessionDisplay()
-            + "&title-starts-with=" + titles[i]["title_id"] + "'>" + titles[i]["title_name"] + "</a>"
+            + "<a href='movie-list.html?" + createDefaultMovieListUrl()
+            + "&" + createUrlParams(titleStartsWithKeyName, titles[i]["title_id"]) + "'>" + titles[i]["title_name"] + "</a>"
             + "</div>";
         titles_Table_Element.append(titlesRowHTML);
     }
