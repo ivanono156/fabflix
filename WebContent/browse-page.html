@@ -1,10 +1,4 @@
 <!DOCTYPE html>
-<!-- This example is following frontend and backend separation.
-
-    This .html performs two steps:
-    1. Create a html template skeleton, with all the elements defined (some left empty) and named with ids.
-    2. Load single-star.js to populate the data into empty elements.
-    -->
 <html lang="en">
 <head>
     <!-- Required meta tags -->
@@ -18,9 +12,6 @@
 
     <!-- Our CSS file -->
     <link rel="stylesheet" href="design.css">
-
-    <!-- Icons from fontawesome.com -->
-    <script src="https://kit.fontawesome.com/8d5588e0cf.js" crossorigin="anonymous"></script>
 
     <title>Browse Movies</title>
 </head>
@@ -46,12 +37,10 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
 
-<!-- Load our own JS file -->
-<!-- The path is relative to single-movie.html, since these two files are in the same directory -->
-<!-- Note the url does not contain a "/" in the beginning, which means the url is relative to current path
-     otherwise the url is relative to the root path-->
+<!-- Load session data JS file -->
 <script src="session-data.js"></script>
 <script src="browse-page.js"></script>
+
 </body>
 
 </html>
