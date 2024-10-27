@@ -43,11 +43,6 @@ public class MovieListServlet extends HttpServlet {
 
         String titleStartsWith = request.getParameter("title-starts-with");
 
-        String title_name = request.getParameter("title_entry");
-        String year = request.getParameter("year_entry");
-        String director_name = request.getParameter("director_entry");
-        String star_name = request.getParameter("star_entry");
-
         // Pagination params
         // limit; how many movies will be displayed on each page
         String display = request.getParameter("display");
@@ -161,44 +156,9 @@ public class MovieListServlet extends HttpServlet {
                 } else {
                     searchQuery = "where m.title like ? ";
                 }
-            } else {
-//                    String searchPageQuery = "";
-                if ((title_name != null && !title_name.isEmpty())
-                        || (year != null && !year.isEmpty())
-                        || (director_name != null && !director_name.isEmpty())
-                        || (star_name != null && !star_name.isEmpty())) {
-                    searchQuery = "inner join stars_in_movies sim on m.id = sim.movieId " +
-                            "inner join stars s on sim.starId = s.id " +
-                            "where ";
-                }
-
-                ArrayList<String> queryArgs = new ArrayList<>();
-
-                if (title_name != null && !title_name.isEmpty()) {
-                    queryArgs.add("m. title like ? ");
-                }
-                if (year != null && !year.isEmpty()) {
-//                    searchQuery += "and m.year = ? ";
-                    queryArgs.add("m.year = ? ");
-                }
-                if (director_name != null && !director_name.isEmpty()) {
-//                    searchQuery += "and m.director like ? ";
-                    queryArgs.add("m.director like ? ");
-                }
-                if (star_name != null && !star_name.isEmpty()) {
-//                    searchQuery += "and s.name like ? ";
-//                    queryArgs.add("(select s.name from stars s " +
-//                            "inner join stars_in_movies sim on s.id = sim.starId " +
-//                            "where sim.movieId = m.id) as s like ? ");
-                     queryArgs.add("s.name like ? ");
-                }
-
-                searchQuery += String.join("and ", queryArgs);
             }
 
-            String query = selectQuery + searchQuery /*+ searchPageQuery */+ orderQuery + limitQuery;
-
-            System.out.println(query);
+            String query = selectQuery + searchQuery + orderQuery + limitQuery;
            
             // Declare statement
             try (PreparedStatement statement = conn.prepareStatement(query)){
@@ -209,22 +169,7 @@ public class MovieListServlet extends HttpServlet {
                     if (!titleStartsWith.equalsIgnoreCase("non-alnum")) {
                         statement.setString(params++, titleStartsWith + "%");
                     }
-                } else {
-                    if (title_name != null && !title_name.isEmpty()) {
-                        statement.setString(params++, "%" + title_name + "%");
-                    }
-                    if (year != null && !year.isEmpty()) {
-                        statement.setInt(params++, Integer.parseInt(year));
-                    }
-                    if (director_name != null && !director_name.isEmpty()) {
-                        statement.setString(params++, "%" + director_name + "%");
-                    }
-                    if (star_name != null && !star_name.isEmpty()) {
-                        statement.setString(params++, "%" + star_name + "%");
-                    }
                 }
-
-
 
                 // Set the limit & offset params for pagination
                 int limit = Integer.parseInt(display);

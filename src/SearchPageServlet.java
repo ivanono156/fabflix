@@ -47,181 +47,92 @@ public class SearchPageServlet extends HttpServlet {
 
         // Get a connection from dataSource and let resource manager close the connection after usage.
         try (Connection conn = dataSource.getConnection()){
-/*
             String query = "select m.id, m.title , m.year, m.director, "
 
-                    //Selecting the first genre name
-                    + "(select g.name "
-                    + "from genres g "
-                    + "join genres_in_movies gim on g.id = gim.genreId "
-                    + "where gim.movieId = m.id "
-                    + "limit 1 offset 0) as genre1, "
+                //Selecting the first genre name
+                + "(select g.name "
+                + "from genres g "
+                + "join genres_in_movies gim on g.id = gim.genreId "
+                + "where gim.movieId = m.id "
+                + "limit 1 offset 0) as genre1, "
 
-                    //Selecting the second genre name
-                    + "(select g.name "
-                    + "from genres g "
-                    + "join genres_in_movies gim on g.id = gim.genreId "
-                    + "where gim.movieId = m.id "
-                    + "limit 1 offset 1) as genre2, "
+                //Selecting the second genre name
+                + "(select g.name "
+                + "from genres g "
+                + "join genres_in_movies gim on g.id = gim.genreId "
+                + "where gim.movieId = m.id "
+                + "limit 1 offset 1) as genre2, "
 
-                    //Selecting the third genre name
-                    + "(select g.name "
-                    + "from genres g "
-                    + "join genres_in_movies gim on g.id = gim.genreId "
-                    + "where gim.movieId = m.id "
-                    + "limit 1 offset 2) as genre3, "
+                //Selecting the third genre name
+                + "(select g.name "
+                + "from genres g "
+                + "join genres_in_movies gim on g.id = gim.genreId "
+                + "where gim.movieId = m.id "
+                + "limit 1 offset 2) as genre3, "
 
-                    //Selecting the first genre id
-                    + "(select g.id "
-                    + "from genres g "
-                    + "join genres_in_movies gim on g.id = gim.genreId "
-                    + "where gim.movieId = m.id "
-                    + "limit 1 offset 0) as genre1Id, "
+                //Selecting the first genre id
+                + "(select g.id "
+                + "from genres g "
+                + "join genres_in_movies gim on g.id = gim.genreId "
+                + "where gim.movieId = m.id "
+                + "limit 1 offset 0) as genre1Id, "
 
-                    //Selecting the second genre id
-                    + "(select g.id "
-                    + "from genres g "
-                    + "join genres_in_movies gim on g.id = gim.genreId "
-                    + "where gim.movieId = m.id "
-                    + "limit 1 offset 1) as genre2Id, "
+                //Selecting the second genre id
+                + "(select g.id "
+                + "from genres g "
+                + "join genres_in_movies gim on g.id = gim.genreId "
+                + "where gim.movieId = m.id "
+                + "limit 1 offset 1) as genre2Id, "
 
-                    //Selecting the third genre id
-                    + "(select g.id "
-                    + "from genres g "
-                    + "join genres_in_movies gim on g.id = gim.genreId "
-                    + "where gim.movieId = m.id "
-                    + "limit 1 offset 2) as genre3Id, "
-
-
-                    +"(select s.name " // getting star1
-                    + "from stars s "
-                    + "join stars_in_movies sim on s.id = sim.starId "
-                    + "where sim.movieId = m.id "
-                    + "limit 1 offset 0) as star1, "
-
-                    +"(select s.id " // getting star1 id
-                    + "from stars s "
-                    + "join stars_in_movies sim on s.id = sim.starId "
-                    + "where sim.movieId = m.id "
-                    + "limit 1 offset 0) as star1Id, "
-
-                    +"(select s.name " //star 2
-                    + "from stars s "
-                    + "join stars_in_movies sim on s.id = sim.starId "
-                    + "where sim.movieId = m.id "
-                    + "limit 1 offset 1) as star2, "
-
-                    +"(select s.id " //star2 id
-                    + "from stars s "
-                    + "join stars_in_movies sim on s.id = sim.starId "
-                    + "where sim.movieId = m.id "
-                    + "limit 1 offset 1) as star2Id, "
-
-                    +"(select s.name " // star 3
-                    + "from stars s "
-                    + "join stars_in_movies sim on s.id = sim.starId "
-                    + "where sim.movieId = m.id "
-                    + "limit 1 offset 2) as star3, "
-
-                    +"(select s.id " // star3 id
-                    + "from stars s "
-                    + "join stars_in_movies sim on s.id = sim.starId "
-                    + "where sim.movieId = m.id "
-                    + "limit 1 offset 2) as star3Id, "
-
-                    + "r.rating "
-                    + "from movies m "
-                    + "join ratings r on m.id = r.movieId " +
-                    "order by r.rating desc limit ? offset ?;";
-
- */
-
-            String query = "select m.id, m.title , m.year, m.director, "
-
-                    //Selecting the first genre name
-                    + "(select g.name "
-                    + "from genres g "
-                    + "join genres_in_movies gim on g.id = gim.genreId "
-                    + "where gim.movieId = m.id "
-                    + "limit 1 offset 0) as genre1, "
-
-                    //Selecting the second genre name
-                    + "(select g.name "
-                    + "from genres g "
-                    + "join genres_in_movies gim on g.id = gim.genreId "
-                    + "where gim.movieId = m.id "
-                    + "limit 1 offset 1) as genre2, "
-
-                    //Selecting the third genre name
-                    + "(select g.name "
-                    + "from genres g "
-                    + "join genres_in_movies gim on g.id = gim.genreId "
-                    + "where gim.movieId = m.id "
-                    + "limit 1 offset 2) as genre3, "
-
-                    //Selecting the first genre id
-                    + "(select g.id "
-                    + "from genres g "
-                    + "join genres_in_movies gim on g.id = gim.genreId "
-                    + "where gim.movieId = m.id "
-                    + "limit 1 offset 0) as genre1Id, "
-
-                    //Selecting the second genre id
-                    + "(select g.id "
-                    + "from genres g "
-                    + "join genres_in_movies gim on g.id = gim.genreId "
-                    + "where gim.movieId = m.id "
-                    + "limit 1 offset 1) as genre2Id, "
-
-                    //Selecting the third genre id
-                    + "(select g.id "
-                    + "from genres g "
-                    + "join genres_in_movies gim on g.id = gim.genreId "
-                    + "where gim.movieId = m.id "
-                    + "limit 1 offset 2) as genre3Id, "
+                //Selecting the third genre id
+                + "(select g.id "
+                + "from genres g "
+                + "join genres_in_movies gim on g.id = gim.genreId "
+                + "where gim.movieId = m.id "
+                + "limit 1 offset 2) as genre3Id, "
 
 
-                    +"(select s.name " // getting star1
-                    + "from stars s "
-                    + "join stars_in_movies sim on s.id = sim.starId "
-                    + "where sim.movieId = m.id "
-                    + "limit 1 offset 0) as star1, "
+                +"(select s.name " // getting star1
+                + "from stars s "
+                + "join stars_in_movies sim on s.id = sim.starId "
+                + "where sim.movieId = m.id "
+                + "limit 1 offset 0) as star1, "
 
-                    +"(select s.id " // getting star1 id
-                    + "from stars s "
-                    + "join stars_in_movies sim on s.id = sim.starId "
-                    + "where sim.movieId = m.id "
-                    + "limit 1 offset 0) as star1Id, "
+                +"(select s.id " // getting star1 id
+                + "from stars s "
+                + "join stars_in_movies sim on s.id = sim.starId "
+                + "where sim.movieId = m.id "
+                + "limit 1 offset 0) as star1Id, "
 
-                    +"(select s.name " //star 2
-                    + "from stars s "
-                    + "join stars_in_movies sim on s.id = sim.starId "
-                    + "where sim.movieId = m.id "
-                    + "limit 1 offset 1) as star2, "
+                +"(select s.name " //star 2
+                + "from stars s "
+                + "join stars_in_movies sim on s.id = sim.starId "
+                + "where sim.movieId = m.id "
+                + "limit 1 offset 1) as star2, "
 
-                    +"(select s.id " //star2 id
-                    + "from stars s "
-                    + "join stars_in_movies sim on s.id = sim.starId "
-                    + "where sim.movieId = m.id "
-                    + "limit 1 offset 1) as star2Id, "
+                +"(select s.id " //star2 id
+                + "from stars s "
+                + "join stars_in_movies sim on s.id = sim.starId "
+                + "where sim.movieId = m.id "
+                + "limit 1 offset 1) as star2Id, "
 
-                    +"(select s.name " // star 3
-                    + "from stars s "
-                    + "join stars_in_movies sim on s.id = sim.starId "
-                    + "where sim.movieId = m.id "
-                    + "limit 1 offset 2) as star3, "
+                +"(select s.name " // star 3
+                + "from stars s "
+                + "join stars_in_movies sim on s.id = sim.starId "
+                + "where sim.movieId = m.id "
+                + "limit 1 offset 2) as star3, "
 
-                    +"(select s.id " // star3 id
-                    + "from stars s "
-                    + "join stars_in_movies sim on s.id = sim.starId "
-                    + "where sim.movieId = m.id "
-                    + "limit 1 offset 2) as star3Id, "
+                +"(select s.id " // star3 id
+                + "from stars s "
+                + "join stars_in_movies sim on s.id = sim.starId "
+                + "where sim.movieId = m.id "
+                + "limit 1 offset 2) as star3Id, "
 
-                    + "r.rating "
-                    + "from movies m "
-                    + "join ratings r on m.id = r.movieId " +
-                    "inner join stars_in_movies sim ON sim.movieId = m.id " +
-                    "inner join stars s ON sim.starId = s.id where 1=1";
+                + "r.rating "
+                + "from movies m "
+                + "join ratings r on m.id = r.movieId " +
+                "inner join stars_in_movies sim ON sim.movieId = m.id " +
+                "inner join stars s ON sim.starId = s.id where 1=1";
             if(title != null && !title.isEmpty()){
                 query += " and m. title like ?";
             }
@@ -236,8 +147,6 @@ public class SearchPageServlet extends HttpServlet {
             }
 
             query += " group by m.id, m.title, m.year, m.director, r.rating order by r.rating desc limit ? offset ?;";
-
-
 
             // Declare our statement
             try( PreparedStatement statement = conn.prepareStatement(query)) {

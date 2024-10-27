@@ -140,12 +140,7 @@ if (titleStartsWith != null) {
 } else {
     sessionStorage.removeItem("title-starts-with")
 }
-/*
-let titleId = getParameterByName("title_entry");
-if (titleId != null) {
-    searchParams["title_entry"] = titleId;  // add gid parameter to url
-}
-*/
+
 let title_name = getParameterByName("title_entry");
 if (title_name != null && title_name !== "") {
     searchParams["title_entry"] = title_name;
@@ -187,9 +182,8 @@ if(title_name != null || year != null || director_name != null || star_name != n
         data: searchParams, // Setting search query data
         success: (resultData) => handleMovieResult(resultData) // Setting callback function to handle data returned successfully
     });
-}
-
-else{
+} else{
+    console.log("using movie list servlet");
     jQuery.ajax({
         dataType: "json", // Setting return data type
         method: "GET", // Setting request method
