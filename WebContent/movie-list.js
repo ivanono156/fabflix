@@ -136,6 +136,8 @@ setSearchParamData(searchByDirectorKeyName);
 setSearchParamData(searchByStarKeyName);
 setSearchParamData(searchBySortField);
 setSearchParamData(searchBySortOrder);
+setSearchParamData(searchBySortField2);
+setSearchParamData(searchBySortOrder2);
 
 let title_name = getParameterByName(searchByTitleKeyName);
 let year = getParameterByName(searchByYearKeyName);
@@ -144,7 +146,6 @@ let star_name = getParameterByName(searchByStarKeyName);
 
 //for browsepage reads the letter the user selected in the url
 let search_letter = getParameterByName("search_title_entry");
-
 
 if(title_name != null || year != null || director_name != null || star_name != null){
     console.log("search page servlet executed");

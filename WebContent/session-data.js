@@ -11,6 +11,8 @@ const searchByDirectorKeyName = "director_entry";
 const searchByStarKeyName = "star_entry";
 const searchBySortField = "sort_field";
 const searchBySortOrder = "sort_order";
+const searchBySortField2 = "sort_field2";
+const searchBySortOrder2 = "sort_order2";
 
 
 function getSessionPageNumber() {
@@ -62,6 +64,13 @@ function getSearchBySortFieldSessionData(){
 function getSearchBySortOrderSessionData(){
     return sessionStorage.getItem(searchBySortOrder);
 }
+function getSearchBySortFieldSessionData(){
+    return sessionStorage.getItem(searchBySortField2);
+}
+
+function getSearchBySortOrderSessionData(){
+    return sessionStorage.getItem(searchBySortOrder2);
+}
 
 
 function createUrlParams(key, value) {
@@ -110,6 +119,15 @@ function getSessionDataAsUrl() {
         let sortOrder = getSearchBySortOrderSessionData();
         if(sortOrder != null){
             urlString += "&" + createUrlParams(searchBySortOrder, sortOrder);
+        }
+        let sortField2 = getSearchBySortFieldSessionData();
+        if(sortField != null) {
+            urlString += "&" + createUrlParams(searchBySortField2, sortField2);
+        }
+
+        let sortOrder2 = getSearchBySortOrderSessionData();
+        if(sortOrder != null){
+            urlString += "&" + createUrlParams(searchBySortOrder2, sortOrder2);
         }
     }
 
