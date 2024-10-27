@@ -1,4 +1,4 @@
-/**
+/*
  * This example is following frontend and backend separation.
  *
  * Before this .js is loaded, the html skeleton is created.
@@ -24,10 +24,15 @@ function getParameterByName(target) {
     return decodeURIComponent(results[2].replace(/\+/g, " "));
 }
 
-/**
- * Handles the data returned by the API, read the jsonObject and populate data into html elements
- * @param resultData jsonObject
- */
+function setSearchParamData (keyName) {
+    let value = getParameterByName(keyName);
+    if (value != null && value !== "") {
+        searchParams[keyName] = value;
+        sessionStorage.setItem(keyName, value);
+    } else {
+        sessionStorage.removeItem(keyName);
+    }
+}
 
 function handleAddToCartResult(resultData) {
     alert("Successfully added movie to cart!")
@@ -60,14 +65,11 @@ function handleMovieResult(resultData) {
     console.log("handleMovieResult: populating movie table from resultData");
 
     // Populate the movie table
-    // Find the empty table body by id "star_table_body"
     let movieTableBodyElement = jQuery("#movie_list_body");
 
     movieTableBodyElement.empty();
-    // Iterate through resultData, no more than 20 entries
-    //resultData is the jsonArray of movie objects
-    for (let i = 0; i < resultData.length; i++) {
 
+    for (let i = 0; i < resultData.length; i++) {
         // Concatenate the html tags with resultData jsonObject
         let rowHTML = "";
         rowHTML += "<tr>";
@@ -76,14 +78,12 @@ function handleMovieResult(resultData) {
         let genres = resultData[i]["genres"];
         for (const genreId in genres) {
             let genreName = genres[genreId]
-            genresHTML += "<li><a href='movie-list.html?gid=" + genreId + "'>" + genreName + "</a></li>";
+            genresHTML += "<li><a href='movie-list.html?page-number=1&display=" + getSessionDisplay() + "&gid=" + genreId + "'>" + genreName + "</a></li>";
         }
         genresHTML += "</ul></td>";
 
-        //add link the sing-movie page in the title column
         rowHTML += "<td><a href='single-movie.html?id=" + resultData[i]["movie_id"] + "'>" + resultData[i]["movie_title"] + "</a></td>";
 
-        //adding in the rest of the column data
         rowHTML += "<td>" + resultData[i]["movie_year"] + "</td>";
         rowHTML += "<td>" + resultData[i]["movie_director"] + "</td>";
         rowHTML += genresHTML;
@@ -106,72 +106,39 @@ function handleMovieResult(resultData) {
         "</td>";
         rowHTML += "</tr>";
 
-        // Append the row created to the table body, which will refresh the page
         movieTableBodyElement.append(rowHTML);
     }
 
-    // Bind add to cart function to all add to cart buttons
     $(".add-to-cart-btn").submit(addToCart);
 }
 
 
-/**
- * Once this .js is loaded, following scripts will be executed by the browser
- */
+// Once this .js is loaded, following scripts will be executed by the browser
+let searchParams = {}
 
-let searchParams = {
-    pagenumber: getSessionPageNumber(),
-    display: getSessionDisplay()
+let pageNumber = getParameterByName(pageNumberKeyName);
+if (pageNumber == null) {
+    console.log("movie-list.js: page number is missing from url!");
 }
 
-let genreId = getParameterByName("gid");
-// let genreId = getParameterByName(genreKeyName)
-if (genreId != null) {
-    searchParams["gid"] = genreId;  // add gid parameter to url
-    sessionStorage.setItem("gid", genreId);
-} else {
-    sessionStorage.removeItem("gid");
+let displayAmount = getParameterByName(displayKeyName);
+if (displayAmount == null) {
+    console.log("movie-list.js: display amount is missing from the url!");
 }
 
-let titleStartsWith = getParameterByName("title-starts-with");
-if (titleStartsWith != null) {
-    searchParams["title-starts-with"] = titleStartsWith;  // add gid parameter to url
-    sessionStorage.setItem("title-starts-with", titleStartsWith);
-} else {
-    sessionStorage.removeItem("title-starts-with")
-}
+setSearchParamData(pageNumberKeyName);
+setSearchParamData(displayKeyName);
+setSearchParamData(genreKeyName);
+setSearchParamData(titleStartsWithKeyName);
+setSearchParamData(searchByTitleKeyName);
+setSearchParamData(searchByYearKeyName);
+setSearchParamData(searchByDirectorKeyName);
+setSearchParamData(searchByStarKeyName);
 
-let title_name = getParameterByName("title_entry");
-if (title_name != null && title_name !== "") {
-    searchParams["title_entry"] = title_name;
-    sessionStorage.setItem("title_entry", title_name);
-} else {
-    sessionStorage.removeItem("title_entry")
-}
-
-let year = getParameterByName("year_entry");
-if (year != null && year !== "") {
-    searchParams["year_entry"] = year;
-    sessionStorage.setItem("year_entry", year);
-} else {
-    sessionStorage.removeItem("year_entry")
-}
-
-let director_name = getParameterByName("director_entry");
-if (director_name != null && director_name !== "") {
-    searchParams["director_entry"] = director_name;
-    sessionStorage.setItem("director_entry", director_name);
-} else {
-    sessionStorage.removeItem("director_entry")
-}
-
-let star_name = getParameterByName("star_entry");
-if (star_name != null && star_name !== "") {
-    searchParams["star_entry"] = star_name;
-    sessionStorage.setItem("star_entry", star_name);
-} else {
-    sessionStorage.removeItem("star_entry")
-}
+let title_name = getParameterByName(searchByTitleKeyName);
+let year = getParameterByName(searchByYearKeyName);
+let director_name = getParameterByName(searchByDirectorKeyName);
+let star_name = getParameterByName(searchByStarKeyName);
 
 if(title_name != null || year != null || director_name != null || star_name != null){
     console.log("search page servlet executed");

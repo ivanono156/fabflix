@@ -47,7 +47,7 @@ public class MovieListServlet extends HttpServlet {
         // limit; how many movies will be displayed on each page
         String display = request.getParameter("display");
         // offset; page 1 = offset 0
-        String pageNumber = request.getParameter("pagenumber");
+        String pageNumber = request.getParameter("page-number");
 
         // Retrieve parameter id from the url
         // Log message can be found in localhost log

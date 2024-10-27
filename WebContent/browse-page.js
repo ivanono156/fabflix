@@ -8,7 +8,7 @@ function handleBrowseResult(resultData) {
     for (let i = 0; i < genres.length; i++) {
         let genreRowHTML = "";
         genreRowHTML += "<div class='grid-item'>"
-            + "<a href='movie-list.html?pagenumber=1&display=" + getSessionDisplay()
+            + "<a href='movie-list.html?page-number=1&display=" + getSessionDisplay()
             + "&gid=" + genres[i]["genreId"] + "'>" + genres[i]["genreName"] + "</a>"
             + "</div>";
 
@@ -24,14 +24,14 @@ function handleBrowseResult(resultData) {
     let titlesRowHTML = "";
     for (let i = 0; i < titles.length; i++) {
         titlesRowHTML += "<div class='grid-item'>"
-            + "<a href='movie-list.html?pagenumber=1&display=" + getSessionDisplay()
+            + "<a href='movie-list.html?page-number=1&display=" + getSessionDisplay()
             + "&title-starts-with=" + titles[i] + "'>" + titles[i] + "</a>"
             + "</div>";
     }
 
     // add the "*" character too
     titlesRowHTML += "<div class='grid-item'>"
-        + "<a href='movie-list.html?pagenumber=1&display=" + getSessionDisplay() + "&title-starts-with=non-alnum'>*</a>"
+        + "<a href='movie-list.html?page-number=1&display=" + getSessionDisplay() + "&title-starts-with=non-alnum'>*</a>"
         + "</div>";
 
     titles_Table_Element.append(titlesRowHTML);

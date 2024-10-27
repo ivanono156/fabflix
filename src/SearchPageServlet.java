@@ -38,7 +38,7 @@ public class SearchPageServlet extends HttpServlet {
         // limit; how many movies will be displayed on each page
         String display = request.getParameter("display");
         // offset; page 1 = offset 0
-        String pageNumber = request.getParameter("pagenumber");
+        String pageNumber = request.getParameter("page-number");
 
 
         response.setContentType("application/json");

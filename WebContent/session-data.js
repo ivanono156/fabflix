@@ -1,5 +1,5 @@
 // used in all movie list pages
-const pageNumberKeyName = "pagenumber";
+const pageNumberKeyName = "page-number";
 const displayKeyName = "display";
 // browse page parameters
 const genreKeyName = "gid";
@@ -23,7 +23,7 @@ function getSessionPageNumber() {
 function getSessionDisplay() {
     let sessionDisplay = sessionStorage.getItem(displayKeyName)
     if (sessionDisplay == null) {
-        sessionDisplay = 100;
+        sessionDisplay = 25;
         sessionStorage.setItem(displayKeyName, sessionDisplay.toString());
     }
     return parseInt(sessionDisplay);
@@ -51,17 +51,6 @@ function getSearchByDirectorSessionData() {
 
 function getSearchByStarSessionData() {
     return sessionStorage.getItem(searchByStarKeyName);
-}
-
-function setParamSessionData (keyName, searchParams) {
-    let value = getParameterByName(keyName);
-    if (value != null && value !== "") {
-        searchParams[keyName] = value;
-        sessionStorage.setItem(keyName, value);
-    } else {
-        sessionStorage.removeItem(keyName);
-    }
-    return searchParams;
 }
 
 function createUrlParams(key, value) {

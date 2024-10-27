@@ -72,7 +72,7 @@ function handleResult(resultData) {
         rowHTML +=
             "<td>"
             // Add a link to browse by genre
-            + '<a href="movie-list.html?gid=' + genreId + '">'
+            + '<a href="movie-list.html?page-number=1&display=' + getSessionDisplay() + '&gid=' + genreId + '">'
             + genres[genreId] // Display genre name
             + '</a>'
             + "</td>";
