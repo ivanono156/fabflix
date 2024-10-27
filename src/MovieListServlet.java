@@ -48,8 +48,14 @@ public class MovieListServlet extends HttpServlet {
         String display = request.getParameter("display");
         // offset; page 1 = offset 0
         String pageNumber = request.getParameter("page-number");
-        String titleSortOrder = request.getParameter("sort-by-title");
-        String ratingSortOrder = request.getParameter("sort-by-rating");
+        String sortFieldEntry = request.getParameter("sort_field");
+        String sortOrderEntry = request.getParameter("sort_order");
+        if (sortFieldEntry == null) {
+            sortFieldEntry = "rating"; // Default to sorting by rating
+        }
+        if (sortOrderEntry == null || (!sortOrderEntry.equalsIgnoreCase("ASC") && !sortOrderEntry.equalsIgnoreCase("DESC"))) {
+            sortOrderEntry = "DESC"; // Default to descending order
+        }
 
         // Retrieve parameter id from the url
         // Log message can be found in localhost log
@@ -59,7 +65,6 @@ public class MovieListServlet extends HttpServlet {
         // Get a connection from the database
         try (Connection conn = dataSource.getConnection()) {
             // Construct query
-
             String selectQuery = "select distinct m.id, m.title , m.year, m.director, "
 
                 //Selecting the first genre name
@@ -146,8 +151,15 @@ public class MovieListServlet extends HttpServlet {
                 + "join ratings r on m.id = r.movieId ";
 
             String searchQuery = "";
-            String orderQuery = "order by ?, ? ";
+
             String limitQuery = "limit ? offset ?;";
+
+            String orderQuery = "order by ";
+            if (sortFieldEntry.equalsIgnoreCase("title")) {
+                orderQuery += "m.title " + sortOrderEntry + ", r.rating " + sortOrderEntry + " ";
+            } else {
+                orderQuery += "r.rating " + sortOrderEntry + ", m.title " + sortOrderEntry + " ";
+            }
 
             if (genreId != null) {
                 searchQuery = "inner join genres_in_movies gim on m.id = gim.movieId " +
@@ -172,9 +184,6 @@ public class MovieListServlet extends HttpServlet {
                         statement.setString(params++, titleStartsWith + "%");
                     }
                 }
-
-                statement.setString(params++, "m.title " + titleSortOrder);
-                statement.setString(params++, "r.rating " + ratingSortOrder);
 
                 // Set the limit & offset params for pagination
                 int limit = Integer.parseInt(display);

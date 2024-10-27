@@ -140,6 +140,8 @@ setSearchParamData(searchByTitleKeyName);
 setSearchParamData(searchByYearKeyName);
 setSearchParamData(searchByDirectorKeyName);
 setSearchParamData(searchByStarKeyName);
+setSearchParamData(searchBySortField);
+setSearchParamData(searchBySortOrder);
 
 let title_name = getParameterByName(searchByTitleKeyName);
 let year = getParameterByName(searchByYearKeyName);
@@ -148,6 +150,7 @@ let star_name = getParameterByName(searchByStarKeyName);
 
 //for browsepage reads the letter the user selected in the url
 let search_letter = getParameterByName("search_title_entry");
+
 
 if(title_name != null || year != null || director_name != null || star_name != null){
     console.log("search page servlet executed");
@@ -168,6 +171,7 @@ if(title_name != null || year != null || director_name != null || star_name != n
         success: (resultData) => handleMovieResult(resultData) // Setting callback function to handle data returned successfully
     });
 } else{
+    console.log("movie list servlet executed");
     jQuery.ajax({
         dataType: "json", // Setting return data type
         method: "GET", // Setting request method
