@@ -103,3 +103,11 @@ ul.top-nav li a.active {
 .add-to-cart-btn:hover {
     background-color: lightgrey;
 }
+
+.pagination {
+    color: ghostwhite;
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    background-color: black;
+}
