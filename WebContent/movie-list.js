@@ -111,6 +111,8 @@ function handleMovieResult(resultData) {
     }
 
     $(".add-to-cart-btn").submit(addToCart);
+
+    $("#pageNumber").text(getParameterByName(pageNumberKeyName));
 }
 
 
