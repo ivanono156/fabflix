@@ -48,6 +48,8 @@ public class MovieListServlet extends HttpServlet {
         String display = request.getParameter("display");
         // offset; page 1 = offset 0
         String pageNumber = request.getParameter("page-number");
+        String titleSortOrder = request.getParameter("sort-by-title");
+        String ratingSortOrder = request.getParameter("sort-by-rating");
 
         // Retrieve parameter id from the url
         // Log message can be found in localhost log
@@ -144,7 +146,7 @@ public class MovieListServlet extends HttpServlet {
                 + "join ratings r on m.id = r.movieId ";
 
             String searchQuery = "";
-            String orderQuery = "order by r.rating desc ";
+            String orderQuery = "order by ?, ? ";
             String limitQuery = "limit ? offset ?;";
 
             if (genreId != null) {
@@ -170,6 +172,9 @@ public class MovieListServlet extends HttpServlet {
                         statement.setString(params++, titleStartsWith + "%");
                     }
                 }
+
+                statement.setString(params++, "m.title " + titleSortOrder);
+                statement.setString(params++, "r.rating " + ratingSortOrder);
 
                 // Set the limit & offset params for pagination
                 int limit = Integer.parseInt(display);
