@@ -1,69 +1,45 @@
-/**
- * This example is following frontend and backend separation.
- *
- * Before this .js is loaded, the html skeleton is created.
- *
- * This .js performs two steps:
- *      1. Use jQuery to talk to backend API to get the json data.
- *      2. Populate the data to correct html elements.
- */
-
-
-/*
- * Handles the data returned by the API, read the jsonObject and populate data into html elements
- * @param resultData jsonObject
- */
 function handleBrowseResult(resultData) {
-    console.log("handleBrowseResult: populating genre and title table from resultData");
-
-    // Populate the movie table
-    // Find the empty table body by id "star_table_body"
-    let genres_Table_Element = jQuery("#genre_table_body");
-
-    genres_Table_Element.empty();
+    console.log("handleBrowseResult: populating genre from resultData");
 
     let genres = resultData["genres"];
 
-    let genreRowHTML = "";
-    genreRowHTML += "<tr>";
-    // Iterate through resultData, number of genres 23
+    let genres_Table_Element = jQuery("#genres_grid");
+
     for (let i = 0; i < genres.length; i++) {
-        genreRowHTML += "<td><a href='movie-list.html?pagenumber=1&display=" + getSessionDisplay() + "&gid=" + genres[i]["genreId"] + "'>" + genres[i]["genreName"] + "</a></td>";
+        let genreRowHTML = "";
+        genreRowHTML += "<div class='grid-item'>"
+            + "<a href='movie-list.html?pagenumber=1&display=" + getSessionDisplay()
+            + "&gid=" + genres[i]["genreId"] + "'>" + genres[i]["genreName"] + "</a>"
+            + "</div>";
+
+        genres_Table_Element.append(genreRowHTML);
     }
-    genreRowHTML += "</tr>";
 
-    //append the row to the body
-    genres_Table_Element.append(genreRowHTML);
-
-    let titles_Table_Element = jQuery("#titles_table_body");
+    console.log("handleBrowseResult: populating title from resultData");
 
     let titles = resultData["titles"];
 
+    let titles_Table_Element = jQuery("#titles_grid");
+
     let titlesRowHTML = "";
-    titlesRowHTML += "<tr>";
     for (let i = 0; i < titles.length; i++) {
-        titlesRowHTML += "<td>" +
-            "<a href='movie-list.html?pagenumber=1&display=" + getSessionDisplay() + "&title-starts-with=" + titles[i] + "'>" + titles[i] + "</a>" +
-            "</td>";
+        titlesRowHTML += "<div class='grid-item'>"
+            + "<a href='movie-list.html?pagenumber=1&display=" + getSessionDisplay()
+            + "&title-starts-with=" + titles[i] + "'>" + titles[i] + "</a>"
+            + "</div>";
     }
 
     // add the "*" character too
-    titlesRowHTML += "<td><a href='movie-list.html?pagenumber=1&display=" + getSessionDisplay() + "&title-starts-with=non-alnum'>*</a></td>";
-
-    titlesRowHTML += "</tr>";
+    titlesRowHTML += "<div class='grid-item'>"
+        + "<a href='movie-list.html?pagenumber=1&display=" + getSessionDisplay() + "&title-starts-with=non-alnum'>*</a>"
+        + "</div>";
 
     titles_Table_Element.append(titlesRowHTML);
 }
 
-
-/**
- * Once this .js is loaded, following scripts will be executed by the browser
- */
-
-// Makes the HTTP GET request and registers on success callback function handleStarResult
 jQuery.ajax({
-    dataType: "json", // Setting return data type
-    method: "GET", // Setting request method
-    url: "api/browse-page", // Setting request url, which is mapped by StarsServlet in Stars.java
-    success: (resultData) => handleBrowseResult(resultData) // Setting callback function to handle data returned successfully by the StarsServlet
+    dataType: "json",
+    method: "GET",
+    url: "api/browse-page",
+    success: (resultData) => handleBrowseResult(resultData)
 });

@@ -74,6 +74,20 @@ ul.top-nav li a.active {
     min-height: 100vh;
 }
 
+#genres_grid.grid-container {
+    display: grid;
+    grid-template-columns: auto auto auto;
+}
+
+#titles_grid.grid-container {
+    display: grid;
+    grid-template-columns: auto auto auto auto auto auto auto auto auto auto;
+}
+
+.grid-item {
+    text-align: center;
+}
+
 .back-btn {
     text-align: left;
     padding-left: 10px;
