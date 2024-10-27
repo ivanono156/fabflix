@@ -3,6 +3,10 @@ const pageNumberKeyName = "page-number";
 const displayKeyName = "display";
 const titleSortOrderKeyName = "sort-by-title";
 const ratingSortOrderKeyName = "sort-by-rating"
+const searchBySortField = "sort_field";
+const searchBySortOrder = "sort_order";
+const searchBySortField2 = "sort_field2";
+const searchBySortOrder2 = "sort_order2";
 // browse page parameters
 const genreKeyName = "gid";
 const titleStartsWithKeyName = "title-starts-with";
@@ -11,10 +15,6 @@ const searchByTitleKeyName = "title_entry";
 const searchByYearKeyName = "year_entry";
 const searchByDirectorKeyName = "director_entry";
 const searchByStarKeyName = "star_entry";
-const searchBySortField = "sort_field";
-const searchBySortOrder = "sort_order";
-const searchBySortField2 = "sort_field2";
-const searchBySortOrder2 = "sort_order2";
 
 function getSessionPageNumber() {
     let pageNumber = sessionStorage.getItem(pageNumberKeyName)
@@ -83,11 +83,12 @@ function getSearchBySortFieldSessionData(){
 function getSearchBySortOrderSessionData(){
     return sessionStorage.getItem(searchBySortOrder);
 }
-function getSearchBySortFieldSessionData(){
+
+function getSearchBySortField2SessionData(){
     return sessionStorage.getItem(searchBySortField2);
 }
 
-function getSearchBySortOrderSessionData(){
+function getSearchBySortOrder2SessionData(){
     return sessionStorage.getItem(searchBySortOrder2);
 }
 

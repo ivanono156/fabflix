@@ -132,6 +132,10 @@ setSearchParamData(pageNumberKeyName);
 setSearchParamData(displayKeyName);
 setSearchParamData(titleSortOrderKeyName);
 setSearchParamData(ratingSortOrderKeyName);
+setSearchParamData(searchBySortField);
+setSearchParamData(searchBySortOrder);
+setSearchParamData(searchBySortField2);
+setSearchParamData(searchBySortOrder2);
 // Browse params
 setSearchParamData(genreKeyName);
 setSearchParamData(titleStartsWithKeyName);
@@ -140,10 +144,6 @@ setSearchParamData(searchByTitleKeyName);
 setSearchParamData(searchByYearKeyName);
 setSearchParamData(searchByDirectorKeyName);
 setSearchParamData(searchByStarKeyName);
-setSearchParamData(searchBySortField);
-setSearchParamData(searchBySortOrder);
-setSearchParamData(searchBySortField2);
-setSearchParamData(searchBySortOrder2);
 
 let title_name = getParameterByName(searchByTitleKeyName);
 let year = getParameterByName(searchByYearKeyName);
