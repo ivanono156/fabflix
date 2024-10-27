@@ -45,7 +45,6 @@ public class BrowsePageServlet extends HttpServlet {
         // Get a connection from the database
         try (Connection conn = dataSource.getConnection()) {
             // Construct query
-
             String query = "select g.id, g.name from genres g order by g.name;";
 
             // Declare statement

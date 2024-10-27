@@ -154,6 +154,14 @@ if(star_name !=null){
     searchParams["star_entry"] = star_name;
 }
 
+//for browsepage reads the letter the user selected in the url
+let search_letter = getParameterByName("search_title_entry");
+if(search_letter != null){
+    searchParams["search_title_entry"] = search_letter;
+}
+
+
+
 if(title_name != null || year != null || director_name != null || star_name != null){
     console.log("search page servlet executed");
     jQuery.ajax({
@@ -164,7 +172,16 @@ if(title_name != null || year != null || director_name != null || star_name != n
         success: (resultData) => handleMovieResult(resultData) // Setting callback function to handle data returned successfully
     });
 }
-
+else if(search_letter != null){
+    console.log("Browse page title servlet executed");
+    jQuery.ajax({
+        dataType: "json", // Setting return data type
+        method: "GET", // Setting request method
+        url: "api/browse-page-title", // Setting request url
+        data: searchParams, // Setting search query data
+        success: (resultData) => handleMovieResult(resultData) // Setting callback function to handle data returned successfully
+    });
+}
 else{
     jQuery.ajax({
         dataType: "json", // Setting return data type

@@ -33,6 +33,20 @@ function handleBrowseResult(resultData) {
 
     //append the row to the body
     genres_Table_Element.append(genreRowHTML);
+
+    let titleRowHtml = "";
+    titleRowHtml += "<tr>";
+
+    const alphabetUppercase = Array.from({ length: 26 }, (_, i) => String.fromCharCode(65 + i));
+    for (let i = 0; i < alphabetUppercase.length; i++){
+        titleRowHtml += "<td><a href='movie-list.html?pagenumber=1&display=50&search_title_entry=" + alphabetUppercase[i] + "'>" + alphabetUppercase[i] + "</a></td>";
+    }
+   for(let i = 0; i < 10; i++){
+       titleRowHtml += "<td><a href='movie-list.html?pagenumber=1&display=50&search_title_entry=" + i + "'>" + i + "</a></td>";
+   }
+    titleRowHtml += "<td><a href='movie-list.html?pagenumber=1&display=50&search_title_entry=" + "*" + "'>" + "*" + "</a></td>";
+    titleRowHtml += "</tr>";
+    titles_Table_Element.append(titleRowHtml);
 }
 
 
