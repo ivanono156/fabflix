@@ -66,12 +66,26 @@ ul.top-nav li a.active {
 }
 
 .login-form {
-    /*margin: auto;*/
+    margin: auto;
     display: flex;
     justify-content: center;
     text-align: center;
     align-items: center;
-    min-height: 100vh;
+    position: relative;
+    min-height: 50%;
+    max-height: 80%;
+}
+
+.login-form-text, .login-form-error-message {
+    font-size: 40px;
+    color: ghostwhite;
+    text-align: center;
+    justify-content: center;
+}
+
+.login-form-error-message {
+    font-size: 20px;
+    justify-content: normal;
 }
 
 #genres_grid.grid-container {
