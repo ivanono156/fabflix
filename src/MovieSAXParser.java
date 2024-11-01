@@ -44,7 +44,7 @@ public class MovieSAXParser extends FabflixSAXParser {
     @Override
     protected void parseItem(String qName) {
         if (qName.equalsIgnoreCase(MOVIE_TAG)) {
-            addDataToList(tempMovie);
+            validateData(tempMovie);
         } else if (qName.equalsIgnoreCase(ID_TAG)) {
             tempMovie.setId(tempValue);
         } else if (qName.equalsIgnoreCase(TITLE_TAG)) {
@@ -66,8 +66,23 @@ public class MovieSAXParser extends FabflixSAXParser {
     }
 
     @Override
-    protected boolean isValidItem(DataBaseItem item) {
-        Movie movie = (Movie) item;
+    protected String getCauseOfInvalidData(DataBaseItem data) {
+        Movie movie = (Movie) data;
+        if (movie.getId() == null || movie.getId().isEmpty()) {
+            return "Missing movie id";
+        } else if (movie.getTitle() == null || movie.getTitle().isEmpty()) {
+            return "Missing movie title";
+        } else if (movie.getYear() == -1) {
+            return "Error parsing movie year";
+        } else if (movie.getDirector() == null || movie.getDirector().isEmpty()) {
+            return "Missing movie director";
+        }
+        return "Unknown error while parsing data";
+    }
+
+    @Override
+    protected boolean isValidData(DataBaseItem data) {
+        Movie movie = (Movie) data;
         return movie.getId() != null && !movie.getId().isEmpty()
                 && movie.getTitle() != null && !movie.getTitle().isEmpty()
                 && movie.getYear() != -1
@@ -76,6 +91,7 @@ public class MovieSAXParser extends FabflixSAXParser {
 
     public static void main(String[] args) {
         MovieSAXParser parser = new MovieSAXParser();
+//        parser.setDebugMode(DebugMode.OFF);
         parser.run();
     }
 }

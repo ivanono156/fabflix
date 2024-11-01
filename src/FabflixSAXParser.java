@@ -9,6 +9,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public abstract class FabflixSAXParser extends DefaultHandler {
+    public enum DebugMode {
+        ON,
+        OFF
+    }
+
     public static final String XML_FOLDER_PATH = "C:\\Users\\Ivan Onofre\\University\\CS 122B\\stanford-movies\\";
     public static final String ENCODING = "ISO-8859-1";
 
@@ -17,6 +22,8 @@ public abstract class FabflixSAXParser extends DefaultHandler {
     private final ArrayList<DataBaseItem> validData;
     private final ArrayList<DataBaseItem> invalidData;
     private final ArrayList<String> brokenAttributes;
+
+    private DebugMode debugging = DebugMode.ON;
 
     public FabflixSAXParser() {
         validData = new ArrayList<>();
@@ -27,7 +34,13 @@ public abstract class FabflixSAXParser extends DefaultHandler {
     public void run() {
         String xmlFilePath = XML_FOLDER_PATH + getXmlFileName();
         parseDocument(xmlFilePath);
-        printData();
+        if (debugging == DebugMode.ON) {
+            printData();
+        }
+    }
+
+    public void setDebugMode(DebugMode debugMode) {
+        debugging = debugMode;
     }
 
     protected abstract String getXmlFileName();
@@ -87,22 +100,25 @@ public abstract class FabflixSAXParser extends DefaultHandler {
 
     protected abstract void parseItem(String qName);
 
-    protected int parseIntValue(String tag) {
+    protected int parseIntValue(String value) {
         try {
-            return Integer.parseInt(tag);
+            return Integer.parseInt(value);
         } catch (NumberFormatException e) {
-            brokenAttributes.add("Error parsing int: " + e.getMessage());
             return -1;
         }
     }
 
-    protected final void addDataToList(DataBaseItem data) {
-        if (isValidItem(data)) {
+    protected final void validateData(DataBaseItem data) {
+        if (!validData.contains(data) && isValidData(data)) {
             validData.add(data);
         } else {
+            String invalidDataCause = getCauseOfInvalidData(data);
+            brokenAttributes.add(invalidDataCause + " - " + data.toString());
             invalidData.add(data);
         }
     }
 
-    protected abstract boolean isValidItem(DataBaseItem data);
+    protected abstract String getCauseOfInvalidData(DataBaseItem data);
+
+    protected abstract boolean isValidData(DataBaseItem data);
 }
