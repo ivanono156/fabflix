@@ -1,6 +1,6 @@
 import java.util.HashSet;
 
-public class Movie {
+public class Movie implements DataBaseItem {
     private String id;
     private String title;
     private int year;
@@ -17,6 +17,7 @@ public class Movie {
     public Movie() {
     }
 
+    @Override
     public String getId() {
         return id;
     }
@@ -37,6 +38,7 @@ public class Movie {
         return genres;
     }
 
+    @Override
     public void setId(String id) {
         this.id = id;
     }
