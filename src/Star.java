@@ -1,7 +1,8 @@
 public class Star implements DataBaseItem{
     private String id;
     private String name;
-    private int birthYear;
+    // Year can be null in database
+    private Integer birthYear;
 
     public Star(String id, String name, int birthYear) {
         this.id = id;

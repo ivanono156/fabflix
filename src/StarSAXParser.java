@@ -27,19 +27,37 @@ public class StarSAXParser extends FabflixSAXParser {
     @Override
     protected void parseItem(String qName) {
         if (qName.equalsIgnoreCase(STAR_TAG)) {
-            addDataToList(tempStar);
+            validateData(tempStar);
         } else if (qName.equalsIgnoreCase(ID_TAG)) {
             tempStar.setId(tempValue);
             tempStar.setName(tempValue);
         } else if (qName.equalsIgnoreCase(NAME_TAG)) {
             tempStar.setName(tempValue);
         } else if (qName.equalsIgnoreCase(BIRTHYEAR_TAG)) {
-            tempStar.setBirthYear(parseIntValue(tempValue));
+            addStarBirthYear(tempStar, tempValue);
+        }
+    }
+
+    private void addStarBirthYear(Star star, String value) {
+        int dob = parseIntValue(value);
+        if (dob != -1) {
+            star.setBirthYear(dob);
         }
     }
 
     @Override
-    protected boolean isValidItem(DataBaseItem item) {
+    protected String getCauseOfInvalidData(DataBaseItem data) {
+        Star star = (Star) data;
+        if (star.getId() == null || star.getId().isEmpty()) {
+            return "Missing star Id";
+        } else if (star.getName() == null || star.getName().isEmpty()) {
+            return "Missing star name";
+        }
+        return "Unknown error while parsing data";
+    }
+
+    @Override
+    protected boolean isValidData(DataBaseItem item) {
         Star star = (Star) item;
         return star.getId() != null && !star.getId().isEmpty()
                 && star.getName() != null && !star.getName().isEmpty();
