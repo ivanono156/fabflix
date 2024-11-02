@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.HashSet;
 
 public class MovieSAXParser extends FabflixSAXParser {
@@ -43,18 +44,25 @@ public class MovieSAXParser extends FabflixSAXParser {
 
     @Override
     protected void parseItem(String qName) {
-        if (qName.equalsIgnoreCase(MOVIE_TAG)) {
-            validateData(tempMovie);
-        } else if (qName.equalsIgnoreCase(ID_TAG)) {
-            tempMovie.setId(tempValue);
-        } else if (qName.equalsIgnoreCase(TITLE_TAG)) {
-            tempMovie.setTitle(tempValue);
-        } else if (qName.equalsIgnoreCase(YEAR_TAG)) {
-            tempMovie.setYear(parseIntValue(tempValue));
-        } else if (qName.equalsIgnoreCase(DIRECTOR_TAG)) {
-            tempMovie.setDirector(tempValue);
-        } else if (qName.equalsIgnoreCase(GENRE_TAG)) {
-            addGenreToMovie(tempValue);
+        switch (qName.toLowerCase()) {
+            case MOVIE_TAG:
+                validateData(tempMovie);
+                break;
+            case ID_TAG:
+                tempMovie.setId(tempValue);
+                break;
+            case TITLE_TAG:
+                tempMovie.setTitle(tempValue);
+                break;
+            case YEAR_TAG:
+                tempMovie.setYear(parseIntValue(tempValue));
+                break;
+            case DIRECTOR_TAG:
+                tempMovie.setDirector(tempValue);
+                break;
+            case GENRE_TAG:
+                addGenreToMovie(tempValue);
+                break;
         }
     }
 
@@ -68,7 +76,9 @@ public class MovieSAXParser extends FabflixSAXParser {
     @Override
     protected String getCauseOfInvalidData(DataBaseItem data) {
         Movie movie = (Movie) data;
-        if (movie.getId() == null || movie.getId().isEmpty()) {
+        if (isDuplicateData(movie)) {
+            return "Duplicate movie";
+        } else if (movie.getId() == null || movie.getId().isEmpty()) {
             return "Missing movie id";
         } else if (movie.getTitle() == null || movie.getTitle().isEmpty()) {
             return "Missing movie title";
@@ -83,10 +93,16 @@ public class MovieSAXParser extends FabflixSAXParser {
     @Override
     protected boolean isValidData(DataBaseItem data) {
         Movie movie = (Movie) data;
-        return movie.getId() != null && !movie.getId().isEmpty()
-                && movie.getTitle() != null && !movie.getTitle().isEmpty()
-                && movie.getYear() != -1
-                && movie.getDirector() != null && !movie.getDirector().isEmpty();
+        return !isDuplicateData(data) && movie.isValid();
+    }
+
+    public ArrayList<String> getGenres() {
+        ArrayList<String> genres = new ArrayList<>();
+        for (DataBaseItem data : getValidData()) {
+            Movie movie = (Movie) data;
+            genres.addAll(movie.getGenres());
+        }
+        return genres;
     }
 
     public static void main(String[] args) {

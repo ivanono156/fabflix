@@ -7,6 +7,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 
 public abstract class FabflixSAXParser extends DefaultHandler {
     public enum DebugMode {
@@ -19,14 +20,14 @@ public abstract class FabflixSAXParser extends DefaultHandler {
 
     protected String tempValue;
 
-    private final ArrayList<DataBaseItem> validData;
+    private final HashSet<DataBaseItem> validData;
     private final ArrayList<DataBaseItem> invalidData;
     private final ArrayList<String> brokenAttributes;
 
     private DebugMode debugging = DebugMode.ON;
 
     public FabflixSAXParser() {
-        validData = new ArrayList<>();
+        validData = new HashSet<>();
         invalidData = new ArrayList<>();
         brokenAttributes = new ArrayList<>();
     }
@@ -41,6 +42,18 @@ public abstract class FabflixSAXParser extends DefaultHandler {
 
     public void setDebugMode(DebugMode debugMode) {
         debugging = debugMode;
+    }
+
+    public HashSet<DataBaseItem> getValidData() {
+        return validData;
+    }
+
+    public ArrayList<DataBaseItem>  getInvalidData() {
+        return invalidData;
+    }
+
+    public ArrayList<String> getBrokenAttributes() {
+        return brokenAttributes;
     }
 
     protected abstract String getXmlFileName();
@@ -109,7 +122,7 @@ public abstract class FabflixSAXParser extends DefaultHandler {
     }
 
     protected final void validateData(DataBaseItem data) {
-        if (!validData.contains(data) && isValidData(data)) {
+        if (isValidData(data)) {
             validData.add(data);
         } else {
             String invalidDataCause = getCauseOfInvalidData(data);
@@ -121,4 +134,8 @@ public abstract class FabflixSAXParser extends DefaultHandler {
     protected abstract String getCauseOfInvalidData(DataBaseItem data);
 
     protected abstract boolean isValidData(DataBaseItem data);
+
+    protected boolean isDuplicateData(DataBaseItem data) {
+        return validData.contains(data);
+    }
 }
