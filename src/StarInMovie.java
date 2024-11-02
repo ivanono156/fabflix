@@ -37,7 +37,22 @@ public class StarInMovie implements DataBaseItem {
         return "";  // Ignored
     }
 
+    @Override
+    public boolean isValid() {
+        return starId != null && !starId.isEmpty() && movieId != null && !movieId.isEmpty();
+    }
+
+    @Override
     public String toString() {
         return "Movie ID: " + movieId + ", Star ID: " + starId;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof StarInMovie) {
+            StarInMovie other = (StarInMovie) obj;
+            return movieId.equals(other.movieId) && starId.equals(other.starId);
+        }
+        return false;
     }
 }

@@ -22,7 +22,7 @@ public class Star implements DataBaseItem{
         return name;
     }
 
-    public int getBirthYear() {
+    public Integer getBirthYear() {
         return birthYear;
     }
 
@@ -38,7 +38,23 @@ public class Star implements DataBaseItem{
         this.birthYear = birthYear;
     }
 
+    @Override
+    public boolean isValid() {
+        return id != null && !id.isEmpty()
+                && name != null && !name.isEmpty();
+    }
+
+    @Override
     public String toString() {
         return "ID: " + id + ", Name: " + name + ", Birth Year: " + birthYear;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Star) {
+            Star other = (Star) obj;
+            return id.equals(other.id);
+        }
+        return false;
     }
 }

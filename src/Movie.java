@@ -15,6 +15,7 @@ public class Movie implements DataBaseItem {
     }
 
     public Movie() {
+        year = -1;
     }
 
     @Override
@@ -59,7 +60,25 @@ public class Movie implements DataBaseItem {
         genres.add(genre);
     }
 
+    @Override
+    public boolean isValid() {
+        return id != null && !id.isEmpty()
+                && title != null && !title.isEmpty()
+                && year != -1
+                && director != null && !director.isEmpty();
+    }
+
+    @Override
     public String toString() {
         return "Id: " + id + ", Title: " + title + ", Year: " + year + ", Director: " + director;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Movie) {
+            Movie other = (Movie) obj;
+            return id.equals(other.id);
+        }
+        return false;
     }
 }
