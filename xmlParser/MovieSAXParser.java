@@ -84,7 +84,7 @@ public class MovieSAXParser extends FabflixSAXParser {
 
     public HashSet<String> getGenres() {
         HashSet<String> genres = new HashSet<>();
-        for (DataBaseItem data : getValidData()) {
+        for (DataBaseItem data : validData.values()) {
             Movie movie = (Movie) data;
             genres.addAll(movie.getGenres());
         }

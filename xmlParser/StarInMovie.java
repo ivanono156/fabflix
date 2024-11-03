@@ -4,6 +4,9 @@ public class StarInMovie implements DataBaseItem {
     private String movieId;
     private String starId;
 
+    private Movie movie;
+    private Star star;
+
     public StarInMovie(String movieId, String starId) {
         this.movieId = movieId;
         this.starId = starId;
@@ -17,16 +20,32 @@ public class StarInMovie implements DataBaseItem {
         return movieId;
     }
 
+    public Movie getMovie() {
+        return movie;
+    }
+
     public String getStarId() {
         return starId;
+    }
+
+    public Star getStar() {
+        return star;
     }
 
     public void setMovieId(String movieId) {
         this.movieId = movieId;
     }
 
+    public void setMovie(Movie movie) {
+        this.movie = movie;
+    }
+
     public void setStarId(String starId) {
         this.starId = starId;
+    }
+
+    public void setStar(Star star) {
+        this.star = star;
     }
 
     @Override
@@ -36,7 +55,7 @@ public class StarInMovie implements DataBaseItem {
 
     @Override
     public String getId() {
-        return "";  // Ignored
+        return getMovieId() + "," + getStarId();
     }
 
     @Override
