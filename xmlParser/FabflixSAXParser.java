@@ -5,9 +5,12 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.HashMap;
 
 public abstract class FabflixSAXParser extends DefaultHandler {
     public enum DebugMode {
@@ -17,12 +20,12 @@ public abstract class FabflixSAXParser extends DefaultHandler {
 
     public static final String XML_FOLDER_PATH = "C:\\Users\\Ivan Onofre\\University\\CS 122B\\stanford-movies\\";
     public static final String ENCODING = "ISO-8859-1";
+    public static final String OUTPUT_FILE = "parser_result.txt";
 
     protected String tempValue;
 
-    private final HashSet<DataBaseItem> validData = new HashSet<>();
-    private final ArrayList<DataBaseItem> invalidData = new ArrayList<>();
-    private final ArrayList<String> brokenAttributes = new ArrayList<>();
+    protected HashMap<String, DataBaseItem> validData = new HashMap<>();
+    protected ArrayList<String> invalidData = new ArrayList<>();
 
     private DebugMode debugging = DebugMode.ON;
 
@@ -38,16 +41,12 @@ public abstract class FabflixSAXParser extends DefaultHandler {
         debugging = debugMode;
     }
 
-    public HashSet<DataBaseItem> getValidData() {
+    public HashMap<String, DataBaseItem> getValidData() {
         return validData;
     }
 
-    public ArrayList<DataBaseItem>  getInvalidData() {
+    public ArrayList<String> getInvalidData() {
         return invalidData;
-    }
-
-    public ArrayList<String> getBrokenAttributes() {
-        return brokenAttributes;
     }
 
     protected abstract String getXmlFileName();
@@ -68,18 +67,37 @@ public abstract class FabflixSAXParser extends DefaultHandler {
 
     protected void printData() {
         System.out.println("Number of valid items found: " + validData.size());
-        for (DataBaseItem data : validData) {
+        for (DataBaseItem data : validData.values()) {
             System.out.println("\t" + data.toString());
         }
 
         System.out.println("Number of invalid items found: " + invalidData.size());
-        for (DataBaseItem data : invalidData) {
-            System.out.println("\t" + data.toString());
-        }
-
-        System.out.println("Number of broken attributes found: " + brokenAttributes.size());
-        for (String attr : brokenAttributes) {
+        for (String attr : invalidData) {
             System.out.println("\t" + attr);
+        }
+    }
+
+    public void writeToFile() {
+        writeToFile(OUTPUT_FILE);
+    }
+
+    protected void writeToFile(String file) {
+        try (FileWriter fileWriter = new FileWriter(file);
+             PrintWriter printWriter = new PrintWriter(fileWriter)) {
+
+            printWriter.println("Number of valid items found: " + validData.size());
+            for (DataBaseItem data : validData.values()) {
+                printWriter.println("\t" + data.toString());
+            }
+
+            printWriter.println("Number of broken attributes found: " + invalidData.size());
+            for (String attr : invalidData) {
+                printWriter.println("\t" + attr);
+            }
+        } catch (FileNotFoundException e) {
+            System.out.println("File not found: " + e.getMessage());
+        } catch (IOException e) {
+            System.out.println("I/O error: " + e.getMessage());
         }
     }
 
@@ -117,11 +135,10 @@ public abstract class FabflixSAXParser extends DefaultHandler {
 
     protected final void validateData(DataBaseItem data) {
         if (isValidData(data)) {
-            validData.add(data);
+            validData.put(data.getId(), data);
         } else {
             String invalidDataCause = getCauseOfInvalidData(data);
-            brokenAttributes.add(invalidDataCause + " - " + data);
-            invalidData.add(data);
+            invalidData.add(invalidDataCause + " - " + data);
         }
     }
 
@@ -132,6 +149,6 @@ public abstract class FabflixSAXParser extends DefaultHandler {
     }
 
     protected boolean isDuplicateData(DataBaseItem data) {
-        return validData.contains(data);
+        return validData.containsKey(data.getId());
     }
 }
