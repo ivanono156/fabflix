@@ -47,12 +47,6 @@ public class StarsInMoviesSAXParser extends FabflixSAXParser {
         return "Unknown error while parsing data";
     }
 
-    @Override
-    protected boolean isValidData(DataBaseItem data) {
-        StarInMovie starInMovie = (StarInMovie) data;
-        return !isDuplicateData(data) && starInMovie.isValid();
-    }
-
     public static void main(String[] args) {
         StarsInMoviesSAXParser parser = new StarsInMoviesSAXParser();
         parser.run();

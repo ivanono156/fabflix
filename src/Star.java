@@ -1,3 +1,5 @@
+import java.util.Objects;
+
 public class Star implements DataBaseItem{
     private String id;
     private String name;
@@ -56,5 +58,10 @@ public class Star implements DataBaseItem{
             return id.equals(other.id);
         }
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
     }
 }

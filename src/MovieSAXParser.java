@@ -1,4 +1,3 @@
-import java.util.ArrayList;
 import java.util.HashSet;
 
 public class MovieSAXParser extends FabflixSAXParser {
@@ -13,13 +12,6 @@ public class MovieSAXParser extends FabflixSAXParser {
 
     private Movie tempMovie;
 
-    private HashSet<String> genres;
-
-    public MovieSAXParser() {
-        super();
-        genres = new HashSet<>();
-    }
-
     @Override
     protected String getXmlFileName() {
         return XML_FILE_NAME;
@@ -29,7 +21,8 @@ public class MovieSAXParser extends FabflixSAXParser {
     protected void printData() {
         super.printData();
 
-        System.out.println("Number of genres: " + genres.size());
+        HashSet<String> genres = getGenres();
+        System.out.println("Number of unique genres found: " + genres.size());
         for (String genre : genres) {
             System.out.println("\t" + genre);
         }
@@ -61,15 +54,14 @@ public class MovieSAXParser extends FabflixSAXParser {
                 tempMovie.setDirector(tempValue);
                 break;
             case GENRE_TAG:
-                addGenreToMovie(tempValue);
+                addGenreToMovie(tempMovie, tempValue);
                 break;
         }
     }
 
-    private void addGenreToMovie(String genre) {
+    private void addGenreToMovie(Movie movie, String genre) {
         if (!genre.isEmpty()) {
-            tempMovie.addGenre(genre);
-            genres.add(genre);
+            movie.addGenre(genre);
         }
     }
 
@@ -77,7 +69,7 @@ public class MovieSAXParser extends FabflixSAXParser {
     protected String getCauseOfInvalidData(DataBaseItem data) {
         Movie movie = (Movie) data;
         if (isDuplicateData(movie)) {
-            return "Duplicate movie";
+            return "Duplicate movie id";
         } else if (movie.getId() == null || movie.getId().isEmpty()) {
             return "Missing movie id";
         } else if (movie.getTitle() == null || movie.getTitle().isEmpty()) {
@@ -90,14 +82,8 @@ public class MovieSAXParser extends FabflixSAXParser {
         return "Unknown error while parsing data";
     }
 
-    @Override
-    protected boolean isValidData(DataBaseItem data) {
-        Movie movie = (Movie) data;
-        return !isDuplicateData(data) && movie.isValid();
-    }
-
-    public ArrayList<String> getGenres() {
-        ArrayList<String> genres = new ArrayList<>();
+    public HashSet<String> getGenres() {
+        HashSet<String> genres = new HashSet<>();
         for (DataBaseItem data : getValidData()) {
             Movie movie = (Movie) data;
             genres.addAll(movie.getGenres());
@@ -107,7 +93,6 @@ public class MovieSAXParser extends FabflixSAXParser {
 
     public static void main(String[] args) {
         MovieSAXParser parser = new MovieSAXParser();
-//        parser.setDebugMode(DebugMode.OFF);
         parser.run();
     }
 }

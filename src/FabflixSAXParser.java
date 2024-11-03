@@ -20,17 +20,11 @@ public abstract class FabflixSAXParser extends DefaultHandler {
 
     protected String tempValue;
 
-    private final HashSet<DataBaseItem> validData;
-    private final ArrayList<DataBaseItem> invalidData;
-    private final ArrayList<String> brokenAttributes;
+    private final HashSet<DataBaseItem> validData = new HashSet<>();
+    private final ArrayList<DataBaseItem> invalidData = new ArrayList<>();
+    private final ArrayList<String> brokenAttributes = new ArrayList<>();
 
     private DebugMode debugging = DebugMode.ON;
-
-    public FabflixSAXParser() {
-        validData = new HashSet<>();
-        invalidData = new ArrayList<>();
-        brokenAttributes = new ArrayList<>();
-    }
 
     public void run() {
         String xmlFilePath = XML_FOLDER_PATH + getXmlFileName();
@@ -126,14 +120,16 @@ public abstract class FabflixSAXParser extends DefaultHandler {
             validData.add(data);
         } else {
             String invalidDataCause = getCauseOfInvalidData(data);
-            brokenAttributes.add(invalidDataCause + " - " + data.toString());
+            brokenAttributes.add(invalidDataCause + " - " + data);
             invalidData.add(data);
         }
     }
 
     protected abstract String getCauseOfInvalidData(DataBaseItem data);
 
-    protected abstract boolean isValidData(DataBaseItem data);
+    protected boolean isValidData(DataBaseItem data) {
+        return data.isValid() && !isDuplicateData(data);
+    }
 
     protected boolean isDuplicateData(DataBaseItem data) {
         return validData.contains(data);

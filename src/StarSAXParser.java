@@ -7,10 +7,6 @@ public class StarSAXParser extends FabflixSAXParser {
     private static final String BIRTHYEAR_TAG = "dob";
 
     private Star tempStar;
-    
-    public StarSAXParser() {
-        super();
-    }
 
     @Override
     protected String getXmlFileName() {
@@ -54,19 +50,13 @@ public class StarSAXParser extends FabflixSAXParser {
     protected String getCauseOfInvalidData(DataBaseItem data) {
         Star star = (Star) data;
         if (isDuplicateData(star)) {
-            return "Duplicate star";
+            return "Duplicate star id";
         } else if (star.getId() == null || star.getId().isEmpty()) {
             return "Missing star Id";
         } else if (star.getName() == null || star.getName().isEmpty()) {
             return "Missing star name";
         }
         return "Unknown error while parsing data";
-    }
-
-    @Override
-    protected boolean isValidData(DataBaseItem item) {
-        Star star = (Star) item;
-        return !isDuplicateData(star) && star.isValid();
     }
 
     public static void main(String[] args) {
