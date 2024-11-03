@@ -133,7 +133,9 @@ public abstract class FabflixSAXParser extends DefaultHandler {
 
     protected abstract String getCauseOfInvalidData(DataBaseItem data);
 
-    protected abstract boolean isValidData(DataBaseItem data);
+    protected boolean isValidData(DataBaseItem data) {
+        return data.isValid() && !isDuplicateData(data);
+    }
 
     protected boolean isDuplicateData(DataBaseItem data) {
         return validData.contains(data);

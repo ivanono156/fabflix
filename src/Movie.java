@@ -1,4 +1,5 @@
 import java.util.HashSet;
+import java.util.Objects;
 
 public class Movie implements DataBaseItem {
     private String id;
@@ -80,5 +81,10 @@ public class Movie implements DataBaseItem {
             return id.equals(other.id);
         }
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
     }
 }

@@ -1,3 +1,5 @@
+import java.util.Objects;
+
 public class StarInMovie implements DataBaseItem {
     private String movieId;
     private String starId;
@@ -54,5 +56,10 @@ public class StarInMovie implements DataBaseItem {
             return movieId.equals(other.movieId) && starId.equals(other.starId);
         }
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(movieId, starId);
     }
 }
