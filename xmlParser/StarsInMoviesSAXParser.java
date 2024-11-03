@@ -1,3 +1,10 @@
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.HashSet;
+
 public class StarsInMoviesSAXParser extends FabflixSAXParser {
     private static final String XML_FILE_NAME = "casts124.xml";
 
@@ -6,6 +13,30 @@ public class StarsInMoviesSAXParser extends FabflixSAXParser {
     private static final String STAR_ID_TAG = "a";
 
     private StarInMovie tempStarInMovie;
+
+    public void writeToFile(String file) {
+        HashSet<DataBaseItem> validData = getValidData();
+        ArrayList<DataBaseItem> invalidData = getInvalidData();
+        ArrayList<String> brokenAttributes = getBrokenAttributes();
+
+        try (FileWriter fileWriter = new FileWriter(file);
+             PrintWriter printWriter = new PrintWriter(fileWriter)) {
+
+            printWriter.println("Number of valid items found: " + validData.size());
+            for (DataBaseItem data : validData) {
+                printWriter.println("\t" + data.toString());
+            }
+
+            printWriter.println("Number of broken attributes found: " + brokenAttributes.size());
+            for (String attr : brokenAttributes) {
+                printWriter.println("\t" + attr);
+            }
+        } catch (FileNotFoundException e) {
+            System.out.println("File not found: " + e.getMessage());
+        } catch (IOException e) {
+            System.out.println("I/O error: " + e.getMessage());
+        }
+    }
 
     @Override
     protected String getXmlFileName() {
@@ -49,7 +80,11 @@ public class StarsInMoviesSAXParser extends FabflixSAXParser {
 
     public static void main(String[] args) {
         StarsInMoviesSAXParser parser = new StarsInMoviesSAXParser();
+        parser.setDebugMode(DebugMode.OFF);
         parser.run();
-        System.out.println("Number of valid data: " + parser.getValidData().size());
+
+        // write to file cuz I can't see everything
+        String outputFile = "sim_sax_output.txt";
+        parser.writeToFile(outputFile);
     }
 }
