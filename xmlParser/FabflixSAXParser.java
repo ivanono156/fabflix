@@ -49,6 +49,8 @@ public abstract class FabflixSAXParser extends DefaultHandler {
         return invalidData;
     }
 
+    public abstract String getItemType();
+
     protected abstract String getXmlFileName();
 
     protected void parseDocument(String xmlFilePath) {
@@ -66,38 +68,37 @@ public abstract class FabflixSAXParser extends DefaultHandler {
     }
 
     protected void printData() {
-        System.out.println("Number of valid items found: " + validData.size());
+        System.out.println("Number of valid " + getItemType() + "s found: " + validData.size());
         for (DataBaseItem data : validData.values()) {
             System.out.println("\t" + data.toString());
         }
 
-        System.out.println("Number of invalid items found: " + invalidData.size());
+        System.out.println("Number of invalid " + getItemType() + "s found: " + invalidData.size());
         for (String attr : invalidData) {
             System.out.println("\t" + attr);
         }
     }
 
     public void writeToFile() {
-        writeToFile(OUTPUT_FILE);
-    }
-
-    protected void writeToFile(String file) {
-        try (FileWriter fileWriter = new FileWriter(file);
+        try (FileWriter fileWriter = new FileWriter(OUTPUT_FILE);
              PrintWriter printWriter = new PrintWriter(fileWriter)) {
-
-            printWriter.println("Number of valid items found: " + validData.size());
-            for (DataBaseItem data : validData.values()) {
-                printWriter.println("\t" + data.toString());
-            }
-
-            printWriter.println("Number of broken attributes found: " + invalidData.size());
-            for (String attr : invalidData) {
-                printWriter.println("\t" + attr);
-            }
+            writeToFile(printWriter);
         } catch (FileNotFoundException e) {
             System.out.println("File not found: " + e.getMessage());
         } catch (IOException e) {
             System.out.println("I/O error: " + e.getMessage());
+        }
+    }
+
+    protected void writeToFile(PrintWriter printWriter) {
+        printWriter.println("Number of valid " + getItemType() + "s found: " + validData.size());
+        for (DataBaseItem data : validData.values()) {
+            printWriter.println("\t" + data.toString());
+        }
+
+        printWriter.println("Number of invalid " + getItemType() + "s found: " + invalidData.size());
+        for (String attr : invalidData) {
+            printWriter.println("\t" + attr);
         }
     }
 
