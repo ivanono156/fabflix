@@ -61,18 +61,18 @@ public class XMLParser {
         try (Connection connection = DriverManager.getConnection(MYSQL_URL, MYSQL_USER, MYSQL_PASSWORD)) {
             connection.setAutoCommit(false);
 
-//            handleMovieRecords(connection);
+            handleMovieRecords(connection);
             handleStarRecords(connection);
-//            handleStarInMovieRecords(connection);
+            handleStarInMovieRecords(connection);
 
-//            connection.commit();
+            connection.commit();
             connection.setAutoCommit(true);
         } catch (SQLException e) {
             System.out.println("SQL Exception: " + e.getMessage());
         }
 
 //        writeParsersOutputToFile();
-//        printErrors();
+        printErrors();
     }
 
     public void writeParsersOutputToFile() {
@@ -122,9 +122,9 @@ public class XMLParser {
 
                 try (ResultSet resultSet = preparedStatement.executeQuery()) {
                     if (resultSet.next()) {
-                        // If record already exists in database, then don't insert it.
                         String id = resultSet.getString("id");
                         dataBaseItem.setId(id);
+                        // If record already exists in database, then don't insert it.
                         iterator.remove();
                         parser.addInvalidData(FabflixSAXParser.Error.DUPLICATE.getDescription(), dataBaseItem);
                         continue;
@@ -240,8 +240,8 @@ public class XMLParser {
         starsInMoviesSAXParser.setStarInMovieRelations(movieSAXParser.getValidData(), starSAXParser.getValidData());
 
         HashMap<String, DataBaseItem> validStarsInMovies = starsInMoviesSAXParser.getValidData();
-//        int insertedStarsInMovies = insertRecordsIntoDataBase(connection, validStarsInMovies, INSERT_STAR_IN_MOVIE_QUERY);
-//        System.out.println(insertedStarsInMovies + " stars in movies inserted.");
+        int insertedStarsInMovies = insertRecordsIntoDataBase(connection, validStarsInMovies.values(), INSERT_STAR_IN_MOVIE_QUERY);
+        System.out.println(insertedStarsInMovies + " stars in movies inserted.");
     }
 
     private int insertRecordsIntoDataBase(Connection connection, Collection<DataBaseItem> items, String insertQuery) {

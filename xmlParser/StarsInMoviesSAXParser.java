@@ -74,6 +74,7 @@ public class StarsInMoviesSAXParser extends FabflixSAXParser {
                     addInvalidData(Error.STAR_NOT_FOUND.getDescription(), starInMovie);
                 }
                 starInMoviesIterator.remove();
+
             }
         }
     }
