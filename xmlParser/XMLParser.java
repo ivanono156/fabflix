@@ -61,8 +61,8 @@ public class XMLParser {
         try (Connection connection = DriverManager.getConnection(MYSQL_URL, MYSQL_USER, MYSQL_PASSWORD)) {
             connection.setAutoCommit(false);
 
-            handleMovieRecords(connection);
-//            handleStarRecords(connection);
+//            handleMovieRecords(connection);
+            handleStarRecords(connection);
 //            handleStarInMovieRecords(connection);
 
 //            connection.commit();
@@ -72,7 +72,7 @@ public class XMLParser {
         }
 
 //        writeParsersOutputToFile();
-//        printResult();
+//        printErrors();
     }
 
     public void writeParsersOutputToFile() {
@@ -90,7 +90,7 @@ public class XMLParser {
         }
     }
 
-    private void printResult() {
+    private void printErrors() {
         HashMap<String, ArrayList<DataBaseItem>> invalidMovies = movieSAXParser.getInvalidData();
         ArrayList<DataBaseItem> inconsistentMovies = invalidMovies.get(FabflixSAXParser.Error.INCONSISTENT.getDescription());
         System.out.println(inconsistentMovies.size() + " movies inconsistent");
@@ -232,8 +232,8 @@ public class XMLParser {
         String maxStarId = getMaxId(connection, SELECT_MAX_STARS_ID_QUERY);
         setRecordId(connection, starSAXParser, validStars, SELECT_STAR_ID_QUERY, maxStarId);
 
-//        int insertedStars = insertRecordsIntoDataBase(connection, validStars, INSERT_STAR_QUERY);
-//        System.out.println(insertedStars + " stars inserted.");
+        int insertedStars = insertRecordsIntoDataBase(connection, validStars.values(), INSERT_STAR_QUERY);
+        System.out.println(insertedStars + " stars inserted.");
     }
 
     private void handleStarInMovieRecords(Connection connection) {
@@ -306,7 +306,7 @@ public class XMLParser {
         } else if (data instanceof Star) {
             setStarIdValues((Star) data, preparedStatement);
         } else if (data instanceof StarInMovie) {
-//            setStarInMovieValues((StarInMovie) data, preparedStatement);
+            setStarInMovieValues((StarInMovie) data, preparedStatement);
         } else {
             throw new Exception("Unknown data type: " + data.getClass());
         }
