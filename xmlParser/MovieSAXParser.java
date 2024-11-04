@@ -74,15 +74,15 @@ public class MovieSAXParser extends FabflixSAXParser {
     protected String getCauseOfInvalidData(DataBaseItem data) {
         Movie movie = (Movie) data;
         if (isDuplicateData(movie)) {
-            return "Duplicate movie id";
+            return Error.DUPLICATE.getDescription();
         } else if (movie.getId() == null || movie.getId().isEmpty()) {
-            return "Missing movie id";
+            return Error.INCONSISTENT.getDescription();
         } else if (movie.getTitle() == null || movie.getTitle().isEmpty()) {
-            return "Missing movie title";
+            return Error.INCONSISTENT.getDescription();
         } else if (movie.getYear() == -1) {
-            return "Error parsing movie year";
+            return Error.INCONSISTENT.getDescription();
         } else if (movie.getDirector() == null || movie.getDirector().isEmpty()) {
-            return "Missing movie director";
+            return Error.INCONSISTENT.getDescription();
         }
         return "Unknown error while parsing data";
     }

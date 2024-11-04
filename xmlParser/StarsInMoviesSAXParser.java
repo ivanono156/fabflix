@@ -46,11 +46,11 @@ public class StarsInMoviesSAXParser extends FabflixSAXParser {
     protected String getCauseOfInvalidData(DataBaseItem data) {
         StarInMovie starInMovie = (StarInMovie) data;
         if (isDuplicateData(starInMovie)) {
-            return "Duplicate star in movie relation";
+            return Error.DUPLICATE.getDescription();
         } else if (starInMovie.getMovieId() == null || starInMovie.getMovieId().isEmpty()) {
-            return "Missing movie id";
+            return Error.MOVIE_NOT_FOUND.getDescription();
         } else if (starInMovie.getStarId() == null || starInMovie.getStarId().isEmpty()) {
-            return "Missing star id";
+            return Error.STAR_NOT_FOUND.getDescription();
         }
         return "Unknown error while parsing data";
     }
@@ -68,7 +68,11 @@ public class StarsInMoviesSAXParser extends FabflixSAXParser {
                 starInMovie.setStar(associatedStar);
                 starInMovie.setMovie(associatedMovie);
             } else {
-                invalidData.add("Missing star/movie for star in movie relation - " + starInMovie);
+                if (!movies.containsKey(parsedMovieId)) {
+                    addInvalidData(Error.MOVIE_NOT_FOUND.getDescription(), starInMovie);
+                } else {
+                    addInvalidData(Error.STAR_NOT_FOUND.getDescription(), starInMovie);
+                }
                 starInMoviesIterator.remove();
             }
         }

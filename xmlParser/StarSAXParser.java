@@ -50,11 +50,11 @@ public class StarSAXParser extends FabflixSAXParser {
     protected String getCauseOfInvalidData(DataBaseItem data) {
         Star star = (Star) data;
         if (isDuplicateData(star)) {
-            return "Duplicate star id";
+            return Error.DUPLICATE.getDescription();
         } else if (star.getId() == null || star.getId().isEmpty()) {
-            return "Missing star Id";
+            return Error.INCONSISTENT.getDescription();
         } else if (star.getName() == null || star.getName().isEmpty()) {
-            return "Missing star name";
+            return Error.INCONSISTENT.getDescription();
         }
         return "Unknown error while parsing data";
     }

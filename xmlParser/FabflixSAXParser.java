@@ -11,11 +11,34 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 public abstract class FabflixSAXParser extends DefaultHandler {
     public enum DebugMode {
         ON,
         OFF
+    }
+
+    public enum Error {
+        DUPLICATE("Duplicate"),
+        MOVIE_NOT_FOUND("Movie not found"),
+        STAR_NOT_FOUND("Star not found"),
+        INCONSISTENT("Inconsistent");
+
+        private final String description;
+
+        Error(String description) {
+            this.description = description;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
+        @Override
+        public String toString() {
+            return getDescription();
+        }
     }
 
     public static final String XML_FOLDER_PATH = "C:\\Users\\Ivan Onofre\\University\\CS 122B\\stanford-movies\\";
@@ -25,7 +48,7 @@ public abstract class FabflixSAXParser extends DefaultHandler {
     protected String tempValue;
 
     protected HashMap<String, DataBaseItem> validData = new HashMap<>();
-    protected ArrayList<String> invalidData = new ArrayList<>();
+    protected HashMap<String, ArrayList<DataBaseItem>> invalidData = new HashMap<>();
 
     private DebugMode debugging = DebugMode.ON;
 
@@ -45,7 +68,7 @@ public abstract class FabflixSAXParser extends DefaultHandler {
         return validData;
     }
 
-    public ArrayList<String> getInvalidData() {
+    public HashMap<String, ArrayList<DataBaseItem>> getInvalidData() {
         return invalidData;
     }
 
@@ -74,8 +97,10 @@ public abstract class FabflixSAXParser extends DefaultHandler {
         }
 
         System.out.println("Number of invalid " + getItemType() + "s found: " + invalidData.size());
-        for (String attr : invalidData) {
-            System.out.println("\t" + attr);
+        for (Map.Entry<String, ArrayList<DataBaseItem>> attr : invalidData.entrySet()) {
+            for (DataBaseItem data : attr.getValue()) {
+                System.out.println("\t" + attr.getKey() + ": " + data);
+            }
         }
     }
 
@@ -97,8 +122,10 @@ public abstract class FabflixSAXParser extends DefaultHandler {
         }
 
         printWriter.println("Number of invalid " + getItemType() + "s found: " + invalidData.size());
-        for (String attr : invalidData) {
-            printWriter.println("\t" + attr);
+        for (Map.Entry<String, ArrayList<DataBaseItem>> attr : invalidData.entrySet()) {
+            for (DataBaseItem data : attr.getValue()) {
+                printWriter.println("\t" + attr.getKey() + ": " + data);
+            }
         }
     }
 
@@ -139,7 +166,17 @@ public abstract class FabflixSAXParser extends DefaultHandler {
             validData.put(data.getId(), data);
         } else {
             String invalidDataCause = getCauseOfInvalidData(data);
-            invalidData.add(invalidDataCause + " - " + data);
+            addInvalidData(invalidDataCause, data);
+        }
+    }
+
+    protected final void addInvalidData(String error, DataBaseItem dataBaseItem) {
+        if (invalidData.containsKey(error)) {
+                invalidData.get(error).add(dataBaseItem);
+        } else {
+            ArrayList<DataBaseItem> dataBaseItems = new ArrayList<>();
+            dataBaseItems.add(dataBaseItem);
+            invalidData.put(error, dataBaseItems);
         }
     }
 
