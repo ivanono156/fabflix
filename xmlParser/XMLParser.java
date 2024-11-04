@@ -3,10 +3,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
+import java.util.*;
 
 public class XMLParser {
     String MYSQL_USER = "mytestuser";
@@ -154,7 +151,6 @@ public class XMLParser {
         return "";
     }
 
-
     private String getIdPrefix(String id) {
         return id.replaceAll("\\d+", "");
     }
@@ -166,22 +162,17 @@ public class XMLParser {
     private void handleMovieRecords(Connection connection) {
         HashMap<String, DataBaseItem> validMovies = movieSAXParser.getValidData();
         String maxMovieId = getMaxId(connection, SELECT_MAX_MOVIE_ID_QUERY);
-//        setRecordId(connection, movieSAXParser, validMovies, SELECT_MOVIE_ID_QUERY, maxMovieId);
+        setRecordId(connection, movieSAXParser, validMovies, SELECT_MOVIE_ID_QUERY, maxMovieId);
 
-//        int insertedMovies = insertRecordsIntoDataBase(connection, validMovies, INSERT_MOVIE_QUERY);
-//        System.out.println(insertedMovies + " movies inserted.");
+        int insertedMovies = insertRecordsIntoDataBase(connection, validMovies.values(), INSERT_MOVIE_QUERY);
+        System.out.println(insertedMovies + " movies inserted.");
 
-        HashSet<String> movieGenres = movieSAXParser.getGenres();
-        HashMap<String, Integer> dataBaseGenres = getDataBaseGenres(connection);
-        System.out.println("Parsed genres: " + dataBaseGenres);
-        filterGenres(dataBaseGenres, movieGenres);
-        System.out.println("Filtered genres: ");
-        movieGenres.forEach(System.out::println);
-        int insertedGenres = insertGenresIntoDataBase(connection, movieGenres);
+        HashSet<String> newGenres = movieSAXParser.getGenres();
+        filterGenres(getDataBaseGenres(connection), newGenres);
+        int insertedGenres = insertGenresIntoDataBase(connection, newGenres);
         System.out.println(insertedGenres + " genres inserted.");
 
-        dataBaseGenres = getDataBaseGenres(connection);
-        int insertedGenresInMovies = insertGenresInMoviesIntoDataBase(connection, validMovies, dataBaseGenres);
+        int insertedGenresInMovies = insertGenresInMoviesIntoDataBase(connection, validMovies, getDataBaseGenres(connection));
         System.out.println(insertedGenresInMovies + " genres in movies inserted.");
     }
 
@@ -195,21 +186,21 @@ public class XMLParser {
                 totalGenres += movie.getGenres().size();
             }
 
-//            for (DataBaseItem dataBaseItem : validMovies.values()) {
-//                Movie movie = (Movie) dataBaseItem;
-//                for (String genre : movie.getGenres()) {
-//                    int genreId = dataBaseGenres.get(genre);
-//                    preparedStatement.setString(1, movie.getId());
-//                    preparedStatement.setInt(2, genreId);
-//                    preparedStatement.addBatch();
-//
-//                    if (i % BATCH_AMOUNT == 0 || i == totalGenres - 1) {
-//                        int[] updateCounts = preparedStatement.executeBatch();
-//                        insertedItems += updateCounts.length;
-//                    }
-//                    i++;
-//                }
-//            }
+            for (DataBaseItem dataBaseItem : validMovies.values()) {
+                Movie movie = (Movie) dataBaseItem;
+                for (String genre : movie.getGenres()) {
+                    int genreId = dataBaseGenres.get(genre);
+                    preparedStatement.setInt(1, genreId);
+                    preparedStatement.setString(2, movie.getId());
+                    preparedStatement.addBatch();
+
+                    if (i % BATCH_AMOUNT == 0 || i == totalGenres - 1) {
+                        int[] updateCounts = preparedStatement.executeBatch();
+                        insertedItems += updateCounts.length;
+                    }
+                    i++;
+                }
+            }
             return insertedItems;
         } catch (SQLException se) {
             System.out.println("SQLException: while inserting genres in movies" + se.getMessage());
@@ -253,7 +244,7 @@ public class XMLParser {
 //        System.out.println(insertedStarsInMovies + " stars in movies inserted.");
     }
 
-    private int insertRecordsIntoDataBase(Connection connection, HashSet<DataBaseItem> items, String insertQuery) {
+    private int insertRecordsIntoDataBase(Connection connection, Collection<DataBaseItem> items, String insertQuery) {
         try (PreparedStatement preparedStatement = connection.prepareStatement(insertQuery)) {
             int insertedItems = 0;
             int i = 0;
