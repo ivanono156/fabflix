@@ -1,4 +1,5 @@
 import java.util.HashMap;
+import java.util.Iterator;
 
 public class StarsInMoviesSAXParser extends FabflixSAXParser {
     private static final String XML_FILE_NAME = "casts124.xml";
@@ -8,6 +9,11 @@ public class StarsInMoviesSAXParser extends FabflixSAXParser {
     private static final String STAR_ID_TAG = "a";
 
     private StarInMovie tempStarInMovie;
+
+    @Override
+    public String getItemType() {
+        return "Star In Movie";
+    }
 
     @Override
     protected String getXmlFileName() {
@@ -50,7 +56,7 @@ public class StarsInMoviesSAXParser extends FabflixSAXParser {
     }
     
     public void setStarInMovieRelations(HashMap<String, DataBaseItem> movies, HashMap<String, DataBaseItem> stars) {
-        var starInMoviesIterator = validData.values().iterator();
+        Iterator<DataBaseItem> starInMoviesIterator = validData.values().iterator();
         while (starInMoviesIterator.hasNext()) {
             StarInMovie starInMovie = (StarInMovie) starInMoviesIterator.next();
             String parsedMovieId = starInMovie.getMovieId();

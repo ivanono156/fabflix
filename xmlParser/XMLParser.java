@@ -1,6 +1,11 @@
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.sql.*;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 
 public class XMLParser {
     String MYSQL_USER = "mytestuser";
@@ -56,40 +61,63 @@ public class XMLParser {
         movieSAXParser.run();
         starSAXParser.run();
         starsInMoviesSAXParser.run();
-        starsInMoviesSAXParser.setStarInMovieRelations(movieSAXParser.getValidData(), starSAXParser.getValidData());
-        starsInMoviesSAXParser.writeToFile("sim_sax_output.txt");
+//        starsInMoviesSAXParser.setStarInMovieRelations(movieSAXParser.getValidData(), starSAXParser.getValidData());
 
         try (Connection connection = DriverManager.getConnection(MYSQL_URL, MYSQL_USER, MYSQL_PASSWORD)) {
             connection.setAutoCommit(false);
 
-//            handleMovieRecords(connection);
-//            handleStarRecords(connection);
-//            handleStarInMovieRecords(connection);
+            handleMovieRecords(connection);
+            handleStarRecords(connection);
+            handleStarInMovieRecords(connection);
 
 //            connection.commit();
             connection.setAutoCommit(true);
         } catch (SQLException e) {
             System.out.println("SQL Exception: " + e.getMessage());
         }
+
+        starsInMoviesSAXParser.setStarInMovieRelations(movieSAXParser.getValidData(), starSAXParser.getValidData());
+        writeParsersOutputToFile();
     }
 
-    private void setRecordId(Connection connection, HashSet<DataBaseItem> dataBaseItems, String selectQuery, String maxId) {
+    public void writeParsersOutputToFile() {
+        try (FileWriter fileWriter = new FileWriter(FabflixSAXParser.OUTPUT_FILE);
+             PrintWriter printWriter = new PrintWriter(fileWriter)) {
+
+            movieSAXParser.writeToFile(printWriter);
+            starSAXParser.writeToFile(printWriter);
+            starsInMoviesSAXParser.writeToFile(printWriter);
+
+        } catch (FileNotFoundException e) {
+            System.out.println("File not found: " + e.getMessage());
+        } catch (IOException e) {
+            System.out.println("I/O error: " + e.getMessage());
+        }
+    }
+
+    private void setRecordId(Connection connection, FabflixSAXParser parser, HashMap<String, DataBaseItem> dataBaseItems,
+                             String selectQuery, String maxId) {
+
         try (PreparedStatement preparedStatement = connection.prepareStatement(selectQuery)) {
             String idPrefix = getIdPrefix(maxId);
             int idSuffix = getIdSuffix(maxId);
 
-            for (DataBaseItem dataBaseItem : dataBaseItems) {
+            Iterator<DataBaseItem> iterator = dataBaseItems.values().iterator();
+            while (iterator.hasNext()) {
+                DataBaseItem dataBaseItem = iterator.next();
                 setIdPreparedStatementValues(dataBaseItem, preparedStatement);
 
                 try (ResultSet resultSet = preparedStatement.executeQuery()) {
                     if (resultSet.next()) {
+                        // If record already exists in database, then don't insert it.
                         String id = resultSet.getString("id");
                         dataBaseItem.setId(id);
+                        iterator.remove();
+                        parser.invalidData.add("Star already exists in database - " + dataBaseItem);
                         continue;
                     }
                 }
 
-                // FIXME: If record already exists in database, then don't insert it.
                 String id = idPrefix + ++idSuffix;
                 dataBaseItem.setId(id);
             }
@@ -122,7 +150,7 @@ public class XMLParser {
     private void handleMovieRecords(Connection connection) {
         HashMap<String, DataBaseItem> validMovies = movieSAXParser.getValidData();
         String maxMovieId = getMaxId(connection, SELECT_MAX_MOVIE_ID_QUERY);
-//        setRecordId(connection, new HashSet<>(validMovies.values()), SELECT_MOVIE_ID_QUERY, maxMovieId);
+        setRecordId(connection, movieSAXParser, validMovies, SELECT_MOVIE_ID_QUERY, maxMovieId);
 
 //        int insertedMovies = insertRecordsIntoDataBase(connection, validMovies, INSERT_MOVIE_QUERY);
 //        System.out.println(insertedMovies + " movies inserted.");
@@ -135,7 +163,7 @@ public class XMLParser {
     private void handleStarRecords(Connection connection) {
         HashMap<String, DataBaseItem> validStars = starSAXParser.getValidData();
         String maxStarId = getMaxId(connection, SELECT_MAX_STARS_ID_QUERY);
-//        setRecordId(connection, new HashSet<>(validStars.values()), SELECT_STAR_ID_QUERY, maxStarId);
+        setRecordId(connection, starSAXParser, validStars, SELECT_STAR_ID_QUERY, maxStarId);
 
 //        int insertedStars = insertRecordsIntoDataBase(connection, validStars, INSERT_STAR_QUERY);
 //        System.out.println(insertedStars + " stars inserted.");

@@ -8,6 +8,11 @@ public class StarSAXParser extends FabflixSAXParser {
     private Star tempStar;
 
     @Override
+    public String getItemType() {
+        return "Star";
+    }
+
+    @Override
     protected String getXmlFileName() {
         return XML_FILE_NAME;
     }

@@ -38,6 +38,7 @@ public class StarInMovie implements DataBaseItem {
 
     public void setMovie(Movie movie) {
         this.movie = movie;
+        this.movieId = movie.getId();
     }
 
     public void setStarId(String starId) {
@@ -46,6 +47,7 @@ public class StarInMovie implements DataBaseItem {
 
     public void setStar(Star star) {
         this.star = star;
+        this.starId = star.getId();
     }
 
     @Override

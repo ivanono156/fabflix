@@ -13,6 +13,11 @@ public class MovieSAXParser extends FabflixSAXParser {
     private Movie tempMovie;
 
     @Override
+    public String getItemType() {
+        return "Movie";
+    }
+
+    @Override
     protected String getXmlFileName() {
         return XML_FILE_NAME;
     }
