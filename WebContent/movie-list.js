@@ -73,28 +73,29 @@ function handleMovieResult(resultData) {
         // Concatenate the html tags with resultData jsonObject
         let rowHTML = "";
         rowHTML += "<tr>";
+        rowHTML += "<td><a href='single-movie.html?id=" + resultData[i]["movie_id"] + "'>" + resultData[i]["movie_title"] + "</a></td>";
+        rowHTML += "<td>" + resultData[i]["movie_year"] + "</td>";
+        rowHTML += "<td>" + resultData[i]["movie_director"] + "</td>";
 
         let genresHTML = "<td><ul>";
         let genres = resultData[i]["genres"];
         for (const genreId in genres) {
-            let genreName = genres[genreId]
+            let genreName = genres[genreId];
             genresHTML += "<li><a href='movie-list.html?" + createDefaultMovieListUrl()
                 + "&" + createUrlParams(genreKeyName, genreId) + "'>" + genreName + "</a></li>";
         }
         genresHTML += "</ul></td>";
-
-        rowHTML += "<td><a href='single-movie.html?id=" + resultData[i]["movie_id"] + "'>" + resultData[i]["movie_title"] + "</a></td>";
-
-        rowHTML += "<td>" + resultData[i]["movie_year"] + "</td>";
-        rowHTML += "<td>" + resultData[i]["movie_director"] + "</td>";
         rowHTML += genresHTML;
-        rowHTML += "<td>" +
-            "<ul>" +
-            "<li><a href='single-star.html?id=" + resultData[i]["movie_star1_id"] + "'>" + resultData[i]["movie_star1"] + "</a></li>" +
-            "<li><a href='single-star.html?id=" + resultData[i]["movie_star2_id"] + "'>" + resultData[i]["movie_star2"] + "</a></li>" +
-            "<li><a href='single-star.html?id=" + resultData[i]["movie_star3_id"] + "'>" + resultData[i]["movie_star3"] + "</a></li>" +
-            "</ul>" +
-            "</td>";
+
+        let starsHTML = "<td><ul>";
+        let stars = resultData[i]["stars"];
+        for (const starId in stars) {
+            let starName = stars[starId];
+            starsHTML += "<li><a href='single-star.html?id=" + starId + "'>" + starName + "</a></li>";
+        }
+        starsHTML += "</ul></td>"
+        rowHTML += starsHTML;
+
         rowHTML += "<td>" + resultData[i]["movie_rating"] + "</td>";
         rowHTML += "" +
             "<td>" +

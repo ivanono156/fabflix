@@ -15,6 +15,7 @@ import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 @WebServlet(name = "SearchPageServlet", urlPatterns = "/api/search-page")
 public class SearchPageServlet extends HttpServlet {
@@ -130,7 +131,7 @@ public class SearchPageServlet extends HttpServlet {
 
                 + "r.rating "
                 + "from movies m "
-                + "join ratings r on m.id = r.movieId " +
+                + "left join ratings r on m.id = r.movieId " +
                 "inner join stars_in_movies sim ON sim.movieId = m.id " +
                 "inner join stars s ON sim.starId = s.id where 1=1";
             if(title != null && !title.isEmpty()){
@@ -183,36 +184,25 @@ public class SearchPageServlet extends HttpServlet {
                     while (rs.next()) {
                         JsonObject jsonObject = new JsonObject();
                         JsonObject movieGenres = new JsonObject();
+                        JsonObject movieStars = new JsonObject();
+
                         // Get info
                         String movieId = rs.getString("id");
                         String movieTitle = rs.getString("title");
                         String movieYear = rs.getString("year");
                         String movieDirector = rs.getString("director");
                         String movieRating = rs.getString("rating");
-
-                        String movieStarName1 = rs.getString("star1");
-                        String movieStarName2 = rs.getString("star2");
-                        String movieStarName3 = rs.getString("star3");
-                        String movieStarId1 = rs.getString("star1Id");
-                        String movieStarId2 = rs.getString("star2Id");
-                        String movieStarId3 = rs.getString("star3Id");
-
-                        String movieGenreName1 = rs.getString("genre1");
-                        String movieGenreName2 = rs.getString("genre2");
-                        String movieGenreName3 = rs.getString("genre3");
-
-                        String movieGenreId1 = rs.getString("genre1Id");
-                        if (!rs.wasNull()) {
-                            movieGenres.addProperty(movieGenreId1, movieGenreName1);
+                        if (rs.wasNull()) {
+                            movieRating = "None";
                         }
-                        String movieGenreId2 = rs.getString("genre2Id");
-                        if (!rs.wasNull()) {
-                            movieGenres.addProperty(movieGenreId2, movieGenreName2);
-                        }
-                        String movieGenreId3 = rs.getString("genre3Id");
-                        if (!rs.wasNull()) {
-                            movieGenres.addProperty(movieGenreId3, movieGenreName3);
-                        }
+
+                        addNonNullValueToJsonObject(rs, "star1", movieStars);
+                        addNonNullValueToJsonObject(rs, "star2", movieStars);
+                        addNonNullValueToJsonObject(rs, "star3", movieStars);
+
+                        addNonNullValueToJsonObject(rs, "genre1", movieGenres);
+                        addNonNullValueToJsonObject(rs, "genre2", movieGenres);
+                        addNonNullValueToJsonObject(rs, "genre3", movieGenres);
 
                         //place the info into the json object
                         jsonObject.addProperty("movie_id", movieId);
@@ -221,13 +211,7 @@ public class SearchPageServlet extends HttpServlet {
                         jsonObject.addProperty("movie_director", movieDirector);
                         jsonObject.addProperty("movie_rating", movieRating);
 
-                        jsonObject.addProperty("movie_star1", movieStarName1);
-                        jsonObject.addProperty("movie_star2", movieStarName2);
-                        jsonObject.addProperty("movie_star3", movieStarName3);
-                        jsonObject.addProperty("movie_star1_id", movieStarId1);
-                        jsonObject.addProperty("movie_star2_id", movieStarId2);
-                        jsonObject.addProperty("movie_star3_id", movieStarId3);
-
+                        jsonObject.add("stars", movieStars);
                         jsonObject.add("genres", movieGenres);
 
                         array.add(jsonObject);
@@ -253,6 +237,13 @@ public class SearchPageServlet extends HttpServlet {
         } finally {
             out.close();
         }
+    }
 
+    private void addNonNullValueToJsonObject(ResultSet resultSet, String columnName, JsonObject jsonObject) throws SQLException {
+        String id = resultSet.getString(columnName + "Id");
+        if (!resultSet.wasNull()) {
+            String name = resultSet.getString(columnName);
+            jsonObject.addProperty(id, name);
+        }
     }
 }

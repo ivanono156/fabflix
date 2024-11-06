@@ -63,6 +63,7 @@ ul.top-nav li a.active {
 
 .main-page-content {
     margin-top: 60px;
+    padding-bottom: 50px;
 }
 
 .login-form {
@@ -90,7 +91,7 @@ ul.top-nav li a.active {
 
 #genres_grid.grid-container {
     display: grid;
-    grid-template-columns: repeat(3, auto);
+    grid-template-columns: repeat(4, auto);
 }
 
 #titles_grid.grid-container {

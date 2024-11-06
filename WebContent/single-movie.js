@@ -94,13 +94,7 @@ function handleResult(resultData) {
     for (const starId in stars) {
         let rowHTML = "";
         rowHTML += "<tr>";
-        rowHTML +=
-            "<td>"
-            // Add a link to each single-star.html page
-            + '<a href="single-star.html?id=' + starId + '">'
-            + stars[starId] // Display star name
-            + '</a>'
-            + "</td>";
+        rowHTML += "<td>" + '<a href="single-star.html?id=' + starId + '">' + stars[starId] + '</a>' + "</td>";
         rowHTML += "</tr>";
 
         // Append the row created to the table body, which will refresh the page
