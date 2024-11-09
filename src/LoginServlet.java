@@ -35,17 +35,22 @@ public class LoginServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
 
+        try {
+            String gRecaptchaResponse = request.getParameter("g-recaptcha-response");
+            RecaptchaVerifyUtils.verify(gRecaptchaResponse);
+        } catch (Exception e) {
+            JsonObject recaptchaErrorJson = getResponseJsonObject(false, e.getMessage());
+            response.getWriter().write(recaptchaErrorJson.toString());
+            return;
+        }
+
         String email = request.getParameter("email");
         String password = request.getParameter("password");
-
-        PrintWriter out = response.getWriter();
 
         try (Connection conn = dataSource.getConnection();
             PreparedStatement ps = conn.prepareStatement(credentialsQuery)) {
 
             ps.setString(1, email);
-
-            JsonObject responseJsonObject = new JsonObject();
 
             boolean success;
             String message;
@@ -63,34 +68,36 @@ public class LoginServlet extends HttpServlet {
                         request.getSession().setAttribute("user", new User(id));
                     } else {
                         success = false;
-                        message = "incorrect password";
+                        message = "Incorrect password";
                     }
                 } else {
                     success = false;
-                    message = "email " + email + " not found";
+                    message = "Email " + email + " not found";
                 }
 
-                if (success) {
-                    responseJsonObject.addProperty("status", "success");
-                    responseJsonObject.addProperty("message", message);
-                } else {
-                    responseJsonObject.addProperty("status", "fail");
-                    responseJsonObject.addProperty("message", message);
+                if (!success) {
                     request.getServletContext().log("Login failed");
                 }
-            }
 
-            out.write(responseJsonObject.toString());
+                JsonObject responseJsonObject = getResponseJsonObject(success, message);
+                response.getWriter().write(responseJsonObject.toString());
+            }
         } catch (Exception e) {
             JsonObject jsonObject = new JsonObject();
             jsonObject.addProperty("errorMessage", e.getMessage());
-            out.write(jsonObject.toString());
+            response.getWriter().write(jsonObject.toString());
 
             request.getServletContext().log("Error:", e);
             // Set response status to 500 (Internal Server Error)
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        } finally {
-            out.close();
         }
+    }
+
+    private JsonObject getResponseJsonObject(boolean success, String message) {
+        JsonObject jsonObject = new JsonObject();
+        String status = success ? "success" : "fail";
+        jsonObject.addProperty("status", status);
+        jsonObject.addProperty("message", message);
+        return jsonObject;
     }
 }

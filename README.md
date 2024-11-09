@@ -1,12 +1,21 @@
 # CS 122B Fall 2024 Project - Team 997
 
-Demo Video URL: https://youtu.be/WU_2dXQ5tro
+## Project 2
+
+Demo Video URL: https://youtu.be/XUs5J1l8Sr8
 
 ## Contributions
 
 Ivan Onofre
-- Single Movie pages (html, js, java)
-- Single Star pages (html, js, java)
+- Login pages (html, js, java)
+- Shopping Cart + Checkout + Payment/Order pages (html, js, java)
+- Extend Single pages
 
 Carlos Arias
-- Index/Movie List pages (html, js, java)
+- Browse pages (html, js, java)
+- Search pages (html, js, java)
+- Extend movie list pages
+- Substring matching
+
+### Substring Matching Pattern
+"%" + term + "%"

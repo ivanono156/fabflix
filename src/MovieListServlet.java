@@ -42,16 +42,22 @@ public class MovieListServlet extends HttpServlet {
         String genreId = request.getParameter("gid");
 
         String titleStartsWith = request.getParameter("title-starts-with");
-        String sortFieldEntry = request.getParameter("sort_field");
-        String sortOrderEntry = request.getParameter("sort_order");
-        String sortFieldEntry2 = request.getParameter("sort_field2");
-        String sortOrderEntry2 = request.getParameter("sort_order2");
 
         // Pagination params
         // limit; how many movies will be displayed on each page
         String display = request.getParameter("display");
         // offset; page 1 = offset 0
         String pageNumber = request.getParameter("page-number");
+        String sortFieldEntry = request.getParameter("sort_field");
+        String sortOrderEntry = request.getParameter("sort_order");
+        String sortFieldEntry2 = request.getParameter("sort_field2");
+        String sortOrderEntry2 = request.getParameter("sort_order2");
+        if (sortFieldEntry == null) {
+            sortFieldEntry = "rating"; // Default to sorting by rating
+        }
+        if (sortOrderEntry == null || (!sortOrderEntry.equalsIgnoreCase("ASC") && !sortOrderEntry.equalsIgnoreCase("DESC"))) {
+            sortOrderEntry = "DESC"; // Default to descending order
+        }
 
         // Retrieve parameter id from the url
         // Log message can be found in localhost log
