@@ -41,7 +41,7 @@ public class StarSAXParser extends FabflixSAXParser {
 
     private void addStarBirthYear(Star star, String value) {
         int dob = parseIntValue(value);
-        if (dob != -1) {
+        if (dob != invalidIntValue) {
             star.setBirthYear(dob);
         }
     }

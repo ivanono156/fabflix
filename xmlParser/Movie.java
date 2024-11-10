@@ -7,6 +7,7 @@ public class Movie implements DataBaseItem {
     private int year;
     private String director;
     private HashSet<String> genres = new HashSet<>();
+    private HashSet<Star> movieStars = new HashSet<>();
 
     public Movie(String id, String title, int year, String director) {
         this.id = id;
@@ -16,7 +17,7 @@ public class Movie implements DataBaseItem {
     }
 
     public Movie() {
-        year = -1;
+        year = FabflixSAXParser.invalidIntValue;
     }
 
     @Override
@@ -40,6 +41,10 @@ public class Movie implements DataBaseItem {
         return genres;
     }
 
+    public HashSet<Star> getMovieStars() {
+        return movieStars;
+    }
+
     @Override
     public void setId(String id) {
         this.id = id;
@@ -61,11 +66,15 @@ public class Movie implements DataBaseItem {
         genres.add(genre);
     }
 
+    public void addMovieStar(Star movieStar) {
+        movieStars.add(movieStar);
+    }
+
     @Override
     public boolean isValid() {
         return id != null && !id.isEmpty()
                 && title != null && !title.isEmpty()
-                && year != -1
+                && year != FabflixSAXParser.invalidIntValue
                 && director != null && !director.isEmpty();
     }
 

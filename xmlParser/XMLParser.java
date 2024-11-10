@@ -61,9 +61,7 @@ public class XMLParser {
         try (Connection connection = DriverManager.getConnection(MYSQL_URL, MYSQL_USER, MYSQL_PASSWORD)) {
             connection.setAutoCommit(false);
 
-            handleMovieRecords(connection);
-            handleStarRecords(connection);
-            handleStarInMovieRecords(connection);
+            handleRecords(connection);
 
             connection.commit();
             connection.setAutoCommit(true);
@@ -90,10 +88,34 @@ public class XMLParser {
         }
     }
 
-    private void printErrors() {
+    private void handleRecords(Connection connection) {
+        HashMap<String, DataBaseItem> validStars = prepareStarRecords(connection);
+        HashMap<String, DataBaseItem> validMovies = prepareMovieRecords(connection);
+        prepareStarInMovieRecords(validMovies, validStars);
+        HashSet<String> newGenres = prepareGenreRecords(connection);
+
+        int insertedStars = insertRecordsIntoDataBase(connection, validStars.values(), INSERT_STAR_QUERY);
+        System.out.println(insertedStars + " stars inserted.");
+
+        int insertedMovies = insertRecordsIntoDataBase(connection, validMovies.values(), INSERT_MOVIE_QUERY);
+        System.out.println(insertedMovies + " movies inserted.");
+
+        int insertedGenres = insertGenresIntoDataBase(connection, newGenres);
+        System.out.println(insertedGenres + " genres inserted.");
+
+        int insertedGenresInMovies = insertGenresInMoviesIntoDataBase(connection, validMovies, getDataBaseGenres(connection));
+        System.out.println(insertedGenresInMovies + " genres in movies inserted.");
+
+        HashMap<String, DataBaseItem> validStarsInMovies = starsInMoviesSAXParser.getValidData();
+        int insertedStarsInMovies = insertRecordsIntoDataBase(connection, validStarsInMovies.values(), INSERT_STAR_IN_MOVIE_QUERY);
+        System.out.println(insertedStarsInMovies + " stars in movies inserted.");
+    }
+
+    public void printErrors() {
         HashMap<String, ArrayList<DataBaseItem>> invalidMovies = movieSAXParser.getInvalidData();
         ArrayList<DataBaseItem> inconsistentMovies = invalidMovies.get(FabflixSAXParser.Error.INCONSISTENT.getDescription());
         System.out.println(inconsistentMovies.size() + " movies inconsistent");
+
         ArrayList<DataBaseItem> duplicateMovies = invalidMovies.get(FabflixSAXParser.Error.DUPLICATE.getDescription());
         System.out.println(duplicateMovies.size() + " movies duplicate");
 
@@ -104,8 +126,35 @@ public class XMLParser {
         HashMap<String, ArrayList<DataBaseItem>> invalidStarsInMovies = starsInMoviesSAXParser.getInvalidData();
         ArrayList<DataBaseItem> notFoundMovies = invalidStarsInMovies.get(FabflixSAXParser.Error.MOVIE_NOT_FOUND.getDescription());
         System.out.println(notFoundMovies.size() + " movies not found");
+
         ArrayList<DataBaseItem> notFoundStars = invalidStarsInMovies.get(FabflixSAXParser.Error.STAR_NOT_FOUND.getDescription());
         System.out.println(notFoundStars.size() + " stars not found");
+    }
+
+    private void prepareStarInMovieRecords(HashMap<String, DataBaseItem> movies, HashMap<String, DataBaseItem> stars) {
+        starsInMoviesSAXParser.setStarInMovieRelations(movies, stars);
+        removeMoviesWithoutStars(movies.values());
+    }
+
+    private HashMap<String, DataBaseItem> prepareStarRecords(Connection connection) {
+        HashMap<String, DataBaseItem> validStars = starSAXParser.getValidData();
+        String maxStarId = getMaxId(connection, SELECT_MAX_STARS_ID_QUERY);
+        setRecordId(connection, starSAXParser, validStars, SELECT_STAR_ID_QUERY, maxStarId);
+        return validStars;
+    }
+
+    private HashMap<String, DataBaseItem> prepareMovieRecords(Connection connection) {
+        HashMap<String, DataBaseItem> validMovies = movieSAXParser.getValidData();
+        String maxMovieId = getMaxId(connection, SELECT_MAX_MOVIE_ID_QUERY);
+        setRecordId(connection, movieSAXParser, validMovies, SELECT_MOVIE_ID_QUERY, maxMovieId);
+        return validMovies;
+    }
+
+    private HashSet<String> prepareGenreRecords(Connection connection) {
+        HashSet<String> newGenres = movieSAXParser.getGenres();
+        HashMap<String, Integer> dataBaseGenres = getDataBaseGenres(connection);
+        newGenres.removeIf(dataBaseGenres::containsKey);
+        return newGenres;
     }
 
     private void setRecordId(Connection connection, FabflixSAXParser parser, HashMap<String, DataBaseItem> dataBaseItems,
@@ -118,7 +167,7 @@ public class XMLParser {
             Iterator<DataBaseItem> iterator = dataBaseItems.values().iterator();
             while (iterator.hasNext()) {
                 DataBaseItem dataBaseItem = iterator.next();
-                setIdPreparedStatementValues(dataBaseItem, preparedStatement);
+                setPreparedStatementValuesForRetrievingIds(dataBaseItem, preparedStatement);
 
                 try (ResultSet resultSet = preparedStatement.executeQuery()) {
                     if (resultSet.next()) {
@@ -137,43 +186,6 @@ public class XMLParser {
         } catch (Exception e) {
             System.out.println("Exception occurred while setting record ids: " + e.getMessage());
         }
-    }
-
-    private String getMaxId(Connection connection, String selectQuery) {
-        try (PreparedStatement preparedStatement = connection.prepareStatement(selectQuery);
-             ResultSet resultSet = preparedStatement.executeQuery()) {
-            if (resultSet.next()) {
-                return resultSet.getString("max(id)");
-            }
-        } catch (Exception e) {
-            System.out.println("Exception occurred while getting max ids: " + e.getMessage());
-        }
-        return "";
-    }
-
-    private String getIdPrefix(String id) {
-        return id.replaceAll("\\d+", "");
-    }
-
-    private int getIdSuffix(String id) {
-        return Integer.parseInt(id.replaceAll("\\D+", ""));
-    }
-
-    private void handleMovieRecords(Connection connection) {
-        HashMap<String, DataBaseItem> validMovies = movieSAXParser.getValidData();
-        String maxMovieId = getMaxId(connection, SELECT_MAX_MOVIE_ID_QUERY);
-        setRecordId(connection, movieSAXParser, validMovies, SELECT_MOVIE_ID_QUERY, maxMovieId);
-
-        int insertedMovies = insertRecordsIntoDataBase(connection, validMovies.values(), INSERT_MOVIE_QUERY);
-        System.out.println(insertedMovies + " movies inserted.");
-
-        HashSet<String> newGenres = movieSAXParser.getGenres();
-        filterGenres(getDataBaseGenres(connection), newGenres);
-        int insertedGenres = insertGenresIntoDataBase(connection, newGenres);
-        System.out.println(insertedGenres + " genres inserted.");
-
-        int insertedGenresInMovies = insertGenresInMoviesIntoDataBase(connection, validMovies, getDataBaseGenres(connection));
-        System.out.println(insertedGenresInMovies + " genres in movies inserted.");
     }
 
     private int insertGenresInMoviesIntoDataBase(Connection connection, HashMap<String,DataBaseItem> validMovies, HashMap<String, Integer> dataBaseGenres) {
@@ -208,42 +220,6 @@ public class XMLParser {
         return 0;
     }
 
-    private HashMap<String, Integer> getDataBaseGenres(Connection connection) {
-        HashMap<String, Integer> genres = new HashMap<>();
-        try (PreparedStatement preparedStatement = connection.prepareStatement(SELECT_GENRES_QUERY);
-             ResultSet resultSet = preparedStatement.executeQuery()) {
-            while (resultSet.next()) {
-                Integer genreId = resultSet.getInt("id");
-                String genreName = resultSet.getString("name");
-                genres.put(genreName, genreId);
-            }
-        } catch (SQLException se) {
-            System.out.println("SQL Exception while getting genres: " + se.getMessage());
-        }
-        return genres;
-    }
-
-    private void filterGenres(HashMap<String, Integer> dataBaseGenres, HashSet<String> newGenres) {
-        newGenres.removeIf(dataBaseGenres::containsKey);
-    }
-
-    private void handleStarRecords(Connection connection) {
-        HashMap<String, DataBaseItem> validStars = starSAXParser.getValidData();
-        String maxStarId = getMaxId(connection, SELECT_MAX_STARS_ID_QUERY);
-        setRecordId(connection, starSAXParser, validStars, SELECT_STAR_ID_QUERY, maxStarId);
-
-        int insertedStars = insertRecordsIntoDataBase(connection, validStars.values(), INSERT_STAR_QUERY);
-        System.out.println(insertedStars + " stars inserted.");
-    }
-
-    private void handleStarInMovieRecords(Connection connection) {
-        starsInMoviesSAXParser.setStarInMovieRelations(movieSAXParser.getValidData(), starSAXParser.getValidData());
-
-        HashMap<String, DataBaseItem> validStarsInMovies = starsInMoviesSAXParser.getValidData();
-        int insertedStarsInMovies = insertRecordsIntoDataBase(connection, validStarsInMovies.values(), INSERT_STAR_IN_MOVIE_QUERY);
-        System.out.println(insertedStarsInMovies + " stars in movies inserted.");
-    }
-
     private int insertRecordsIntoDataBase(Connection connection, Collection<DataBaseItem> items, String insertQuery) {
         try (PreparedStatement preparedStatement = connection.prepareStatement(insertQuery)) {
             int insertedItems = 0;
@@ -266,8 +242,7 @@ public class XMLParser {
     }
 
     private int insertGenresIntoDataBase(Connection connection, HashSet<String> genres) {
-        try (PreparedStatement preparedStatement =
-                     connection.prepareStatement(INSERT_GENRE_QUERY, PreparedStatement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(INSERT_GENRE_QUERY)) {
 
             int insertedGenres = 0;
             int i = 0;
@@ -290,9 +265,9 @@ public class XMLParser {
 
     private void setPreparedStatementValues(DataBaseItem data, PreparedStatement preparedStatement) throws Exception {
         if (data instanceof Movie) {
-            setMovieValues((Movie) data, preparedStatement);
+            setValues((Movie) data, preparedStatement);
         } else if (data instanceof Star) {
-            setStarValues((Star) data, preparedStatement);
+            setValues((Star) data, preparedStatement);
         } else if (data instanceof StarInMovie) {
             setStarInMovieValues((StarInMovie) data, preparedStatement);
         } else {
@@ -300,11 +275,11 @@ public class XMLParser {
         }
     }
 
-    private void setIdPreparedStatementValues(DataBaseItem data, PreparedStatement preparedStatement) throws Exception {
+    private void setPreparedStatementValuesForRetrievingIds(DataBaseItem data, PreparedStatement preparedStatement) throws Exception {
         if (data instanceof Movie) {
-            setMovieIdValues((Movie) data, preparedStatement);
+            setMovieValues(1, (Movie) data, preparedStatement);
         } else if (data instanceof Star) {
-            setStarIdValues((Star) data, preparedStatement);
+            setStarValues(1, (Star) data, preparedStatement);
         } else if (data instanceof StarInMovie) {
             setStarInMovieValues((StarInMovie) data, preparedStatement);
         } else {
@@ -312,21 +287,14 @@ public class XMLParser {
         }
     }
 
-    private void setMovieValues(Movie movie, PreparedStatement preparedStatement) throws SQLException {
+    private void setValues(Movie movie, PreparedStatement preparedStatement) throws SQLException {
         preparedStatement.setString(1, movie.getId());
-        preparedStatement.setString(2, movie.getTitle());
-        preparedStatement.setInt(3, movie.getYear());
-        preparedStatement.setString(4, movie.getDirector());
+        setMovieValues(2, movie, preparedStatement);
     }
 
-    private void setStarValues(Star star, PreparedStatement preparedStatement) throws SQLException {
+    private void setValues(Star star, PreparedStatement preparedStatement) throws SQLException {
         preparedStatement.setString(1, star.getId());
-        preparedStatement.setString(2, star.getName());
-        if (star.getBirthYear() == null) {
-            preparedStatement.setNull(3, Types.INTEGER);
-        } else {
-            preparedStatement.setInt(3, star.getBirthYear());
-        }
+        setStarValues(2, star, preparedStatement);
     }
 
     private void setStarInMovieValues(StarInMovie starInMovie, PreparedStatement preparedStatement) throws SQLException {
@@ -334,18 +302,64 @@ public class XMLParser {
         preparedStatement.setString(2, starInMovie.getMovieId());
     }
 
-    private void setMovieIdValues(Movie movie, PreparedStatement preparedStatement) throws SQLException {
-        preparedStatement.setString(1, movie.getTitle());
-        preparedStatement.setInt(2, movie.getYear());
-        preparedStatement.setString(3, movie.getDirector());
+    private void setMovieValues(int startIndex, Movie movie, PreparedStatement preparedStatement) throws SQLException {
+        preparedStatement.setString(startIndex, movie.getTitle());
+        preparedStatement.setInt(startIndex + 1, movie.getYear());
+        preparedStatement.setString(startIndex + 2, movie.getDirector());
     }
 
-    private void setStarIdValues(Star star, PreparedStatement preparedStatement) throws SQLException {
-        preparedStatement.setString(1, star.getName());
+    private void setStarValues(int startIndex, Star star, PreparedStatement preparedStatement) throws SQLException {
+        preparedStatement.setString(startIndex, star.getName());
         if (star.getBirthYear() == null) {
-            preparedStatement.setNull(2, Types.INTEGER);
+            preparedStatement.setNull(startIndex + 1, Types.INTEGER);
         } else {
-            preparedStatement.setInt(2, star.getBirthYear());
+            preparedStatement.setInt(startIndex + 1, star.getBirthYear());
+        }
+    }
+
+    private String getMaxId(Connection connection, String selectQuery) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(selectQuery);
+             ResultSet resultSet = preparedStatement.executeQuery()) {
+            if (resultSet.next()) {
+                return resultSet.getString("max(id)");
+            }
+        } catch (Exception e) {
+            System.out.println("Exception occurred while getting max ids: " + e.getMessage());
+        }
+        return "";
+    }
+
+    private String getIdPrefix(String id) {
+        return id.replaceAll("\\d+", "");
+    }
+
+    private int getIdSuffix(String id) {
+        return Integer.parseInt(id.replaceAll("\\D+", ""));
+    }
+
+    private HashMap<String, Integer> getDataBaseGenres(Connection connection) {
+        HashMap<String, Integer> genres = new HashMap<>();
+        try (PreparedStatement preparedStatement = connection.prepareStatement(SELECT_GENRES_QUERY);
+             ResultSet resultSet = preparedStatement.executeQuery()) {
+            while (resultSet.next()) {
+                Integer genreId = resultSet.getInt("id");
+                String genreName = resultSet.getString("name");
+                genres.put(genreName, genreId);
+            }
+        } catch (SQLException se) {
+            System.out.println("SQL Exception while getting genres: " + se.getMessage());
+        }
+        return genres;
+    }
+
+    private void removeMoviesWithoutStars(Collection<DataBaseItem> validMovies) {
+        Iterator<DataBaseItem> iterator = validMovies.iterator();
+        while (iterator.hasNext()) {
+            Movie movie = (Movie) iterator.next();
+            if (movie.getMovieStars().isEmpty()) {
+                movieSAXParser.addInvalidData(FabflixSAXParser.Error.MOVIE_HAS_NO_STARS.getDescription(), movie);
+                iterator.remove();
+            }
         }
     }
 

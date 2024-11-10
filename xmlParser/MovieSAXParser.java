@@ -1,4 +1,7 @@
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 
 public class MovieSAXParser extends FabflixSAXParser {
     private static final String XML_FILE_NAME = "mains243.xml";
@@ -11,6 +14,41 @@ public class MovieSAXParser extends FabflixSAXParser {
     private static final String GENRE_TAG = "cat";
 
     private Movie tempMovie;
+
+    public static final HashMap<String, String> categoriesToGenres;
+    static {
+        categoriesToGenres = new HashMap<>();
+        categoriesToGenres.put("ctxx", "Uncategorized");    // Ctxx
+        categoriesToGenres.put("actn", "Action");   // Actn: violence
+        categoriesToGenres.put("camp", "Now - Camp");
+        categoriesToGenres.put("disa", "Disaster");
+        categoriesToGenres.put("epic", "Epic");
+        categoriesToGenres.put("scfi", "Sci-Fi");   // science fiction
+        categoriesToGenres.put("cart", "Animation");
+        categoriesToGenres.put("faml", "Family");
+        categoriesToGenres.put("surl", "Surreal");
+        categoriesToGenres.put("avga", "Avant Garde");  // AvGa
+        categoriesToGenres.put("hist", "History");
+
+        categoriesToGenres.put("susp", "Thriller");
+        categoriesToGenres.put("cnr", "Cops and Robbers");  // CnR
+        categoriesToGenres.put("dram", "Drama");
+        categoriesToGenres.put("west", "Western");
+        categoriesToGenres.put("myst", "Mystery");
+        categoriesToGenres.put("sf", "Sci-Fi");   // science fiction
+        categoriesToGenres.put("advt", "Adventure");
+        categoriesToGenres.put("horr", "Horror");
+        categoriesToGenres.put("romt", "Romance");  // Romantic
+        categoriesToGenres.put("comd", "Comedy");
+        categoriesToGenres.put("musc", "Musical");
+        categoriesToGenres.put("docu", "Documentary");
+        categoriesToGenres.put("porn", "Adult");    // Pornography
+        categoriesToGenres.put("noir", "Noir"); // Black
+        categoriesToGenres.put("biop", "Biographical Picture");
+        categoriesToGenres.put("tv", "TV Show");
+        categoriesToGenres.put("tvs", "TV Series");
+        categoriesToGenres.put("tvm", "TV MiniSeries");
+    }
 
     @Override
     public String getItemType() {
@@ -65,8 +103,15 @@ public class MovieSAXParser extends FabflixSAXParser {
     }
 
     private void addGenreToMovie(Movie movie, String genre) {
-        if (!genre.isEmpty()) {
-            movie.addGenre(genre);
+        String newGenre = genre.replaceAll("\\W+", "").toLowerCase();
+        if (!newGenre.isEmpty()) {
+            if (categoriesToGenres.containsKey(newGenre)) {
+                movie.addGenre(categoriesToGenres.get(newGenre));
+            } else if (newGenre.length() > 1) {
+                movie.addGenre(newGenre.substring(0, 1).toUpperCase() + newGenre.substring(1).toLowerCase());
+            } else {
+                movie.addGenre(newGenre.substring(0, 1).toUpperCase());
+            }
         }
     }
 
@@ -79,7 +124,7 @@ public class MovieSAXParser extends FabflixSAXParser {
             return Error.INCONSISTENT.getDescription();
         } else if (movie.getTitle() == null || movie.getTitle().isEmpty()) {
             return Error.INCONSISTENT.getDescription();
-        } else if (movie.getYear() == -1) {
+        } else if (movie.getYear() == invalidIntValue) {
             return Error.INCONSISTENT.getDescription();
         } else if (movie.getDirector() == null || movie.getDirector().isEmpty()) {
             return Error.INCONSISTENT.getDescription();

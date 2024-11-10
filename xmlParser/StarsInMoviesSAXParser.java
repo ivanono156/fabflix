@@ -67,6 +67,7 @@ public class StarsInMoviesSAXParser extends FabflixSAXParser {
                 Movie associatedMovie = (Movie) movies.get(parsedMovieId);
                 starInMovie.setStar(associatedStar);
                 starInMovie.setMovie(associatedMovie);
+                associatedMovie.addMovieStar(associatedStar);
             } else {
                 if (!movies.containsKey(parsedMovieId)) {
                     addInvalidData(Error.MOVIE_NOT_FOUND.getDescription(), starInMovie);
@@ -74,7 +75,6 @@ public class StarsInMoviesSAXParser extends FabflixSAXParser {
                     addInvalidData(Error.STAR_NOT_FOUND.getDescription(), starInMovie);
                 }
                 starInMoviesIterator.remove();
-
             }
         }
     }

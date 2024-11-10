@@ -23,7 +23,8 @@ public abstract class FabflixSAXParser extends DefaultHandler {
         DUPLICATE("Duplicate"),
         MOVIE_NOT_FOUND("Movie not found"),
         STAR_NOT_FOUND("Star not found"),
-        INCONSISTENT("Inconsistent");
+        INCONSISTENT("Inconsistent"),
+        MOVIE_HAS_NO_STARS("Movie without stars");
 
         private final String description;
 
@@ -44,6 +45,8 @@ public abstract class FabflixSAXParser extends DefaultHandler {
     public static final String XML_FOLDER_PATH = "C:\\Users\\Ivan Onofre\\University\\CS 122B\\stanford-movies\\";
     public static final String ENCODING = "ISO-8859-1";
     public static final String OUTPUT_FILE = "parser_result.txt";
+
+    public static final int invalidIntValue = -1;
 
     protected String tempValue;
 
@@ -157,7 +160,7 @@ public abstract class FabflixSAXParser extends DefaultHandler {
         try {
             return Integer.parseInt(value);
         } catch (NumberFormatException e) {
-            return -1;
+            return invalidIntValue;
         }
     }
 
