@@ -31,9 +31,10 @@ public class MovieSAXParser extends FabflixSAXParser {
         categoriesToGenres.put("hist", "History");
 
         categoriesToGenres.put("susp", "Thriller");
-        categoriesToGenres.put("cnr", "Cops and Robbers");  // CnR
-        categoriesToGenres.put("cnrb", "Cops and Robbers");  // CnRb
+        categoriesToGenres.put("cnr", "Crime");  // CnR: Cops and Robbers
+        categoriesToGenres.put("cnrb", "Crime");  // CnRb
         categoriesToGenres.put("dram", "Drama");
+        categoriesToGenres.put("h", "Drama");
         categoriesToGenres.put("west", "Western");
         categoriesToGenres.put("myst", "Mystery");
         categoriesToGenres.put("sf", "Sci-Fi");   // science fiction
@@ -104,7 +105,7 @@ public class MovieSAXParser extends FabflixSAXParser {
     }
 
     private void addGenreToMovie(Movie movie, String genre) {
-        String newGenre = genre.replaceAll("\\W+", "").toLowerCase();
+        String newGenre = genre.replaceAll("[^a-zA-Z]", "").toLowerCase();
         if (!newGenre.isEmpty()) {
             if (categoriesToGenres.containsKey(newGenre)) {
                 movie.addGenre(categoriesToGenres.get(newGenre));
@@ -140,6 +141,15 @@ public class MovieSAXParser extends FabflixSAXParser {
             genres.addAll(movie.getGenres());
         }
         return genres;
+    }
+
+    public void setMoviesWithoutAGenreToUncategorizedGenre() {
+        for (DataBaseItem item : validData.values()) {
+            Movie movie = (Movie) item;
+            if (movie.getGenres().isEmpty()) {
+                movie.addGenre(categoriesToGenres.get("ctxx")); // Uncategorized
+            }
+        }
     }
 
     public static void main(String[] args) {

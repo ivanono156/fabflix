@@ -148,6 +148,7 @@ public class XMLParser {
         HashMap<String, DataBaseItem> validMovies = movieSAXParser.getValidData();
         String maxMovieId = getMaxId(connection, SELECT_MAX_MOVIE_ID_QUERY);
         setRecordId(connection, movieSAXParser, validMovies, SELECT_MOVIE_ID_QUERY, maxMovieId);
+        movieSAXParser.setMoviesWithoutAGenreToUncategorizedGenre();
         return validMovies;
     }
 
