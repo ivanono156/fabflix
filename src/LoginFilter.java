@@ -44,9 +44,9 @@ public class LoginFilter implements Filter {
         allowedURIs.add("login.js");
         allowedURIs.add("api/login");
         allowedURIs.add("design.css");
-        allowedURIs.add("employee_login.html");
+        allowedURIs.add("_dashboard.html");
         allowedURIs.add("api/employee-login");
-        allowedURIs.add("employee_login.js");
+        allowedURIs.add("_dashboard.js");
     }
 
     @Override
