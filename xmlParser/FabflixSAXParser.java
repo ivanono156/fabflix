@@ -3,12 +3,13 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParserFactory;
+import javax.xml.parsers.*;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -41,7 +42,7 @@ public abstract class FabflixSAXParser extends DefaultHandler {
         }
     }
 
-    public static final String XML_FOLDER_PATH = "C:\\Users\\Ivan Onofre\\University\\CS 122B\\stanford-movies\\";
+    public static final String XML_FOLDER_PATH = "/home/ubuntu/stanford-movies";
     public static final String ENCODING = "ISO-8859-1";
     public static final String OUTPUT_FILE = "parser_result.txt";
 
@@ -55,8 +56,8 @@ public abstract class FabflixSAXParser extends DefaultHandler {
     private DebugMode debugging = DebugMode.ON;
 
     public void run() {
-        String xmlFilePath = XML_FOLDER_PATH + getXmlFileName();
-        parseDocument(xmlFilePath);
+        Path xmlFilePath = Paths.get(XML_FOLDER_PATH, getXmlFileName());
+        parseDocument(String.valueOf(xmlFilePath));
         if (debugging == DebugMode.ON) {
             printData();
         }
@@ -85,7 +86,7 @@ public abstract class FabflixSAXParser extends DefaultHandler {
         inputSource.setEncoding(ENCODING);
 
         try {
-            javax.xml.parsers.SAXParser saxParser = saxParserFactory.newSAXParser();
+            SAXParser saxParser = saxParserFactory.newSAXParser();
             saxParser.parse(inputSource, this);
         } catch (SAXException | ParserConfigurationException | IOException e) {
             System.out.println("Error parsing SAX parser: " + e.getMessage());
