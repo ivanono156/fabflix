@@ -23,8 +23,7 @@ public abstract class FabflixSAXParser extends DefaultHandler {
         DUPLICATE("Duplicate"),
         MOVIE_NOT_FOUND("Movie not found"),
         STAR_NOT_FOUND("Star not found"),
-        INCONSISTENT("Inconsistent"),
-        MOVIE_HAS_NO_STARS("Movie without stars");
+        INCONSISTENT("Inconsistent");
 
         private final String description;
 

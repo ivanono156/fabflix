@@ -6,8 +6,8 @@ public class Movie implements DataBaseItem {
     private String title;
     private int year;
     private String director;
-    private HashSet<String> genres = new HashSet<>();
-    private HashSet<Star> movieStars = new HashSet<>();
+    private final HashSet<String> genres = new HashSet<>();
+    private final HashSet<Star> movieStars = new HashSet<>();
 
     public Movie(String id, String title, int year, String director) {
         this.id = id;

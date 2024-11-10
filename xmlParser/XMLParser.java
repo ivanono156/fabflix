@@ -134,6 +134,7 @@ public class XMLParser {
     private void prepareStarInMovieRecords(HashMap<String, DataBaseItem> movies, HashMap<String, DataBaseItem> stars) {
         starsInMoviesSAXParser.setStarInMovieRelations(movies, stars);
         removeMoviesWithoutStars(movies.values());
+        removeStarsWithoutMovies(stars.values());
     }
 
     private HashMap<String, DataBaseItem> prepareStarRecords(Connection connection) {
@@ -357,7 +358,18 @@ public class XMLParser {
         while (iterator.hasNext()) {
             Movie movie = (Movie) iterator.next();
             if (movie.getMovieStars().isEmpty()) {
-                movieSAXParser.addInvalidData(FabflixSAXParser.Error.MOVIE_HAS_NO_STARS.getDescription(), movie);
+                movieSAXParser.addInvalidData(FabflixSAXParser.Error.STAR_NOT_FOUND.getDescription(), movie);
+                iterator.remove();
+            }
+        }
+    }
+
+    private void removeStarsWithoutMovies(Collection<DataBaseItem> validStars) {
+        Iterator<DataBaseItem> iterator = validStars.iterator();
+        while (iterator.hasNext()) {
+            Star star = (Star) iterator.next();
+            if (star.getMovies().isEmpty()) {
+                starSAXParser.addInvalidData(FabflixSAXParser.Error.MOVIE_NOT_FOUND.getDescription(), star);
                 iterator.remove();
             }
         }

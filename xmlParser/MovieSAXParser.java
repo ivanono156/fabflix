@@ -20,7 +20,7 @@ public class MovieSAXParser extends FabflixSAXParser {
         categoriesToGenres = new HashMap<>();
         categoriesToGenres.put("ctxx", "Uncategorized");    // Ctxx
         categoriesToGenres.put("actn", "Action");   // Actn: violence
-        categoriesToGenres.put("camp", "Now - Camp");
+        categoriesToGenres.put("camp", "Camp");
         categoriesToGenres.put("disa", "Disaster");
         categoriesToGenres.put("epic", "Epic");
         categoriesToGenres.put("scfi", "Sci-Fi");   // science fiction
@@ -32,6 +32,7 @@ public class MovieSAXParser extends FabflixSAXParser {
 
         categoriesToGenres.put("susp", "Thriller");
         categoriesToGenres.put("cnr", "Cops and Robbers");  // CnR
+        categoriesToGenres.put("cnrb", "Cops and Robbers");  // CnRb
         categoriesToGenres.put("dram", "Drama");
         categoriesToGenres.put("west", "Western");
         categoriesToGenres.put("myst", "Mystery");

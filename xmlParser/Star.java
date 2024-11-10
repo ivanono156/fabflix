@@ -1,3 +1,4 @@
+import java.util.HashSet;
 import java.util.Objects;
 
 public class Star implements DataBaseItem{
@@ -5,6 +6,7 @@ public class Star implements DataBaseItem{
     private String name;
     // Year can be null in database
     private Integer birthYear;
+    private final HashSet<Movie> movies = new HashSet<>();
 
     public Star(String id, String name, int birthYear) {
         this.id = id;
@@ -28,6 +30,10 @@ public class Star implements DataBaseItem{
         return birthYear;
     }
 
+    public HashSet<Movie> getMovies() {
+        return movies;
+    }
+
     public void setId(String id) {
         this.id = id;
     }
@@ -38,6 +44,10 @@ public class Star implements DataBaseItem{
 
     public void setBirthYear(int birthYear) {
         this.birthYear = birthYear;
+    }
+
+    public void addMovie(Movie movie) {
+        movies.add(movie);
     }
 
     @Override
