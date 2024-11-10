@@ -9,7 +9,7 @@ create table movies (
     primary key (id)
 );
 
-create table stars (
+create table stars
 	id varchar(10) not null,
     name varchar(100) not null,
     birthYear int,

@@ -4,12 +4,11 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
+import org.jasypt.util.password.StrongPasswordEncryptor;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -52,26 +51,26 @@ public class LoginServlet extends HttpServlet {
 
             ps.setString(1, email);
 
-            boolean success;
+            boolean success = false;
             String message;
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     // Email account is found; retrieve its associated password
-                    String foundPassword = rs.getString("password");
+                    String encryptedFoundPassword = rs.getString("password");
+                    System.out.println("Encrypted pass is : " + encryptedFoundPassword);
                     int id = rs.getInt("id");
 
-                    if (foundPassword.equals(password)) {
-                        success = true;
+                    // use the same encryptor to compare the user input password with encrypted password stored in DB
+                    success = new StrongPasswordEncryptor().checkPassword(password, encryptedFoundPassword);
+                    if (success) {
                         message = "success";
                         // Set this user into the session
                         request.getSession().setAttribute("user", new User(id));
                     } else {
-                        success = false;
                         message = "Incorrect password";
                     }
                 } else {
-                    success = false;
                     message = "Email " + email + " not found";
                 }
 
