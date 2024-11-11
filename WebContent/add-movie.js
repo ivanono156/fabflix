@@ -21,13 +21,13 @@ function handleAddMovieResult(resultData) {
             $("#new-star-id").text("Star ID: " + resultData["new_star_id"]).show();
         }
         else{
-            $("#new-star-id").text("Star ID: Found").show();
+            $("#new-star-id").text("Existing Star ID: " + resultData["new_star_id"]).show();
         }
         if (resultData["new_genre_id"] !== null && resultData["new_genre_id"] !== 0) {
             $("#new-genre-id").text("Genre ID: " + resultData["new_genre_id"]).show();
         }
         else{
-            $("#new-genre-id").text("Genre ID: Found").show();
+            $("#new-genre-id").text("Existing Genre ID: " + resultData["new_genre_id"]).show();
         }
 
     }
