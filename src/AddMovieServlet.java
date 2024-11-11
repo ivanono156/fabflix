@@ -58,6 +58,7 @@ public class AddMovieServlet extends HttpServlet { ;
             String new_movie_id = statement.getString(6);
             String new_star_id = statement.getString(7);
             int new_genre_id = statement.getInt(8);
+            System.out.println(new_genre_id);
             String statusMessage = statement.getString(9);
             //jsonResponse.addProperty("new_movie_id", new_movie_id);
             System.out.print("Added movie");
