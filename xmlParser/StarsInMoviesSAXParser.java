@@ -1,5 +1,5 @@
-import java.util.HashMap;
-import java.util.Iterator;
+import java.io.PrintWriter;
+import java.util.*;
 
 public class StarsInMoviesSAXParser extends FabflixSAXParser {
     private static final String XML_FILE_NAME = "casts124.xml";
@@ -10,6 +10,15 @@ public class StarsInMoviesSAXParser extends FabflixSAXParser {
 
     private StarInMovie tempStarInMovie;
 
+    private final StarSAXParser starSAXParser;
+    private final MovieSAXParser movieSAXParser;
+
+    public StarsInMoviesSAXParser(StarSAXParser starSAXParser, MovieSAXParser movieSAXParser) {
+        super();
+        this.starSAXParser = starSAXParser;
+        this.movieSAXParser = movieSAXParser;
+    }
+
     @Override
     public String getItemType() {
         return "Star In Movie";
@@ -18,6 +27,14 @@ public class StarsInMoviesSAXParser extends FabflixSAXParser {
     @Override
     protected String getXmlFileName() {
         return XML_FILE_NAME;
+    }
+
+    @Override
+    protected void writeToFile(PrintWriter printWriter) {
+        printWriter.println("Movies with stars: ");
+        for (DataBaseItem data : movieSAXParser.validData.values()) {
+            printWriter.println("\t" + data.toString());
+        }
     }
 
     @Override
@@ -31,7 +48,7 @@ public class StarsInMoviesSAXParser extends FabflixSAXParser {
     protected void parseItem(String qName) {
         switch (qName.toLowerCase()) {
             case STAR_IN_MOVIE_TAG:
-                validateData(tempStarInMovie);
+                addStarToMovie(tempStarInMovie);
                 break;
             case MOVIE_ID_TAG:
                 tempStarInMovie.setMovieId(tempValue);
@@ -39,6 +56,40 @@ public class StarsInMoviesSAXParser extends FabflixSAXParser {
             case STAR_ID_TAG:
                 tempStarInMovie.setStarId(tempValue);
                 break;
+        }
+    }
+
+    private void addStarToMovie(StarInMovie starInMovie) {
+        String movieId = starInMovie.getMovieId();
+        String starId = starInMovie.getStarId();
+
+        if (movieSAXParser.validData.containsKey(movieId) && starSAXParser.validData.containsKey(starId)) {
+            Movie movie = (Movie) movieSAXParser.validData.get(movieId);
+            Star star = (Star) starSAXParser.validData.get(starId);
+            movie.addMovieStar(star);
+        } else {
+            if (!movieSAXParser.validData.containsKey(movieId)) {
+                addInvalidData(Error.MOVIE_NOT_FOUND.toString(), tempStarInMovie);
+            } else {
+                // add the star, since they can have null birth years
+                Star newStar = new Star();
+                newStar.setId(starId);
+                newStar.setName(starId);
+                starSAXParser.validData.put(starId, newStar);
+                Movie movie = (Movie) movieSAXParser.validData.get(movieId);
+                movie.addMovieStar(newStar);
+            }
+        }
+    }
+
+    public void removeMoviesWithoutStars() {
+        Iterator<DataBaseItem> iterator = movieSAXParser.validData.values().iterator();
+        while (iterator.hasNext()) {
+            Movie movie = (Movie) iterator.next();
+            if (movie.getMovieStars().isEmpty()) {
+                movieSAXParser.addInvalidData(Error.MOVIE_WITHOUT_STAR.toString(), movie);
+                iterator.remove();
+            }
         }
     }
 
@@ -54,34 +105,15 @@ public class StarsInMoviesSAXParser extends FabflixSAXParser {
         }
         return "Unknown error while parsing data";
     }
-    
-    public void setStarInMovieRelations(HashMap<String, DataBaseItem> movies, HashMap<String, DataBaseItem> stars) {
-        Iterator<DataBaseItem> starInMoviesIterator = validData.values().iterator();
-        while (starInMoviesIterator.hasNext()) {
-            StarInMovie starInMovie = (StarInMovie) starInMoviesIterator.next();
-            String parsedMovieId = starInMovie.getMovieId();
-            String parsedStarId = starInMovie.getStarId();
-
-            if (movies.containsKey(parsedMovieId) && stars.containsKey(parsedStarId)) {
-                Star associatedStar = (Star) stars.get(parsedStarId);
-                Movie associatedMovie = (Movie) movies.get(parsedMovieId);
-                starInMovie.setStar(associatedStar);
-                starInMovie.setMovie(associatedMovie);
-                associatedMovie.addMovieStar(associatedStar);
-                associatedStar.addMovie(associatedMovie);
-            } else {
-                if (!movies.containsKey(parsedMovieId)) {
-                    addInvalidData(Error.MOVIE_NOT_FOUND.getDescription(), starInMovie);
-                } else {
-                    addInvalidData(Error.STAR_NOT_FOUND.getDescription(), starInMovie);
-                }
-                starInMoviesIterator.remove();
-            }
-        }
-    }
 
     public static void main(String[] args) {
-        StarsInMoviesSAXParser parser = new StarsInMoviesSAXParser();
+        StarSAXParser starSAXParser = new StarSAXParser();
+        MovieSAXParser movieSAXParser = new MovieSAXParser();
+        starSAXParser.setDebugMode(DebugMode.OFF);
+        movieSAXParser.setDebugMode(DebugMode.OFF);
+        starSAXParser.run();
+        movieSAXParser.run();
+        StarsInMoviesSAXParser parser = new StarsInMoviesSAXParser(starSAXParser, movieSAXParser);
         parser.setDebugMode(DebugMode.OFF);
         parser.run();
 

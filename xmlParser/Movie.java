@@ -80,7 +80,8 @@ public class Movie implements DataBaseItem {
 
     @Override
     public String toString() {
-        return "Id: " + id + ", Title: " + title + ", Year: " + year + ", Director: " + director;
+        return "Id: " + id + ", Title: " + title + ", Year: " + year + ", Director: " + director
+                + "\n\t\tMovie Stars: " + movieStars;
     }
 
     @Override
