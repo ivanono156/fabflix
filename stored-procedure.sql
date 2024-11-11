@@ -57,7 +57,6 @@ BEGIN
             VALUES (s_id, star_name);
         ELSE
             SET s_id = star_id;
-            SET new_star_id = s_id;
         END IF;
 
         INSERT INTO stars_in_movies (starID, movieId)
@@ -72,7 +71,6 @@ BEGIN
             VALUES (genre_name);
             SET genre_id = LAST_INSERT_ID();
         END IF;
-        SET new_genre_id = genre_id;
         INSERT INTO genres_in_movies (genreId, movieId)
         VALUES (genre_id, movie_id);
 
