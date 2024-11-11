@@ -55,6 +55,7 @@ public class AddStarServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
         try (Connection connection = dataSource.getConnection()) {
+            String starId = getNewStarId(connection);
             String starName = request.getParameter("star-name");
             String birthYear = request.getParameter("star-birth-year");
 
@@ -62,14 +63,17 @@ public class AddStarServlet extends HttpServlet {
             if (starName.isBlank()) {
                 updateStatus = new SQLUpdateStatus(false, "Name is blank", 0);
             } else {
-                String starId = getNewStarId(connection);
                 updateStatus = addNewStarToDataBase(connection, starId, starName, birthYear);
             }
+
             JsonObject responseJsonObject = new JsonObject();
             String status = updateStatus.updateWasSuccessful() ? "success" : "failure";
             responseJsonObject.addProperty("status", status);
             responseJsonObject.addProperty("message", updateStatus.getMessage());
             responseJsonObject.addProperty("updated_rows", updateStatus.getUpdatedRows());
+            if (updateStatus.updateWasSuccessful()) {
+                responseJsonObject.addProperty("generated_star_id", starId);
+            }
 
             response.getWriter().write(responseJsonObject.toString());
 

@@ -4,7 +4,7 @@ function handleAddingStar(resultData) {
     console.log("Updated rows: " + resultData["updated_rows"]);
 
     if (resultData["status"] === "success") {
-        $("#add-star-message").text("Successfully added star!");
+        $("#add-star-message").text("Successfully added star! Generated star id: " + resultData["generated_star_id"]);
     } else {
         $("#add-star-message").text("Failed to add star! " + resultData["message"]);
     }
