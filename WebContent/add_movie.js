@@ -15,9 +15,16 @@ function handleAddMovieResult(resultData) {
         if (resultData["new_star_id"] !== null) {
             $("#new-star-id").text("Star ID: " + resultData["new_star_id"]).show();
         }
+        else{
+            $("#new-star-id").text("Star ID: Found").show();
+        }
         if (resultData["new_genre_id"] !== 0) {
             $("#new-genre-id").text("Genre ID: " + resultData["new_genre_id"]).show();
         }
+        else{
+            $("#new-genre-id").text("Genre ID: Found").show();
+        }
+
     }
 }
 
