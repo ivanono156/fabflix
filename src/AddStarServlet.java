@@ -1,5 +1,6 @@
 import com.google.gson.JsonObject;
 import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,6 +19,30 @@ public class AddStarServlet extends HttpServlet {
 
     private DataSource dataSource;
 
+    static class SQLUpdateStatus {
+        private final boolean success;
+        private final String message;
+        private final int updatedRows;
+
+        public SQLUpdateStatus(boolean success, String message, int updatedRows) {
+            this.success = success;
+            this.message = message;
+            this.updatedRows = updatedRows;
+        }
+
+        public boolean updateWasSuccessful() {
+            return success;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        public int getUpdatedRows() {
+            return updatedRows;
+        }
+    }
+
     @Override
     public void init(ServletConfig config) {
         try {
@@ -32,14 +57,22 @@ public class AddStarServlet extends HttpServlet {
         response.setContentType("application/json");
 
         try (Connection connection = dataSource.getConnection()) {
-            String starId = getNewStarId(connection);
             String starName = request.getParameter("star-name");
             String birthYear = request.getParameter("star-birth-year");
 
-            int updatedRows = addNewStarToDataBase(connection, starId, starName, birthYear);
+            SQLUpdateStatus updateStatus;
+            if (starName.isBlank()) {
+                updateStatus = new SQLUpdateStatus(false, "Name is blank", 0);
+            } else {
+                String starId = getNewStarId(connection);
+                updateStatus = addNewStarToDataBase(connection, starId, starName, birthYear);
+            }
 
             JsonObject responseJsonObject = new JsonObject();
-            responseJsonObject.addProperty("updated_rows", updatedRows);
+            String status = updateStatus.updateWasSuccessful() ? "success" : "failure";
+            responseJsonObject.addProperty("status", status);
+            responseJsonObject.addProperty("message", updateStatus.getMessage());
+            responseJsonObject.addProperty("updated_rows", updateStatus.getUpdatedRows());
 
             response.getWriter().write(responseJsonObject.toString());
 
@@ -63,17 +96,20 @@ public class AddStarServlet extends HttpServlet {
         }
     }
 
-    private int addNewStarToDataBase(Connection connection, String starId, String starName, String birthYear) throws SQLException {
+    private SQLUpdateStatus addNewStarToDataBase(Connection connection, String starId, String starName, String birthYear) throws SQLException {
         try (PreparedStatement preparedStatement = connection.prepareStatement(insertStarQuery)) {
             preparedStatement.setString(1, starId);
             preparedStatement.setString(2, starName);
-            if (birthYear == null) {
+            if (birthYear.isBlank()) {
                 preparedStatement.setNull(3, Types.INTEGER);
             } else {
                 preparedStatement.setInt(3, Integer.parseInt(birthYear));
             }
 
-            return preparedStatement.executeUpdate();
+            int updatedRows =  preparedStatement.executeUpdate();
+            return new SQLUpdateStatus(true, "success", updatedRows);
+        } catch (NumberFormatException nfe) {
+            return new SQLUpdateStatus(false, "Invalid birth year value", 0);
         }
     }
 }
