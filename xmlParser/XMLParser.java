@@ -1,7 +1,3 @@
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.sql.*;
 import java.util.*;
 
@@ -21,7 +17,7 @@ public class XMLParser {
 
     private static final String SELECT_MOVIE_ID_QUERY = "select id from movies " +
             "where title = ? and year = ? and director = ?";
-    private static final String SELECT_STAR_ID_QUERY = "select id from stars where name = ? and birthYear = ?";
+    private static final String SELECT_STAR_ID_QUERY = "select id from stars where name = ?";
     private static final String SELECT_GENRES_QUERY = "select * from genres";
 
     private static final String SELECT_MAX_MOVIE_ID_QUERY = "select max(id) from movies";
@@ -36,7 +32,7 @@ public class XMLParser {
     public XMLParser() {
         movieSAXParser = new MovieSAXParser();
         starSAXParser = new StarSAXParser();
-        starsInMoviesSAXParser = new StarsInMoviesSAXParser();
+        starsInMoviesSAXParser = new StarsInMoviesSAXParser(starSAXParser, movieSAXParser);
     }
 
     public void setSAXParserDebugModes(FabflixSAXParser.DebugMode debugMode) {
@@ -69,29 +65,13 @@ public class XMLParser {
             System.out.println("SQL Exception: " + e.getMessage());
         }
 
-//        writeParsersOutputToFile();
         printErrors();
-    }
-
-    public void writeParsersOutputToFile() {
-        try (FileWriter fileWriter = new FileWriter(FabflixSAXParser.OUTPUT_FILE);
-             PrintWriter printWriter = new PrintWriter(fileWriter)) {
-
-            movieSAXParser.writeToFile(printWriter);
-            starSAXParser.writeToFile(printWriter);
-            starsInMoviesSAXParser.writeToFile(printWriter);
-
-        } catch (FileNotFoundException e) {
-            System.out.println("File not found: " + e.getMessage());
-        } catch (IOException e) {
-            System.out.println("I/O error: " + e.getMessage());
-        }
     }
 
     private void handleRecords(Connection connection) {
         HashMap<String, DataBaseItem> validStars = prepareStarRecords(connection);
         HashMap<String, DataBaseItem> validMovies = prepareMovieRecords(connection);
-        prepareStarInMovieRecords(validMovies, validStars);
+
         HashSet<String> newGenres = prepareGenreRecords(connection);
 
         int insertedStars = insertRecordsIntoDataBase(connection, validStars.values(), INSERT_STAR_QUERY);
@@ -106,35 +86,31 @@ public class XMLParser {
         int insertedGenresInMovies = insertGenresInMoviesIntoDataBase(connection, validMovies, getDataBaseGenres(connection));
         System.out.println(insertedGenresInMovies + " genres in movies inserted.");
 
-        HashMap<String, DataBaseItem> validStarsInMovies = starsInMoviesSAXParser.getValidData();
-        int insertedStarsInMovies = insertRecordsIntoDataBase(connection, validStarsInMovies.values(), INSERT_STAR_IN_MOVIE_QUERY);
+        int insertedStarsInMovies = insertStarsInMoviesIntoDataBase(connection);
         System.out.println(insertedStarsInMovies + " stars in movies inserted.");
     }
 
     public void printErrors() {
         HashMap<String, ArrayList<DataBaseItem>> invalidMovies = movieSAXParser.getInvalidData();
-        ArrayList<DataBaseItem> inconsistentMovies = invalidMovies.get(FabflixSAXParser.Error.INCONSISTENT.getDescription());
+        ArrayList<DataBaseItem> inconsistentMovies = invalidMovies.get(FabflixSAXParser.Error.INCONSISTENT.toString());
         System.out.println(inconsistentMovies.size() + " movies inconsistent");
 
-        ArrayList<DataBaseItem> duplicateMovies = invalidMovies.get(FabflixSAXParser.Error.DUPLICATE.getDescription());
+        ArrayList<DataBaseItem> duplicateMovies = invalidMovies.get(FabflixSAXParser.Error.DUPLICATE.toString());
         System.out.println(duplicateMovies.size() + " movies duplicate");
 
+        ArrayList<DataBaseItem> moviesWithoutStars = invalidMovies.get(FabflixSAXParser.Error.MOVIE_WITHOUT_STAR.toString());
+        System.out.println(moviesWithoutStars.size() + " movies have no stars");
+
         HashMap<String, ArrayList<DataBaseItem>> invalidStars = starSAXParser.getInvalidData();
-        ArrayList<DataBaseItem> duplicateStars = invalidStars.get(FabflixSAXParser.Error.DUPLICATE.getDescription());
+        ArrayList<DataBaseItem> duplicateStars = invalidStars.get(FabflixSAXParser.Error.DUPLICATE.toString());
         System.out.println(duplicateStars.size() + " stars duplicate");
 
         HashMap<String, ArrayList<DataBaseItem>> invalidStarsInMovies = starsInMoviesSAXParser.getInvalidData();
-        ArrayList<DataBaseItem> notFoundMovies = invalidStarsInMovies.get(FabflixSAXParser.Error.MOVIE_NOT_FOUND.getDescription());
+        ArrayList<DataBaseItem> notFoundMovies = invalidStarsInMovies.get(FabflixSAXParser.Error.MOVIE_NOT_FOUND.toString());
         System.out.println(notFoundMovies.size() + " movies not found");
 
-        ArrayList<DataBaseItem> notFoundStars = invalidStarsInMovies.get(FabflixSAXParser.Error.STAR_NOT_FOUND.getDescription());
-        System.out.println(notFoundStars.size() + " stars not found");
-    }
-
-    private void prepareStarInMovieRecords(HashMap<String, DataBaseItem> movies, HashMap<String, DataBaseItem> stars) {
-        starsInMoviesSAXParser.setStarInMovieRelations(movies, stars);
-        removeMoviesWithoutStars(movies.values());
-        removeStarsWithoutMovies(stars.values());
+//        ArrayList<DataBaseItem> notFoundStars = invalidStarsInMovies.get(FabflixSAXParser.Error.STAR_NOT_FOUND.toString());
+//        System.out.println(notFoundStars.size() + " stars not found");
     }
 
     private HashMap<String, DataBaseItem> prepareStarRecords(Connection connection) {
@@ -145,6 +121,7 @@ public class XMLParser {
     }
 
     private HashMap<String, DataBaseItem> prepareMovieRecords(Connection connection) {
+        starsInMoviesSAXParser.removeMoviesWithoutStars();
         HashMap<String, DataBaseItem> validMovies = movieSAXParser.getValidData();
         String maxMovieId = getMaxId(connection, SELECT_MAX_MOVIE_ID_QUERY);
         setRecordId(connection, movieSAXParser, validMovies, SELECT_MOVIE_ID_QUERY, maxMovieId);
@@ -163,8 +140,8 @@ public class XMLParser {
                              String selectQuery, String maxId) {
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(selectQuery)) {
-            String idPrefix = getIdPrefix(maxId);
-            int idSuffix = getIdSuffix(maxId);
+            String idPrefix = maxId.replaceAll("\\d+", "");
+            int idSuffix = Integer.parseInt(maxId.replaceAll("\\D+", ""));
 
             Iterator<DataBaseItem> iterator = dataBaseItems.values().iterator();
             while (iterator.hasNext()) {
@@ -218,6 +195,37 @@ public class XMLParser {
             return insertedItems;
         } catch (SQLException se) {
             System.out.println("SQLException: while inserting genres in movies" + se.getMessage());
+        }
+        return 0;
+    }
+
+    private int insertStarsInMoviesIntoDataBase(Connection connection) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(INSERT_STAR_IN_MOVIE_QUERY)) {
+            int totalStarsInMoviesAmount = 0;
+            for (DataBaseItem dataBaseItem : movieSAXParser.validData.values()) {
+                Movie movie = (Movie) dataBaseItem;
+                totalStarsInMoviesAmount += movie.getMovieStars().size();
+            }
+
+            int insertedItems = 0;
+            int i = 0;
+            for (DataBaseItem item : movieSAXParser.validData.values()) {
+                Movie movie = (Movie) item;
+                for (Star star : movie.getMovieStars()) {
+                    preparedStatement.setString(1, star.getId());
+                    preparedStatement.setString(2, movie.getId());
+                    preparedStatement.addBatch();
+
+                    if (i % BATCH_AMOUNT == 0 || i == totalStarsInMoviesAmount - 1) {
+                        int[] updateCounts = preparedStatement.executeBatch();
+                        insertedItems += updateCounts.length;
+                    }
+                    i++;
+                }
+            }
+            return insertedItems;
+        } catch (Exception e) {
+            System.out.println("Could not add record to database: " + e.getMessage());
         }
         return 0;
     }
@@ -281,7 +289,8 @@ public class XMLParser {
         if (data instanceof Movie) {
             setMovieValues(1, (Movie) data, preparedStatement);
         } else if (data instanceof Star) {
-            setStarValues(1, (Star) data, preparedStatement);
+            Star star = (Star) data;
+            preparedStatement.setString(1, star.getName());
         } else if (data instanceof StarInMovie) {
             setStarInMovieValues((StarInMovie) data, preparedStatement);
         } else {
@@ -331,14 +340,6 @@ public class XMLParser {
         return "";
     }
 
-    private String getIdPrefix(String id) {
-        return id.replaceAll("\\d+", "");
-    }
-
-    private int getIdSuffix(String id) {
-        return Integer.parseInt(id.replaceAll("\\D+", ""));
-    }
-
     private HashMap<String, Integer> getDataBaseGenres(Connection connection) {
         HashMap<String, Integer> genres = new HashMap<>();
         try (PreparedStatement preparedStatement = connection.prepareStatement(SELECT_GENRES_QUERY);
@@ -352,28 +353,6 @@ public class XMLParser {
             System.out.println("SQL Exception while getting genres: " + se.getMessage());
         }
         return genres;
-    }
-
-    private void removeMoviesWithoutStars(Collection<DataBaseItem> validMovies) {
-        Iterator<DataBaseItem> iterator = validMovies.iterator();
-        while (iterator.hasNext()) {
-            Movie movie = (Movie) iterator.next();
-            if (movie.getMovieStars().isEmpty()) {
-                movieSAXParser.addInvalidData(FabflixSAXParser.Error.STAR_NOT_FOUND.getDescription(), movie);
-                iterator.remove();
-            }
-        }
-    }
-
-    private void removeStarsWithoutMovies(Collection<DataBaseItem> validStars) {
-        Iterator<DataBaseItem> iterator = validStars.iterator();
-        while (iterator.hasNext()) {
-            Star star = (Star) iterator.next();
-            if (star.getMovies().isEmpty()) {
-                starSAXParser.addInvalidData(FabflixSAXParser.Error.MOVIE_NOT_FOUND.getDescription(), star);
-                iterator.remove();
-            }
-        }
     }
 
     public static void main(String[] args) {
