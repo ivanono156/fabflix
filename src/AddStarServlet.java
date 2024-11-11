@@ -1,6 +1,5 @@
 import com.google.gson.JsonObject;
 import jakarta.servlet.ServletConfig;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,7 +14,7 @@ import java.sql.*;
 @WebServlet(name = "AddStarServlet", urlPatterns = "/api/add-star")
 public class AddStarServlet extends HttpServlet {
     private static final String insertStarQuery = "insert into stars (id, name, birthYear) values (?, ?, ?)";
-    private static final String getMaxStarIdQuery = "select max(id) from stars as max_id";
+    private static final String getMaxStarIdQuery = "select max(id) from stars";
 
     private DataSource dataSource;
 
@@ -67,7 +66,6 @@ public class AddStarServlet extends HttpServlet {
                 String starId = getNewStarId(connection);
                 updateStatus = addNewStarToDataBase(connection, starId, starName, birthYear);
             }
-
             JsonObject responseJsonObject = new JsonObject();
             String status = updateStatus.updateWasSuccessful() ? "success" : "failure";
             responseJsonObject.addProperty("status", status);
@@ -89,10 +87,13 @@ public class AddStarServlet extends HttpServlet {
     private String getNewStarId(Connection connection) throws SQLException {
         try (PreparedStatement preparedStatement = connection.prepareStatement(getMaxStarIdQuery);
              ResultSet resultSet = preparedStatement.executeQuery()) {
-            String maxStarId = resultSet.getString("max_id");
-            String starIdStrPrefix = maxStarId.replaceAll("\\d+", "");
-            int starIdIntSuffix = Integer.parseInt(maxStarId.replaceAll("\\D+", ""));
-            return starIdStrPrefix + (starIdIntSuffix + 1);
+            if (resultSet.next()) {
+                String maxStarId = resultSet.getString("max(id)");
+                String starIdStrPrefix = maxStarId.replaceAll("\\d+", "");
+                int starIdIntSuffix = Integer.parseInt(maxStarId.replaceAll("\\D+", ""));
+                return starIdStrPrefix + (starIdIntSuffix + 1);
+            }
+            return "";
         }
     }
 
@@ -103,7 +104,8 @@ public class AddStarServlet extends HttpServlet {
             if (birthYear.isBlank()) {
                 preparedStatement.setNull(3, Types.INTEGER);
             } else {
-                preparedStatement.setInt(3, Integer.parseInt(birthYear));
+                int birthYearInt = Integer.parseInt(birthYear);
+                preparedStatement.setInt(3, birthYearInt);
             }
 
             int updatedRows =  preparedStatement.executeUpdate();
