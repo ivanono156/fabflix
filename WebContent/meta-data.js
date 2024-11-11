@@ -3,17 +3,18 @@
 function handleMetadata(resultData) {
     let container = jQuery('#metadata-content');
     // Clear previous content
-    let tables = resultData.tables;
-    console.log(resultData.tables);
+    let tables = resultData["tables"];
+    console.log(resultData["tables"]);
     for (let i = 0; i < tables.length; i++) {
         let table = tables[i]; // Get the current table object
         let tableName = table["table_name"]; // Get the table name
-        let tableHtml = "<table id='" + tableName + "-table' class='metadata-table'>"; // Start the table HTML
+        let tableHtml = "<table id='" + tableName + "-table' class='table table-striped metadata-table'>"; // Start the table HTML
 
         // Add the table name as a header
         //tableHtml += "<caption>" + tableName + "</caption>";
         console.log(table);
-        tableHtml += "<thead>" + tableName +"<tr>";
+        tableHtml += "<h3>" + tableName + "</h3>";
+        tableHtml += "<thead><tr>";
         tableHtml += "<th>Attribute</th>";
         tableHtml += "<th>Type</th>";
         tableHtml += "</tr></thead>";

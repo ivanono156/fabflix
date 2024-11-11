@@ -38,23 +38,25 @@ public class MetaDataServlet extends HttpServlet {
         try (Connection conn = dataSource.getConnection()) {
             DatabaseMetaData md = conn.getMetaData();
             JsonArray tablesArray = new JsonArray();
-            ResultSet rstables = md.getTables(null, null, null, new String[]{"TABLE"});
+            try (ResultSet rstables = md.getTables(null, null, null, new String[]{"TABLE"})) {
+                while (rstables.next()) {
+                    //iterate through the tables
+                    JsonObject tableObj = new JsonObject();
+                    String tableName = rstables.getString("TABLE_NAME");
+                    tableObj.addProperty("table_name", tableName);
 
-            while (rstables.next()) {//iterate through the tables
-                JsonObject tableObj = new JsonObject();
-                String tableName = rstables.getString("TABLE_NAME");
-                tableObj.addProperty("table_name", tableName);
-
-                JsonArray columnsArray = new JsonArray();
-                ResultSet columns = md.getColumns(null, null, tableName, "%");
-                while (columns.next()) {
-                    JsonObject columnObj = new JsonObject();
-                    columnObj.addProperty("column_name", columns.getString("COLUMN_NAME"));
-                    columnObj.addProperty("column_type", columns.getString("TYPE_NAME"));
-                    columnsArray.add(columnObj);
+                    JsonArray columnsArray = new JsonArray();
+                    try (ResultSet columns = md.getColumns(null, null, tableName, "%")) {
+                        while (columns.next()) {
+                            JsonObject columnObj = new JsonObject();
+                            columnObj.addProperty("column_name", columns.getString("COLUMN_NAME"));
+                            columnObj.addProperty("column_type", columns.getString("TYPE_NAME"));
+                            columnsArray.add(columnObj);
+                        }
+                    }
+                    tableObj.add("columns", columnsArray);
+                    tablesArray.add(tableObj);
                 }
-                tableObj.add("columns", columnsArray);
-                tablesArray.add(tableObj);
             }
             jsonResponse.add("tables", tablesArray);
             // Set response status to 200 (OK)

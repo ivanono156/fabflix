@@ -126,3 +126,7 @@ ul.top-nav li a.active {
     right: 0;
     background-color: black;
 }
+
+.metadata-table {
+    text-align: center;
+}
