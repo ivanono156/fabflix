@@ -2,6 +2,11 @@ let addMovieForm= $("#add-movie-form");
 
 function handleAddMovieResult(resultData) {
     // Check the status message from the server
+    $("#error-message").text("").hide();
+    $("#success-message").text("").hide();
+    $("#new-movie-id").text("").hide();
+    $("#new-star-id").text("").hide();
+    $("#new-genre-id").text("").hide();
     console.log("SUCCESS: Movie added!");
     if(resultData["status_message"] === "Movie already exists"){
         $("#error-message").text("Movie already exists").show();
@@ -18,7 +23,7 @@ function handleAddMovieResult(resultData) {
         else{
             $("#new-star-id").text("Star ID: Found").show();
         }
-        if (resultData["new_genre_id"] !== 0) {
+        if (resultData["new_genre_id"] !== null && resultData["new_genre_id"] !== 0) {
             $("#new-genre-id").text("Genre ID: " + resultData["new_genre_id"]).show();
         }
         else{
@@ -26,6 +31,7 @@ function handleAddMovieResult(resultData) {
         }
 
     }
+    addMovieForm[0].reset();
 }
 
 function handleError() {

@@ -17,7 +17,7 @@ BEGIN
     DECLARE s_id VARCHAR(10);
     DECLARE star_id VARCHAR(10);
     DECLARE g_id INT;
-    DECLARE genre_id VARCHAR(10);
+    DECLARE genre_id INT;
 
     -- Check if the movie already exists
     SELECT id INTO movie_id
@@ -70,6 +70,7 @@ BEGIN
             INSERT INTO genres (name)
             VALUES (genre_name);
             SET genre_id = LAST_INSERT_ID();
+            SET new_genre_id = genre_id;
         END IF;
         INSERT INTO genres_in_movies (genreId, movieId)
         VALUES (genre_id, movie_id);
