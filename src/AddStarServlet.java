@@ -54,7 +54,6 @@ public class AddStarServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
-
         try (Connection connection = dataSource.getConnection()) {
             String starName = request.getParameter("star-name");
             String birthYear = request.getParameter("star-birth-year");
