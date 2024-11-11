@@ -43,6 +43,7 @@ public class MovieSAXParser extends FabflixSAXParser {
         categoriesToGenres.put("musc", "Musical");
         categoriesToGenres.put("docu", "Documentary");
         categoriesToGenres.put("porn", "Adult");    // Pornography
+        categoriesToGenres.put("porb", "Adult");
         categoriesToGenres.put("noir", "Noir"); // Black
         categoriesToGenres.put("biop", "Biographical Picture");
         categoriesToGenres.put("tv", "TV Show");

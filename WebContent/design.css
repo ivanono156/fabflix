@@ -130,3 +130,8 @@ ul.top-nav li a.active {
 .metadata-table {
     text-align: center;
 }
+
+#success-message, #error-message, #new-movie-id, #new-star-id, #new-genre-id {
+    text-align: center;
+    color: ghostwhite;
+}
