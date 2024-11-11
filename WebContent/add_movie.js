@@ -12,10 +12,10 @@ function handleAddMovieResult(resultData) {
         if (resultData["new_movie_id"]) {
             $("#new-movie-id").text("New Movie ID: " + resultData["new_movie_id"]).show();
         }
-        if (resultData["new_star_id"]) {
+        if (resultData["new_star_id"] !== null) {
             $("#new-star-id").text("Star ID: " + resultData["new_star_id"]).show();
         }
-        if (resultData["new_genre_id"]) {
+        if (resultData["new_genre_id"] !== 0) {
             $("#new-genre-id").text("Genre ID: " + resultData["new_genre_id"]).show();
         }
     }
