@@ -1,6 +1,5 @@
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonObject;
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;

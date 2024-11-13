@@ -58,7 +58,6 @@ public class SingleMovieServlet extends HttpServlet {
         response.setContentType("application/json");
         String id = request.getParameter("id");
         request.getServletContext().log("getting id " + id);
-        PrintWriter out = response.getWriter();
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement statement = conn.prepareStatement(singleMovieQuery)) {
@@ -99,20 +98,15 @@ public class SingleMovieServlet extends HttpServlet {
                 jsonObject.add("movie_genres", genres);
                 jsonObject.add("movie_stars", stars);
 
-                out.write(jsonObject.toString());
-                // Set response status to 200 (OK)
+                response.getWriter().write(jsonObject.toString());
                 response.setStatus(HttpServletResponse.SC_OK);
             }
         } catch (Exception e) {
             JsonObject jsonObject = new JsonObject();
             jsonObject.addProperty("errorMessage", e.getMessage());
-            out.write(jsonObject.toString());
-
+            response.getWriter().write(jsonObject.toString());
             request.getServletContext().log("Error:", e);
-            // Set response status to 500 (Internal Server Error)
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        } finally {
-            out.close();
         }
     }
 }
