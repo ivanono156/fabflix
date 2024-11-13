@@ -44,7 +44,7 @@ public class AutoCompleteServlet extends HttpServlet {
         }
 
         String booleanModeSearchQuery = Stream.of(searchQuery.split(" "))
-                .map(word -> "+" + word)
+                .map(word -> "+" + word + "*")
                 .collect(Collectors.joining(" "));
         System.out.println("User search query: '" + searchQuery + "', " +
                 "Boolean search query: '" + booleanModeSearchQuery + "'");

@@ -36,9 +36,8 @@ function handleLookupAjaxSuccess(jsonData, query, doneCallback) {
 }
 
 function handleSelectSuggestion(suggestion) {
-	// TODO: jump to the specific result page based on the selected suggestion
-
-	console.log("you selected " + suggestion["value"] + " with ID " + suggestion["data"]["heroID"]);
+	console.log("you selected " + suggestion["value"] + " with ID " + suggestion["data"]["movie_id"]);
+	window.location.href = "single-movie.html?id=" + suggestion["data"]["movie_id"];
 }
 
 autocompleteSearchbar.autocomplete({
