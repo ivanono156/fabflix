@@ -43,7 +43,7 @@ public class LoginFilter implements Filter {
         allowedURIs.add("login.html");
         allowedURIs.add("login.js");
         allowedURIs.add("api/login");
-        allowedURIs.add("design.css");
+        allowedURIs.add("style.css");
         allowedURIs.add("_dashboard.html");
         allowedURIs.add("api/employee-login");
         allowedURIs.add("_dashboard.js");

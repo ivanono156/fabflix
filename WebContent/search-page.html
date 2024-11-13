@@ -17,7 +17,7 @@
           integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 
     <!-- Our CSS file -->
-    <link rel="stylesheet" href="design.css">
+    <link rel="stylesheet" href="style.css">
 
     <title>Search Movies</title>
 </head>
@@ -32,13 +32,20 @@
 
 <div class="main-page-content">
 
-<form id="search-page-searches" method="GET" action="#">
-    <input name="title_entry" type="text" placeholder="Enter Movie Title" id="title_entry">
-    <input name="year_entry" type="text" placeholder="Enter a year" id="year_entry">
-    <input name="director_entry" type="text" placeholder="Enter a director" id="director_entry">
-    <input name="star_entry" type="text" placeholder="Enter a star" id="star_entry">
-    <button id="search_btn" type="submit">Search</button>
-</form>
+<!--<form id="search-page-searches" method="GET" action="#">-->
+<!--    <input name="title_entry" type="text" placeholder="Enter Movie Title" id="title_entry">-->
+<!--    <input name="year_entry" type="text" placeholder="Enter a year" id="year_entry">-->
+<!--    <input name="director_entry" type="text" placeholder="Enter a director" id="director_entry">-->
+<!--    <input name="star_entry" type="text" placeholder="Enter a star" id="star_entry">-->
+<!--    <button id="search_btn" type="submit">Search</button>-->
+<!--</form>-->
+
+    <div class="container">
+        <label for="autocomplete"></label>
+        <input type="text" name="search-query" id="autocomplete"
+               class="autocomplete-searchbox form-control"
+               placeholder="Search Movies"/>
+    </div>
 
 </div>
 
@@ -46,10 +53,13 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+<!-- include jQuery autocomplete JS  -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.devbridge-autocomplete/1.4.11/jquery.autocomplete.min.js"></script>
 
 <!-- Load our own JS file -->
 <script src="session-data.js"></script>
 <script src="search-page.js"></script>
+<script src="autocomplete.js"></script>
 
 </body>
 

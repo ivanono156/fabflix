@@ -171,11 +171,9 @@ public class XMLParser {
         try (PreparedStatement preparedStatement = connection.prepareStatement(INSERT_GENRE_IN_MOVIE_QUERY)) {
             int insertedItems = 0;
             int i = 0;
-            int totalGenres = 0;
-            for (DataBaseItem dataBaseItem : validMovies.values()) {
-                Movie movie = (Movie) dataBaseItem;
-                totalGenres += movie.getGenres().size();
-            }
+            int totalGenresInMovies = validMovies.values().stream()
+                    .mapToInt(databaseItem -> ((Movie) databaseItem).getGenres().size())
+                    .sum();
 
             for (DataBaseItem dataBaseItem : validMovies.values()) {
                 Movie movie = (Movie) dataBaseItem;
@@ -185,7 +183,7 @@ public class XMLParser {
                     preparedStatement.setString(2, movie.getId());
                     preparedStatement.addBatch();
 
-                    if (i % BATCH_AMOUNT == 0 || i == totalGenres - 1) {
+                    if (i % BATCH_AMOUNT == 0 || i == totalGenresInMovies - 1) {
                         int[] updateCounts = preparedStatement.executeBatch();
                         insertedItems += updateCounts.length;
                     }
@@ -201,11 +199,9 @@ public class XMLParser {
 
     private int insertStarsInMoviesIntoDataBase(Connection connection) {
         try (PreparedStatement preparedStatement = connection.prepareStatement(INSERT_STAR_IN_MOVIE_QUERY)) {
-            int totalStarsInMoviesAmount = 0;
-            for (DataBaseItem dataBaseItem : movieSAXParser.validData.values()) {
-                Movie movie = (Movie) dataBaseItem;
-                totalStarsInMoviesAmount += movie.getMovieStars().size();
-            }
+            int totalStarsInMovies = movieSAXParser.validData.values().stream()
+                    .mapToInt(databaseItem -> ((Movie) databaseItem).getMovieStars().size())
+                    .sum();
 
             int insertedItems = 0;
             int i = 0;
@@ -216,7 +212,7 @@ public class XMLParser {
                     preparedStatement.setString(2, movie.getId());
                     preparedStatement.addBatch();
 
-                    if (i % BATCH_AMOUNT == 0 || i == totalStarsInMoviesAmount - 1) {
+                    if (i % BATCH_AMOUNT == 0 || i == totalStarsInMovies - 1) {
                         int[] updateCounts = preparedStatement.executeBatch();
                         insertedItems += updateCounts.length;
                     }
