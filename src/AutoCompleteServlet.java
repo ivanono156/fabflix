@@ -39,7 +39,8 @@ public class AutoCompleteServlet extends HttpServlet {
 
         String searchQuery = request.getParameter("search-query");
         if (searchQuery.isBlank()) {
-            response.getWriter().write("");
+            JsonObject emptyJson = new JsonObject();
+            response.getWriter().write(emptyJson.toString());
             response.setStatus(HttpServletResponse.SC_OK);
             return;
         }
@@ -47,8 +48,8 @@ public class AutoCompleteServlet extends HttpServlet {
         String booleanModeSearchQuery = Stream.of(searchQuery.split(" "))
                 .map(word -> "+" + word + "*")
                 .collect(Collectors.joining(" "));
-        System.out.println("User search query: '" + searchQuery + "', " +
-                "Boolean search query: '" + booleanModeSearchQuery + "'");
+        System.out.println("AutoCompleteServlet: User search query = '" + searchQuery + "', " +
+                "Boolean search query = '" + booleanModeSearchQuery + "'");
 
         try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(fullTextSearchQuery)) {

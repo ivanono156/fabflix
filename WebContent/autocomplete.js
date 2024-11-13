@@ -60,8 +60,8 @@ autocompleteSearchbar.autocomplete({
 });
 
 function handleNormalSearch(query) {
-	console.log("doing normal search with query: " + query);
-	// TODO: you should do normal search here
+	window.location.href = "movie-list.html?" + createDefaultMovieListUrl()
+		+ "&" + createUrlParams(searchQueryKeyName, query);
 }
 
 // bind pressing enter key to a handler function

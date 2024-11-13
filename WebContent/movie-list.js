@@ -143,11 +143,13 @@ setSearchParamData(searchBySortOrder2);
 setSearchParamData(genreKeyName);
 setSearchParamData(titleStartsWithKeyName);
 // Search params
+setSearchParamData(searchQueryKeyName);
 setSearchParamData(searchByTitleKeyName);
 setSearchParamData(searchByYearKeyName);
 setSearchParamData(searchByDirectorKeyName);
 setSearchParamData(searchByStarKeyName);
 
+let searchQuery = getParameterByName(searchQueryKeyName)
 let title_name = getParameterByName(searchByTitleKeyName);
 let year = getParameterByName(searchByYearKeyName);
 let director_name = getParameterByName(searchByDirectorKeyName);
@@ -156,7 +158,7 @@ let star_name = getParameterByName(searchByStarKeyName);
 //for browsepage reads the letter the user selected in the url
 let search_letter = getParameterByName("search_title_entry");
 
-if(title_name != null || year != null || director_name != null || star_name != null){
+if(searchQuery !== null){
     console.log("search page servlet executed");
     jQuery.ajax({
         dataType: "json", // Setting return data type

@@ -10,14 +10,87 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @WebServlet(name = "SearchPageServlet", urlPatterns = "/api/search-page")
 public class SearchPageServlet extends HttpServlet {
+    private static final String selectMoviesQuery = "select m.id, m.title , m.year, m.director, " +
+            //Selecting the first genre name
+            "(select g.name from genres g " +
+            "join genres_in_movies gim on g.id = gim.genreId " +
+            "where gim.movieId = m.id " +
+            "limit 1 offset 0) as genre1, " +
+            //Selecting the second genre name
+            "(select g.name from genres g " +
+            "join genres_in_movies gim on g.id = gim.genreId " +
+            "where gim.movieId = m.id " +
+            "limit 1 offset 1) as genre2, " +
+            //Selecting the third genre name
+            "(select g.name from genres g " +
+            "join genres_in_movies gim on g.id = gim.genreId " +
+            "where gim.movieId = m.id " +
+            "limit 1 offset 2) as genre3, "
+            //Selecting the first genre id
+            + "(select g.id from genres g " +
+            "join genres_in_movies gim on g.id = gim.genreId " +
+            "where gim.movieId = m.id " +
+            "limit 1 offset 0) as genre1Id, " +
+            //Selecting the second genre id
+            "(select g.id from genres g " +
+            "join genres_in_movies gim on g.id = gim.genreId " +
+            "where gim.movieId = m.id " +
+            "limit 1 offset 1) as genre2Id, " +
+            //Selecting the third genre id
+            "(select g.id from genres g " +
+            "join genres_in_movies gim on g.id = gim.genreId " +
+            "where gim.movieId = m.id " +
+            "limit 1 offset 2) as genre3Id, " +
+            // getting star1
+            "(select s.name from stars s " +
+            "join stars_in_movies sim on s.id = sim.starId " +
+            "where sim.movieId = m.id " +
+            "limit 1 offset 0) as star1, " +
+            // getting star1 id
+            "(select s.id from stars s " +
+            "join stars_in_movies sim on s.id = sim.starId " +
+            "where sim.movieId = m.id " +
+            "limit 1 offset 0) as star1Id, " +
+            //star 2
+            "(select s.name from stars s " +
+            "join stars_in_movies sim on s.id = sim.starId " +
+            "where sim.movieId = m.id " +
+            "limit 1 offset 1) as star2, " +
+            //star2 id
+            "(select s.id from stars s " +
+            "join stars_in_movies sim on s.id = sim.starId " +
+            "where sim.movieId = m.id " +
+            "limit 1 offset 1) as star2Id, " +
+            // star 3
+            "(select s.name from stars s " +
+            "join stars_in_movies sim on s.id = sim.starId " +
+            "where sim.movieId = m.id " +
+            "limit 1 offset 2) as star3, " +
+            // star3 id
+            "(select s.id from stars s " +
+            "join stars_in_movies sim on s.id = sim.starId " +
+            "where sim.movieId = m.id " +
+            "limit 1 offset 2) as star3Id, " +
+            "r.rating " +
+            "from movies m " +
+            "left join ratings r on m.id = r.movieId " +
+            "inner join stars_in_movies sim ON sim.movieId = m.id " +
+            "inner join stars s ON sim.starId = s.id " +
+            // Fulltext search
+            "where match (title) against (? in boolean mode) " +
+            "group by m.id, m.title, m.year, m.director, r.rating " +
+            // Can order by (rating asc/desc, title asc/desc) or (title asc/desc, rating asc/desc)
+            "order by ?, ? " +
+            "limit ? offset ?";
 
     private DataSource dataSource;
 
@@ -30,211 +103,82 @@ public class SearchPageServlet extends HttpServlet {
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        // Response MIME type
-        String title = request.getParameter("title_entry");
-        String year = request.getParameter("year_entry");
-        String director = request.getParameter("director_entry");
-        String star = request.getParameter("star_entry");
-        // limit; how many movies will be displayed on each page
-        String display = request.getParameter("display");
-        // offset; page 1 = offset 0
-        String pageNumber = request.getParameter("page-number");
-
-
         response.setContentType("application/json");
-        // Output stream to STDOUT
-        PrintWriter out = response.getWriter();
 
-        // Get a connection from dataSource and let resource manager close the connection after usage.
-        try (Connection conn = dataSource.getConnection()){
-            String query = "select m.id, m.title , m.year, m.director, "
+        String searchQuery = request.getParameter("search-query");
+        if (searchQuery.isBlank()) {
+            JsonObject emptyJson = new JsonObject();
+            response.getWriter().write(emptyJson.toString());
+            response.setStatus(HttpServletResponse.SC_OK);
+            return;
+        }
 
-                //Selecting the first genre name
-                + "(select g.name "
-                + "from genres g "
-                + "join genres_in_movies gim on g.id = gim.genreId "
-                + "where gim.movieId = m.id "
-                + "limit 1 offset 0) as genre1, "
+        String ratingOrder = "rating desc";
+        String titleOrder = "title asc";
+        String display = request.getParameter("display");
+        int limit = Integer.parseInt(display);
+        String pageNumber = request.getParameter("page-number");
+        int offset = (Integer.parseInt(pageNumber) - 1) * limit;
 
-                //Selecting the second genre name
-                + "(select g.name "
-                + "from genres g "
-                + "join genres_in_movies gim on g.id = gim.genreId "
-                + "where gim.movieId = m.id "
-                + "limit 1 offset 1) as genre2, "
+        String booleanModeSearchQuery = Stream.of(searchQuery.split(" "))
+                .map(word -> "+" + word + "*")
+                .collect(Collectors.joining(" "));
+        System.out.println("SearchPageServlet: User search query = '" + searchQuery + "', " +
+                "Boolean search query = '" + booleanModeSearchQuery + "'");
 
-                //Selecting the third genre name
-                + "(select g.name "
-                + "from genres g "
-                + "join genres_in_movies gim on g.id = gim.genreId "
-                + "where gim.movieId = m.id "
-                + "limit 1 offset 2) as genre3, "
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(selectMoviesQuery)) {
+            preparedStatement.setString(1, booleanModeSearchQuery);
+            preparedStatement.setString(2, ratingOrder);
+            preparedStatement.setString(3, titleOrder);
+            preparedStatement.setInt(4, limit);
+            preparedStatement.setInt(5, offset);
 
-                //Selecting the first genre id
-                + "(select g.id "
-                + "from genres g "
-                + "join genres_in_movies gim on g.id = gim.genreId "
-                + "where gim.movieId = m.id "
-                + "limit 1 offset 0) as genre1Id, "
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                JsonArray jsonArray = new JsonArray();
 
-                //Selecting the second genre id
-                + "(select g.id "
-                + "from genres g "
-                + "join genres_in_movies gim on g.id = gim.genreId "
-                + "where gim.movieId = m.id "
-                + "limit 1 offset 1) as genre2Id, "
+                while (resultSet.next()) {
+                    JsonObject jsonObject = new JsonObject();
+                    JsonObject movieGenresJsonObject = new JsonObject();
+                    JsonObject movieStarsJsonObject = new JsonObject();
 
-                //Selecting the third genre id
-                + "(select g.id "
-                + "from genres g "
-                + "join genres_in_movies gim on g.id = gim.genreId "
-                + "where gim.movieId = m.id "
-                + "limit 1 offset 2) as genre3Id, "
-
-
-                +"(select s.name " // getting star1
-                + "from stars s "
-                + "join stars_in_movies sim on s.id = sim.starId "
-                + "where sim.movieId = m.id "
-                + "limit 1 offset 0) as star1, "
-
-                +"(select s.id " // getting star1 id
-                + "from stars s "
-                + "join stars_in_movies sim on s.id = sim.starId "
-                + "where sim.movieId = m.id "
-                + "limit 1 offset 0) as star1Id, "
-
-                +"(select s.name " //star 2
-                + "from stars s "
-                + "join stars_in_movies sim on s.id = sim.starId "
-                + "where sim.movieId = m.id "
-                + "limit 1 offset 1) as star2, "
-
-                +"(select s.id " //star2 id
-                + "from stars s "
-                + "join stars_in_movies sim on s.id = sim.starId "
-                + "where sim.movieId = m.id "
-                + "limit 1 offset 1) as star2Id, "
-
-                +"(select s.name " // star 3
-                + "from stars s "
-                + "join stars_in_movies sim on s.id = sim.starId "
-                + "where sim.movieId = m.id "
-                + "limit 1 offset 2) as star3, "
-
-                +"(select s.id " // star3 id
-                + "from stars s "
-                + "join stars_in_movies sim on s.id = sim.starId "
-                + "where sim.movieId = m.id "
-                + "limit 1 offset 2) as star3Id, "
-
-                + "r.rating "
-                + "from movies m "
-                + "left join ratings r on m.id = r.movieId " +
-                "inner join stars_in_movies sim ON sim.movieId = m.id " +
-                "inner join stars s ON sim.starId = s.id where 1=1";
-            if(title != null && !title.isEmpty()){
-                query += " and m. title like ?";
-            }
-            if(year != null && !year.isEmpty()){
-                query += " and m.year = ?";
-            }
-            if(director != null  && !director.isEmpty() ){
-                query += " and m.director like ?";
-            }
-            if(star != null && !star.isEmpty()){
-                query += " and s.name like ?";
-            }
-
-            query += " group by m.id, m.title, m.year, m.director, r.rating order by r.rating desc limit ? offset ?;";
-
-            // Declare our statement
-            try( PreparedStatement statement = conn.prepareStatement(query)) {
-
-                // Set the parameter represented by "?" in the query to the id we get from url,
-                // num 1 indicates the first "?" in the query
-                int i = 1;
-
-                if(title != null && !title.isEmpty()){
-                    statement.setString(i++, "%" + title + "%");
-                }
-                if(year != null && !year.isEmpty()){
-                    statement.setInt(i++, Integer.parseInt(year));
-                }
-                if(director != null && !director.isEmpty()){
-                    statement.setString(i++, "%" + director + "%");
-                }
-                if(star != null && !star.isEmpty()){
-                    statement.setString(i++, "%" + star + "%");
-                }
-
-                int limit = Integer.parseInt(display);
-                statement.setInt(i++, limit);
-                int offset = (Integer.parseInt(pageNumber) - 1) * limit;
-                statement.setInt(i, offset);
-
-                // Perform the query
-                try (ResultSet rs = statement.executeQuery()) {
-                    JsonArray array = new JsonArray();
-
-                    // Create a json array for movies this star has acted in
-
-                    // Iterate through each row of rs
-                    while (rs.next()) {
-                        JsonObject jsonObject = new JsonObject();
-                        JsonObject movieGenres = new JsonObject();
-                        JsonObject movieStars = new JsonObject();
-
-                        // Get info
-                        String movieId = rs.getString("id");
-                        String movieTitle = rs.getString("title");
-                        String movieYear = rs.getString("year");
-                        String movieDirector = rs.getString("director");
-                        String movieRating = rs.getString("rating");
-                        if (rs.wasNull()) {
-                            movieRating = "None";
-                        }
-
-                        addNonNullValueToJsonObject(rs, "star1", movieStars);
-                        addNonNullValueToJsonObject(rs, "star2", movieStars);
-                        addNonNullValueToJsonObject(rs, "star3", movieStars);
-
-                        addNonNullValueToJsonObject(rs, "genre1", movieGenres);
-                        addNonNullValueToJsonObject(rs, "genre2", movieGenres);
-                        addNonNullValueToJsonObject(rs, "genre3", movieGenres);
-
-                        //place the info into the json object
-                        jsonObject.addProperty("movie_id", movieId);
-                        jsonObject.addProperty("movie_title", movieTitle);
-                        jsonObject.addProperty("movie_year", movieYear);
-                        jsonObject.addProperty("movie_director", movieDirector);
-                        jsonObject.addProperty("movie_rating", movieRating);
-
-                        jsonObject.add("stars", movieStars);
-                        jsonObject.add("genres", movieGenres);
-
-                        array.add(jsonObject);
-
-
+                    String movieId = resultSet.getString("id");
+                    String movieTitle = resultSet.getString("title");
+                    String movieYear = resultSet.getString("year");
+                    String movieDirector = resultSet.getString("director");
+                    String movieRating = resultSet.getString("rating");
+                    if (resultSet.wasNull()) {
+                        movieRating = "None";
                     }
-                    // Write JSON string to output
-                    out.write(array.toString());
-                    // Set response status to 200 (OK)
-                    response.setStatus(200);
+
+                    addNonNullValueToJsonObject(resultSet, "star1", movieStarsJsonObject);
+                    addNonNullValueToJsonObject(resultSet, "star2", movieStarsJsonObject);
+                    addNonNullValueToJsonObject(resultSet, "star3", movieStarsJsonObject);
+
+                    addNonNullValueToJsonObject(resultSet, "genre1", movieGenresJsonObject);
+                    addNonNullValueToJsonObject(resultSet, "genre2", movieGenresJsonObject);
+                    addNonNullValueToJsonObject(resultSet, "genre3", movieGenresJsonObject);
+
+                    jsonObject.addProperty("movie_id", movieId);
+                    jsonObject.addProperty("movie_title", movieTitle);
+                    jsonObject.addProperty("movie_year", movieYear);
+                    jsonObject.addProperty("movie_director", movieDirector);
+                    jsonObject.addProperty("movie_rating", movieRating);
+
+                    jsonObject.add("stars", movieStarsJsonObject);
+                    jsonObject.add("genres", movieGenresJsonObject);
+
+                    jsonArray.add(jsonObject);
                 }
+                response.getWriter().write(jsonArray.toString());
+                response.setStatus(HttpServletResponse.SC_OK);
             }
         } catch (Exception e) {
-            // Write error message JSON object to output
             JsonObject jsonObject = new JsonObject();
             jsonObject.addProperty("errorMessage", e.getMessage());
-            out.write(jsonObject.toString());
-
-            // Log error to localhost log
+            response.getWriter().write(jsonObject.toString());
             request.getServletContext().log("Error:", e);
-            // Set response status to 500 (Internal Server Error)
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        } finally {
-            out.close();
         }
     }
 

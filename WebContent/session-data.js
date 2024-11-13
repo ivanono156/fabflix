@@ -11,6 +11,7 @@ const searchBySortOrder2 = "sort_order2";
 const genreKeyName = "gid";
 const titleStartsWithKeyName = "title-starts-with";
 // search page parameters
+const searchQueryKeyName = "search-query";
 const searchByTitleKeyName = "title_entry";
 const searchByYearKeyName = "year_entry";
 const searchByDirectorKeyName = "director_entry";
@@ -58,6 +59,10 @@ function getBrowseByGenreSessionData() {
 
 function getTitleStartsWithSessionData() {
     return sessionStorage.getItem(titleStartsWithKeyName);
+}
+
+function getSearchQuerySessionData() {
+    return sessionStorage.getItem(searchQueryKeyName);
 }
 
 function getSearchByTitleSessionData() {
@@ -117,6 +122,11 @@ function getSessionDataAsUrl() {
         urlString += "&" + createUrlParams(titleStartsWithKeyName, titleStartsWith);
     } else {
         // search page session data
+        let searchQuery = getSearchQuerySessionData();
+        if (searchQuery != null) {
+            urlString += "&" + createUrlParams(searchQueryKeyName, searchQuery);
+        }
+
         let title = getSearchByTitleSessionData();
         if (title != null) {
             urlString += "&" + createUrlParams(searchByTitleKeyName, title);
