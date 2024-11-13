@@ -123,8 +123,6 @@ public class SearchPageServlet extends HttpServlet {
         String booleanModeSearchQuery = Stream.of(searchQuery.split(" "))
                 .map(word -> "+" + word + "*")
                 .collect(Collectors.joining(" "));
-        System.out.println("SearchPageServlet: User search query = '" + searchQuery + "', " +
-                "Boolean search query = '" + booleanModeSearchQuery + "'");
 
         try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(selectMoviesQuery)) {

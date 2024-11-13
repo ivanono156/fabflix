@@ -48,8 +48,6 @@ public class AutoCompleteServlet extends HttpServlet {
         String booleanModeSearchQuery = Stream.of(searchQuery.split(" "))
                 .map(word -> "+" + word + "*")
                 .collect(Collectors.joining(" "));
-        System.out.println("AutoCompleteServlet: User search query = '" + searchQuery + "', " +
-                "Boolean search query = '" + booleanModeSearchQuery + "'");
 
         try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(fullTextSearchQuery)) {
@@ -77,13 +75,6 @@ public class AutoCompleteServlet extends HttpServlet {
         }
     }
 
-    /*
-	 * Generate the JSON Object to be in this format:
-	 * {
-	 *   "value": "Movie Title",
-	 *   "data": { "movie_id": 'tt#######' }
-	 * }
-	 */
 	private static JsonObject generateJsonObject(String movieId, String movieTitle) {
 		JsonObject jsonObject = new JsonObject();
 		jsonObject.addProperty("value", movieTitle);

@@ -155,22 +155,16 @@ let year = getParameterByName(searchByYearKeyName);
 let director_name = getParameterByName(searchByDirectorKeyName);
 let star_name = getParameterByName(searchByStarKeyName);
 
+let requestUrl = "movie-list";
 if(searchQuery !== null){
-    console.log("search page servlet executed");
-    jQuery.ajax({
-        dataType: "json", // Setting return data type
-        method: "GET", // Setting request method
-        url: "api/search-page", // Setting request url
-        data: searchParams, // Setting search query data
-        success: (resultData) => handleMovieResult(resultData) // Setting callback function to handle data returned successfully
-    });
-} else{
-    console.log("movie list servlet executed");
-    jQuery.ajax({
-        dataType: "json", // Setting return data type
-        method: "GET", // Setting request method
-        url: "api/movie-list", // Setting request url
-        data: searchParams, // Setting search query data
-        success: (resultData) => handleMovieResult(resultData) // Setting callback function to handle data returned successfully
-    });
+    requestUrl = "search-page";
 }
+
+console.log(requestUrl + " servlet executed");
+jQuery.ajax({
+    dataType: "json",
+    method: "GET",
+    url: "api/" + requestUrl,
+    data: searchParams,
+    success: (resultData) => handleMovieResult(resultData)
+});
