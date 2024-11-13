@@ -1,4 +1,5 @@
 let autocompleteSearchbar = $('#autocomplete');
+let searchButton = $("#search-button");
 
 function cacheJsonData(key, jsonData) {
   sessionStorage.setItem(key, JSON.stringify(jsonData));
@@ -19,11 +20,7 @@ function handleLookup(query, doneCallback) {
 			"method": "GET",
 			"url": "api/autocomplete?search-query=" + query,
 			"success": function(data) {
-				handleLookupAjaxSuccess(data, query, doneCallback)
-			},
-			"error": function(errorData) {
-				console.log("lookup ajax error")
-				console.log(errorData)
+				handleLookupAjaxSuccess(data, query, doneCallback);
 			}
 		});
 	} else {
@@ -39,7 +36,7 @@ function handleLookup(query, doneCallback) {
 function handleLookupAjaxSuccess(jsonData, query, doneCallback) {
 	console.log(jsonData);
 
-	cacheJsonData(query, jsonData)
+	cacheJsonData(query, jsonData);
 
 	doneCallback( { suggestions: jsonData } );
 }
@@ -50,10 +47,10 @@ function handleSelectSuggestion(suggestion) {
 
 autocompleteSearchbar.autocomplete({
     lookup: function (query, doneCallback) {
-    		handleLookup(query, doneCallback)
+    		handleLookup(query, doneCallback);
     },
     onSelect: function(suggestion) {
-    		handleSelectSuggestion(suggestion)
+    		handleSelectSuggestion(suggestion);
     },
     deferRequestBy: 300,
 	minChars: 3
@@ -64,15 +61,12 @@ function handleNormalSearch(query) {
 		+ "&" + createUrlParams(searchQueryKeyName, query);
 }
 
-// bind pressing enter key to a handler function
 autocompleteSearchbar.keypress(function(event) {
-	// keyCode 13 is the enter key
 	if (event.keyCode === 13) {
-		// pass the value of the input box to the handler function
 		handleNormalSearch(autocompleteSearchbar.val());
 	}
 });
 
-// TODO: if you have a "search" button, you may want to bind the onClick event as well of that button
-
-
+searchButton.on("click", function () {
+	handleNormalSearch(autocompleteSearchbar.val());
+});
