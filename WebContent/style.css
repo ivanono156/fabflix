@@ -138,12 +138,6 @@ ul.top-nav li a.active {
 .autocomplete-group { padding: 2px 5px; }
 .autocomplete-group strong { display: block; border-bottom: 1px solid #000; }
 
-/*html, body {*/
-/*    height: 100%;*/
-/*    width: 100%;*/
-/*    margin: 0;*/
-/*}*/
-
 .container {
     height: 100%;
     width: 100%;
@@ -154,7 +148,7 @@ ul.top-nav li a.active {
 
 .autocomplete-searchbox {
 	height: 50px;
-	width: 600px;
+	width: 80%;
 }
 
 #success-message, #error-message, #new-movie-id, #new-star-id, #new-genre-id {

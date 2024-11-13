@@ -19,7 +19,8 @@ import java.util.stream.Stream;
 @WebServlet(name = "AutoCompleteServlet", urlPatterns = "/api/autocomplete")
 public class AutoCompleteServlet extends HttpServlet {
     private static final String fullTextSearchQuery = "select id, title from movies " +
-            "where match (title) against (? in boolean mode)";
+            "where match (title) against (? in boolean mode) " +
+            "limit 10";
 
     private DataSource dataSource;
 

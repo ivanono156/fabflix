@@ -1,57 +1,62 @@
 let autocompleteSearchbar = $('#autocomplete');
 
+function cacheJsonData(key, jsonData) {
+  sessionStorage.setItem(key, JSON.stringify(jsonData));
+}
+
+function getCachedJsonData(key) {
+  const cachedData = sessionStorage.getItem(key);
+  return cachedData ? JSON.parse(cachedData) : null;
+}
+
 function handleLookup(query, doneCallback) {
-	console.log("autocomplete initiated");
+	console.log("autocomplete search initiated");
 
-	// TODO: if you want to check past query results first, you can do it here
-	console.log("sending AJAX request to backend Java Servlet");
+	if (getCachedJsonData(query) === null) {
+		console.log("sending AJAX request to backend Java Servlet");
 
-	// sending the HTTP GET request to the Java Servlet endpoint hero-suggestion
-	// with the query data
-	jQuery.ajax({
-		"method": "GET",
-		// generate the request url from the query.
-		// escape the query string to avoid errors caused by special characters
-		"url": "api/autocomplete?search-query=" + query,
-		"success": function(data) {
-			// pass the data, query, and doneCallback function into the success handler
-			handleLookupAjaxSuccess(data, query, doneCallback)
-		},
-		"error": function(errorData) {
-			console.log("lookup ajax error")
-			console.log(errorData)
-		}
-	});
+		jQuery.ajax({
+			"method": "GET",
+			"url": "api/autocomplete?search-query=" + query,
+			"success": function(data) {
+				handleLookupAjaxSuccess(data, query, doneCallback)
+			},
+			"error": function(errorData) {
+				console.log("lookup ajax error")
+				console.log(errorData)
+			}
+		});
+	} else {
+		console.log("using cached query results");
+
+		let jsonData = getCachedJsonData(query);
+		console.log(jsonData);
+
+		doneCallback( { suggestions: jsonData } );
+	}
 }
 
 function handleLookupAjaxSuccess(jsonData, query, doneCallback) {
-	console.log("lookup ajax successful");
+	console.log(jsonData);
 
-	// TODO: if you want to cache the result into a global variable you can do it here
+	cacheJsonData(query, jsonData)
 
-	// call the callback function provided by the autocomplete library
-	// add "{suggestions: jsonData}" to satisfy the library response format according to
-	//   the "Response Format" section in documentation
 	doneCallback( { suggestions: jsonData } );
 }
 
 function handleSelectSuggestion(suggestion) {
-	console.log("you selected " + suggestion["value"] + " with ID " + suggestion["data"]["movie_id"]);
 	window.location.href = "single-movie.html?id=" + suggestion["data"]["movie_id"];
 }
 
 autocompleteSearchbar.autocomplete({
-	// documentation of the lookup function can be found under the "Custom lookup function" section
     lookup: function (query, doneCallback) {
     		handleLookup(query, doneCallback)
     },
     onSelect: function(suggestion) {
     		handleSelectSuggestion(suggestion)
     },
-    // set delay time
     deferRequestBy: 300,
-    // there are some other parameters that you might want to use to satisfy all the requirements
-    // TODO: add other parameters, such as minimum characters
+	minChars: 3
 });
 
 function handleNormalSearch(query) {
