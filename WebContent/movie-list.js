@@ -71,6 +71,12 @@ function updateMovieList(submitEvent) {
         + getSearchQueriesAsUrl();
 }
 
+function changePage(newPageNumber) {
+    window.location.href = "movie-list.html?" + createUrlParams(pageNumberKeyName, newPageNumber)
+        + "&" + createUrlParams(displayKeyName, getParameterByName(displayKeyName))
+        + "&" + createUrlParams(sortOrderKeyName, getParameterByName(sortOrderKeyName))
+        + getSearchQueriesAsUrl();
+}
 
 function handleMovieResult(resultData) {
     console.log("handleMovieResult: populating movie table from resultData");
@@ -122,11 +128,31 @@ function handleMovieResult(resultData) {
 
     $(".add-to-cart-btn").submit(addToCart);
 
-    $("#pageNumber").text(getParameterByName(pageNumberKeyName));
+    $("#sort-order").val(getParameterByName(sortOrderKeyName));
 
-    $("#sort-order").val(getSessionSortOrder());
+    $("#display").val(getParameterByName(displayKeyName));
 
-    $("#display").val(getSessionDisplay());
+    let changePageButton = $("#change-page-button");
+
+    let currentPageNumber = Number(getParameterByName(pageNumberKeyName));
+
+    if (currentPageNumber > 1) {
+        let prevButtonHTML = "<button id='prev-button'>Previous</button>";
+        changePageButton.append(prevButtonHTML);
+        $("#prev-button").on("click", function () {
+            changePage(currentPageNumber - 1);
+        });
+    }
+
+    changePageButton.append("<span>Current Page: " + currentPageNumber + "</span>");
+
+    if (resultData.length == getParameterByName(displayKeyName)) {
+        let nextButtonHTML = "<button id='next-button'>Next Page</button>";
+        changePageButton.append(nextButtonHTML);
+        $("#next-button").on("click", function () {
+            changePage(currentPageNumber + 1);
+        });
+    }
 }
 
 let updateMovieListForm = $("#update_movie_list_form");
