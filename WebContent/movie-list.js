@@ -60,6 +60,17 @@ function addToCart(submitEvent) {
     });
 }
 
+function updateMovieList(submitEvent) {
+    console.log("updating movie list");
+
+    submitEvent.preventDefault();
+
+    window.location.href = "movie-list.html?" + createUrlParams(pageNumberKeyName, pageNumber)
+        + "&" + createUrlParams(displayKeyName, $("#display").val())
+        + "&" + createUrlParams(sortOrderKeyName, $("#sort-order").val())
+        + getSearchQueriesAsUrl();
+}
+
 
 function handleMovieResult(resultData) {
     console.log("handleMovieResult: populating movie table from resultData");
@@ -112,7 +123,14 @@ function handleMovieResult(resultData) {
     $(".add-to-cart-btn").submit(addToCart);
 
     $("#pageNumber").text(getParameterByName(pageNumberKeyName));
+
+    $("#sort-order").val(getSessionSortOrder());
+
+    $("#display").val(getSessionDisplay());
 }
+
+let updateMovieListForm = $("#update_movie_list_form");
+updateMovieListForm.submit(updateMovieList);
 
 
 // Once this .js is loaded, following scripts will be executed by the browser
@@ -131,12 +149,7 @@ if (displayAmount == null) {
 // Pagination params
 setSearchParamData(pageNumberKeyName);
 setSearchParamData(displayKeyName);
-setSearchParamData(titleSortOrderKeyName);
-setSearchParamData(ratingSortOrderKeyName);
-setSearchParamData(searchBySortField);
-setSearchParamData(searchBySortOrder);
-setSearchParamData(searchBySortField2);
-setSearchParamData(searchBySortOrder2);
+setSearchParamData(sortOrderKeyName)
 // Browse params
 setSearchParamData(genreKeyName);
 setSearchParamData(titleStartsWithKeyName);

@@ -94,7 +94,7 @@ public class SearchPageServlet extends HttpServlet {
             "where match (title) against (? in boolean mode) or edth(?, title, ?) " +
             "group by m.id, m.title, m.year, m.director, r.rating " +
             // Can order by (rating asc/desc, title asc/desc) or (title asc/desc, rating asc/desc)
-            "order by %s, %s " +
+            "order by %s " +
             "limit ? offset ?";
 
     private static final double editDistanceThreshold = 0.25;
@@ -122,8 +122,7 @@ public class SearchPageServlet extends HttpServlet {
             return;
         }
 
-        String ratingOrder = "rating " + request.getParameter("sort-by-rating");
-        String titleOrder = "title " + request.getParameter("sort-by-title");
+        String sortOrder = request.getParameter("sort-order");
         String display = request.getParameter("display");
         int limit = Integer.parseInt(display);
         String pageNumber = request.getParameter("page-number");
@@ -135,7 +134,7 @@ public class SearchPageServlet extends HttpServlet {
 
         int threshold = Math.max(1, (int) Math.floor(searchQuery.length() * editDistanceThreshold));
 
-        String query = String.format(selectMoviesQuery, ratingOrder, titleOrder);
+        String query = String.format(selectMoviesQuery, sortOrder);
 
         try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {

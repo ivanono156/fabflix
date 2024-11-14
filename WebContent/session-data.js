@@ -1,12 +1,7 @@
 // used in all movie list pages
 const pageNumberKeyName = "page-number";
 const displayKeyName = "display";
-const titleSortOrderKeyName = "sort-by-title";
-const ratingSortOrderKeyName = "sort-by-rating"
-const searchBySortField = "sort_field";
-const searchBySortOrder = "sort_order";
-const searchBySortField2 = "sort_field2";
-const searchBySortOrder2 = "sort_order2";
+const sortOrderKeyName = "sort-order";
 // browse page parameters
 const genreKeyName = "gid";
 const titleStartsWithKeyName = "title-starts-with";
@@ -35,22 +30,13 @@ function getSessionDisplay() {
     return parseInt(display);
 }
 
-function getSessionTitleSortOrder() {
-    let titleSortOrder = sessionStorage.getItem(titleSortOrderKeyName);
-    if (titleSortOrder == null) {
-        titleSortOrder = "asc";
-        sessionStorage.setItem(titleSortOrderKeyName, titleSortOrder);
+function getSessionSortOrder() {
+    let sortOrder = sessionStorage.getItem(sortOrderKeyName);
+    if (sortOrder == null) {
+        sortOrder = "rating desc, title asc";
+        sessionStorage.setItem(sortOrderKeyName, sortOrder);
     }
-    return titleSortOrder;
-}
-
-function getSessionRatingSortOrder() {
-    let ratingSortOrder = sessionStorage.getItem(ratingSortOrderKeyName);
-    if (ratingSortOrder == null) {
-        ratingSortOrder = "desc";
-        sessionStorage.setItem(ratingSortOrderKeyName, ratingSortOrder);
-    }
-    return ratingSortOrder;
+    return sortOrder;
 }
 
 function getBrowseByGenreSessionData() {
@@ -81,38 +67,12 @@ function getSearchByStarSessionData() {
     return sessionStorage.getItem(searchByStarKeyName);
 }
 
-function getSearchBySortFieldSessionData(){
-    return sessionStorage.getItem(searchBySortField);
-}
-
-function getSearchBySortOrderSessionData(){
-    return sessionStorage.getItem(searchBySortOrder);
-}
-
-function getSearchBySortField2SessionData(){
-    return sessionStorage.getItem(searchBySortField2);
-}
-
-function getSearchBySortOrder2SessionData(){
-    return sessionStorage.getItem(searchBySortOrder2);
-}
-
-
 function createUrlParams(key, value) {
     return key + "=" + value;
 }
 
-function getSessionDataAsUrl() {
-    let pageNumber = getSessionPageNumber();
-    let display = getSessionDisplay();
-    let titleSortOrder = getSessionTitleSortOrder();
-    let ratingSortOrder = getSessionRatingSortOrder();
-
-    let urlString = createUrlParams(pageNumberKeyName, pageNumber)
-        + "&" + createUrlParams(displayKeyName, display)
-        + "&" + createUrlParams(titleSortOrderKeyName, titleSortOrder)
-        + "&" + createUrlParams(ratingSortOrderKeyName, ratingSortOrder);
-
+function getSearchQueriesAsUrl() {
+    let urlString = "";
     let genreId = getBrowseByGenreSessionData();
     let titleStartsWith = getTitleStartsWithSessionData();
 
@@ -146,33 +106,27 @@ function getSessionDataAsUrl() {
         if (star != null) {
             urlString += "&" + createUrlParams(searchByStarKeyName, star);
         }
-
-        let sortField = getSearchBySortFieldSessionData();
-        if(sortField != null) {
-            urlString += "&" + createUrlParams(searchBySortField, sortField);
-        }
-
-        let sortOrder = getSearchBySortOrderSessionData();
-        if(sortOrder != null){
-            urlString += "&" + createUrlParams(searchBySortOrder, sortOrder);
-        }
-        let sortField2 = getSearchBySortFieldSessionData();
-        if(sortField != null) {
-            urlString += "&" + createUrlParams(searchBySortField2, sortField2);
-        }
-
-        let sortOrder2 = getSearchBySortOrderSessionData();
-        if(sortOrder != null){
-            urlString += "&" + createUrlParams(searchBySortOrder2, sortOrder2);
-        }
     }
 
     return urlString;
 }
 
+function getSessionDataAsUrl() {
+    let pageNumber = getSessionPageNumber();
+    let display = getSessionDisplay();
+    let sortOrder = getSessionSortOrder();
+
+    let urlString = createUrlParams(pageNumberKeyName, pageNumber)
+        + "&" + createUrlParams(displayKeyName, display)
+        + "&" + createUrlParams(sortOrderKeyName, sortOrder);
+
+    let searchQueryUrlString = getSearchQueriesAsUrl();
+
+    return urlString + searchQueryUrlString;
+}
+
 function createDefaultMovieListUrl() {
     return createUrlParams(pageNumberKeyName, 1)
         + "&" + createUrlParams(displayKeyName, getSessionDisplay())
-        + "&" + createUrlParams(titleSortOrderKeyName, getSessionTitleSortOrder())
-        + "&" + createUrlParams(ratingSortOrderKeyName, getSessionRatingSortOrder());
+        + "&" + createUrlParams(sortOrderKeyName, getSessionSortOrder());
 }
