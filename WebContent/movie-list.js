@@ -79,6 +79,11 @@ function changePage(newPageNumber) {
 }
 
 function handleMovieResult(resultData) {
+    if (resultData.length === 0) {
+        $("#no-results-message").append("<h3>No results found.</h3>");
+        return;
+    }
+
     console.log("handleMovieResult: populating movie table from resultData");
 
     // Populate the movie table
