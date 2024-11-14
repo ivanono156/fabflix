@@ -15,7 +15,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 
 // Declaring a web servlet called movie list servlet, which maps to url "/api/movie-list"
 @WebServlet(name = "MovieListServlet", urlPatterns = "/api/movie-list")
@@ -44,21 +43,12 @@ public class MovieListServlet extends HttpServlet {
 
         String titleStartsWith = request.getParameter("title-starts-with");
 
+        String sortOrder = request.getParameter("sort-order");
         // Pagination params
         // limit; how many movies will be displayed on each page
         String display = request.getParameter("display");
         // offset; page 1 = offset 0
         String pageNumber = request.getParameter("page-number");
-        String sortFieldEntry = request.getParameter("sort_field");
-        String sortOrderEntry = request.getParameter("sort_order");
-        String sortFieldEntry2 = request.getParameter("sort_field2");
-        String sortOrderEntry2 = request.getParameter("sort_order2");
-        if (sortFieldEntry == null) {
-            sortFieldEntry = "rating"; // Default to sorting by rating
-        }
-        if (sortOrderEntry == null || (!sortOrderEntry.equalsIgnoreCase("ASC") && !sortOrderEntry.equalsIgnoreCase("DESC"))) {
-            sortOrderEntry = "DESC"; // Default to descending order
-        }
 
         // Retrieve parameter id from the url
         // Log message can be found in localhost log
@@ -158,18 +148,7 @@ public class MovieListServlet extends HttpServlet {
 
             String limitQuery = "limit ? offset ?;";
 
-            String orderQuery = "order by ";
-            if (sortFieldEntry != null && sortFieldEntry2!= null && sortOrderEntry != null && sortOrderEntry2 != null) {
-                if(sortFieldEntry.equalsIgnoreCase("title")){
-                    orderQuery += "m.title " + sortOrderEntry + ", r.rating " + sortOrderEntry2 + " ";
-                }
-                else{
-                    orderQuery += "r.rating " + sortFieldEntry + ", m.title " + sortOrderEntry2 + " ";
-                }
-            }
-            else{
-                orderQuery += "r.rating desc ";
-            }
+            String orderQuery = String.format("order by %s ", sortOrder);
 
             if (genreId != null) {
                 searchQuery = "inner join genres_in_movies gim on m.id = gim.movieId " +
