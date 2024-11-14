@@ -79,19 +79,17 @@ function handleMovieResult(resultData) {
 
         let genresHTML = "<td><ul>";
         let genres = resultData[i]["genres"];
-        for (const genreId in genres) {
-            let genreName = genres[genreId];
+        for (let i = 0; i < genres.length; i++) {
             genresHTML += "<li><a href='movie-list.html?" + createDefaultMovieListUrl()
-                + "&" + createUrlParams(genreKeyName, genreId) + "'>" + genreName + "</a></li>";
+                + "&" + createUrlParams(genreKeyName, genres[i]["id"]) + "'>" + genres[i]["name"] + "</a></li>";
         }
         genresHTML += "</ul></td>";
         rowHTML += genresHTML;
 
         let starsHTML = "<td><ul>";
         let stars = resultData[i]["stars"];
-        for (const starId in stars) {
-            let starName = stars[starId];
-            starsHTML += "<li><a href='single-star.html?id=" + starId + "'>" + starName + "</a></li>";
+        for (let i = 0; i < stars.length; i++) {
+            starsHTML += "<li><a href='single-star.html?id=" + stars[i]["id"] + "'>" + stars[i]["name"] + "</a></li>";
         }
         starsHTML += "</ul></td>"
         rowHTML += starsHTML;

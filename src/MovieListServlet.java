@@ -75,42 +75,42 @@ public class MovieListServlet extends HttpServlet {
                 + "(select g.name "
                 + "from genres g "
                 + "join genres_in_movies gim on g.id = gim.genreId "
-                + "where gim.movieId = m.id "
+                + "where gim.movieId = m.id " + "order by g.name "
                 + "limit 1 offset 0) as genre1, "
 
                 //Selecting the second genre name
                 + "(select g.name "
                 + "from genres g "
                 + "join genres_in_movies gim on g.id = gim.genreId "
-                + "where gim.movieId = m.id "
+                + "where gim.movieId = m.id " + "order by g.name "
                 + "limit 1 offset 1) as genre2, "
 
                 //Selecting the third genre name
                 + "(select g.name "
                 + "from genres g "
                 + "join genres_in_movies gim on g.id = gim.genreId "
-                + "where gim.movieId = m.id "
+                + "where gim.movieId = m.id " + "order by g.name "
                 + "limit 1 offset 2) as genre3, "
 
                 //Selecting the first genre id
                 + "(select g.id "
                 + "from genres g "
                 + "join genres_in_movies gim on g.id = gim.genreId "
-                + "where gim.movieId = m.id "
+                + "where gim.movieId = m.id " + "order by g.name "
                 + "limit 1 offset 0) as genre1Id, "
 
                 //Selecting the second genre id
                 + "(select g.id "
                 + "from genres g "
                 + "join genres_in_movies gim on g.id = gim.genreId "
-                + "where gim.movieId = m.id "
+                + "where gim.movieId = m.id " + "order by g.name "
                 + "limit 1 offset 1) as genre2Id, "
 
                 //Selecting the third genre id
                 + "(select g.id "
                 + "from genres g "
                 + "join genres_in_movies gim on g.id = gim.genreId "
-                + "where gim.movieId = m.id "
+                + "where gim.movieId = m.id " + "order by g.name "
                 + "limit 1 offset 2) as genre3Id, "
 
 
@@ -202,43 +202,41 @@ public class MovieListServlet extends HttpServlet {
                 statement.setInt(params, offset);
 
                 // Perform the query
-                try (ResultSet rs = statement.executeQuery()) {
+                try (ResultSet resultSet = statement.executeQuery()) {
                     //create array to hold the jsonObjects
                     JsonArray jsonArray = new JsonArray();
 
                     // Iterate through each row of the result set
-                    while (rs.next()) {
+                    while (resultSet.next()) {
                         JsonObject jsonObject = new JsonObject();
-                        JsonObject movieGenres = new JsonObject();
-                        JsonObject movieStars = new JsonObject();
+                        JsonArray movieGenresJsonArray = new JsonArray();
+                        JsonArray movieStarsJsonArray = new JsonArray();
 
-                        // Get info
-                        String movieId = rs.getString("id");
-                        String movieTitle = rs.getString("title");
-                        String movieYear = rs.getString("year");
-                        String movieDirector = rs.getString("director");
-                        String movieRating = rs.getString("rating");
-                        if (rs.wasNull()) {
+                        String movieId = resultSet.getString("id");
+                        String movieTitle = resultSet.getString("title");
+                        String movieYear = resultSet.getString("year");
+                        String movieDirector = resultSet.getString("director");
+                        String movieRating = resultSet.getString("rating");
+                        if (resultSet.wasNull()) {
                             movieRating = "None";
                         }
 
-                        addNonNullValueToJsonObject(rs, "star1", movieStars);
-                        addNonNullValueToJsonObject(rs, "star2", movieStars);
-                        addNonNullValueToJsonObject(rs, "star3", movieStars);
+                        addNonNullValueToJsonObject(resultSet, "star1", movieStarsJsonArray);
+                        addNonNullValueToJsonObject(resultSet, "star2", movieStarsJsonArray);
+                        addNonNullValueToJsonObject(resultSet, "star3", movieStarsJsonArray);
 
-                        addNonNullValueToJsonObject(rs, "genre1", movieGenres);
-                        addNonNullValueToJsonObject(rs, "genre2", movieGenres);
-                        addNonNullValueToJsonObject(rs, "genre3", movieGenres);
+                        addNonNullValueToJsonObject(resultSet, "genre1", movieGenresJsonArray);
+                        addNonNullValueToJsonObject(resultSet, "genre2", movieGenresJsonArray);
+                        addNonNullValueToJsonObject(resultSet, "genre3", movieGenresJsonArray);
 
-                        //place the info into the json object
                         jsonObject.addProperty("movie_id", movieId);
                         jsonObject.addProperty("movie_title", movieTitle);
                         jsonObject.addProperty("movie_year", movieYear);
                         jsonObject.addProperty("movie_director", movieDirector);
                         jsonObject.addProperty("movie_rating", movieRating);
 
-                        jsonObject.add("stars", movieStars);
-                        jsonObject.add("genres", movieGenres);
+                        jsonObject.add("stars", movieStarsJsonArray);
+                        jsonObject.add("genres", movieGenresJsonArray);
 
                         jsonArray.add(jsonObject);
                     }
@@ -264,11 +262,16 @@ public class MovieListServlet extends HttpServlet {
         }
     }
 
-    private void addNonNullValueToJsonObject(ResultSet resultSet, String columnName, JsonObject jsonObject) throws SQLException {
+    private void addNonNullValueToJsonObject(ResultSet resultSet, String columnName, JsonArray jsonArray) throws SQLException {
+        JsonObject jsonObject = new JsonObject();
         String id = resultSet.getString(columnName + "Id");
         if (!resultSet.wasNull()) {
             String name = resultSet.getString(columnName);
-            jsonObject.addProperty(id, name);
+            jsonObject.addProperty("id", id);
+            jsonObject.addProperty("name", name);
+            if (!jsonArray.contains(jsonObject)) {
+                jsonArray.add(jsonObject);
+            }
         }
     }
 }
