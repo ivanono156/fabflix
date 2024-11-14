@@ -19,8 +19,10 @@ import java.util.stream.Stream;
 @WebServlet(name = "AutoCompleteServlet", urlPatterns = "/api/autocomplete")
 public class AutoCompleteServlet extends HttpServlet {
     private static final String fullTextSearchQuery = "select id, title from movies " +
-            "where match (title) against (? in boolean mode) " +
+            "where match (title) against (? in boolean mode) or edth(?, title, ?) " +
             "limit 10";
+
+    private static final double editDistanceThreshold = 0.25;
 
     private DataSource dataSource;
 
@@ -49,9 +51,14 @@ public class AutoCompleteServlet extends HttpServlet {
                 .map(word -> "+" + word + "*")
                 .collect(Collectors.joining(" "));
 
+        int threshold = Math.max(1, (int) Math.floor(searchQuery.length() * editDistanceThreshold));
+
         try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(fullTextSearchQuery)) {
             preparedStatement.setString(1, booleanModeSearchQuery);
+            preparedStatement.setString(2, searchQuery);
+            preparedStatement.setInt(3, threshold);
+
             JsonArray jsonArray = new JsonArray();
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
@@ -69,7 +76,6 @@ public class AutoCompleteServlet extends HttpServlet {
             JsonObject jsonObject = new JsonObject();
             jsonObject.addProperty("errorMessage", e.getMessage());
             response.getWriter().write(jsonObject.toString());
-
             request.getServletContext().log("Error:", e);
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }

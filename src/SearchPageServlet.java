@@ -19,53 +19,53 @@ import java.util.stream.Stream;
 
 @WebServlet(name = "SearchPageServlet", urlPatterns = "/api/search-page")
 public class SearchPageServlet extends HttpServlet {
-    private static final String selectMoviesQuery = "select m.id, m.title , m.year, m.director, " +
-            //Selecting the first genre name
+    private static final String selectMoviesQuery = "select m.id, m.title , m.year, m.director, r.rating, " +
+            // Selecting the first genre name
             "(select g.name from genres g " +
             "join genres_in_movies gim on g.id = gim.genreId " +
             "where gim.movieId = m.id " +
             "limit 1 offset 0) as genre1, " +
-            //Selecting the second genre name
+            // Selecting the second genre name
             "(select g.name from genres g " +
             "join genres_in_movies gim on g.id = gim.genreId " +
             "where gim.movieId = m.id " +
             "limit 1 offset 1) as genre2, " +
-            //Selecting the third genre name
+            // Selecting the third genre name
             "(select g.name from genres g " +
             "join genres_in_movies gim on g.id = gim.genreId " +
             "where gim.movieId = m.id " +
-            "limit 1 offset 2) as genre3, "
-            //Selecting the first genre id
-            + "(select g.id from genres g " +
+            "limit 1 offset 2) as genre3, " +
+            // Selecting the first genre id
+            "(select g.id from genres g " +
             "join genres_in_movies gim on g.id = gim.genreId " +
             "where gim.movieId = m.id " +
             "limit 1 offset 0) as genre1Id, " +
-            //Selecting the second genre id
+            // Selecting the second genre id
             "(select g.id from genres g " +
             "join genres_in_movies gim on g.id = gim.genreId " +
             "where gim.movieId = m.id " +
             "limit 1 offset 1) as genre2Id, " +
-            //Selecting the third genre id
+            // Selecting the third genre id
             "(select g.id from genres g " +
             "join genres_in_movies gim on g.id = gim.genreId " +
             "where gim.movieId = m.id " +
             "limit 1 offset 2) as genre3Id, " +
-            // getting star1
+            // star1
             "(select s.name from stars s " +
             "join stars_in_movies sim on s.id = sim.starId " +
             "where sim.movieId = m.id " +
             "limit 1 offset 0) as star1, " +
-            // getting star1 id
+            // star1 id
             "(select s.id from stars s " +
             "join stars_in_movies sim on s.id = sim.starId " +
             "where sim.movieId = m.id " +
             "limit 1 offset 0) as star1Id, " +
-            //star 2
+            // star 2
             "(select s.name from stars s " +
             "join stars_in_movies sim on s.id = sim.starId " +
             "where sim.movieId = m.id " +
             "limit 1 offset 1) as star2, " +
-            //star2 id
+            // star2 id
             "(select s.id from stars s " +
             "join stars_in_movies sim on s.id = sim.starId " +
             "where sim.movieId = m.id " +
@@ -79,21 +79,23 @@ public class SearchPageServlet extends HttpServlet {
             "(select s.id from stars s " +
             "join stars_in_movies sim on s.id = sim.starId " +
             "where sim.movieId = m.id " +
-            "limit 1 offset 2) as star3Id, " +
-            "r.rating " +
+            "limit 1 offset 2) as star3Id " +
             "from movies m " +
             "left join ratings r on m.id = r.movieId " +
             "inner join stars_in_movies sim ON sim.movieId = m.id " +
             "inner join stars s ON sim.starId = s.id " +
             // Fulltext search
-            "where match (title) against (? in boolean mode) " +
+            "where match (title) against (? in boolean mode) or edth(?, title, ?) " +
             "group by m.id, m.title, m.year, m.director, r.rating " +
             // Can order by (rating asc/desc, title asc/desc) or (title asc/desc, rating asc/desc)
-            "order by ?, ? " +
+            "order by %s, %s " +
             "limit ? offset ?";
+
+    private static final double editDistanceThreshold = 0.25;
 
     private DataSource dataSource;
 
+    @Override
     public void init(ServletConfig config) {
         try {
             dataSource = (DataSource) new InitialContext().lookup("java:comp/env/jdbc/moviedb");
@@ -102,6 +104,7 @@ public class SearchPageServlet extends HttpServlet {
         }
     }
 
+    @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
 
@@ -113,8 +116,8 @@ public class SearchPageServlet extends HttpServlet {
             return;
         }
 
-        String ratingOrder = "rating desc";
-        String titleOrder = "title asc";
+        String ratingOrder = "rating " + request.getParameter("sort-by-rating");
+        String titleOrder = "title " + request.getParameter("sort-by-title");
         String display = request.getParameter("display");
         int limit = Integer.parseInt(display);
         String pageNumber = request.getParameter("page-number");
@@ -124,11 +127,15 @@ public class SearchPageServlet extends HttpServlet {
                 .map(word -> "+" + word + "*")
                 .collect(Collectors.joining(" "));
 
+        int threshold = Math.max(1, (int) Math.floor(searchQuery.length() * editDistanceThreshold));
+
+        String query = String.format(selectMoviesQuery, ratingOrder, titleOrder);
+
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(selectMoviesQuery)) {
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             preparedStatement.setString(1, booleanModeSearchQuery);
-            preparedStatement.setString(2, ratingOrder);
-            preparedStatement.setString(3, titleOrder);
+            preparedStatement.setString(2, searchQuery);
+            preparedStatement.setInt(3, threshold);
             preparedStatement.setInt(4, limit);
             preparedStatement.setInt(5, offset);
 
