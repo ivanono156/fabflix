@@ -1,3 +1,4 @@
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import jakarta.servlet.ServletConfig;
@@ -10,7 +11,6 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -20,27 +20,27 @@ public class SingleMovieServlet extends HttpServlet {
     private static final long serialVersionUID = 2L;
 
     private static final String singleMovieQuery = "select m.id, m.title, m.year, m.director, r.rating, " +
-                "g.id, g.name, smp.id, smp.name, smp.moviesPlayed " +
-                "from movies as m inner join stars_in_movies as sim on m.id = sim.movieId " +
+            "g.id, g.name, smp.id, smp.name, smp.moviesPlayed " +
+            "from movies as m inner join stars_in_movies as sim on m.id = sim.movieId " +
 
-                // Find how many movies each star played in (starMoviesPlayed as smp)
-                "inner join (select s.id, s.name, count(s.id) as moviesPlayed " +
-                // Filter out only stars that acted in this movie first
-                "from (select s.id, s.name from stars as s " +
-                "inner join stars_in_movies as sim on s.id = sim.starId " +
-                "inner join movies as m on sim.movieId = m.id " +
-                "where m.id = ?) as s " +
-                "inner join stars_in_movies as sim on s.id = sim.starId " +
-                "group by (s.id)) as smp on sim.starId = smp.id " +
+            // Find how many movies each star played in (starMoviesPlayed as smp)
+            "inner join (select s.id, s.name, count(s.id) as moviesPlayed " +
+            // Filter out only stars that acted in this movie first
+            "from (select s.id, s.name from stars as s " +
+            "inner join stars_in_movies as sim on s.id = sim.starId " +
+            "inner join movies as m on sim.movieId = m.id " +
+            "where m.id = ?) as s " +
+            "inner join stars_in_movies as sim on s.id = sim.starId " +
+            "group by (s.id)) as smp on sim.starId = smp.id " +
 
-                // Find the genres in the movie
-                "inner join genres_in_movies as gim on gim.movieId = m.id " +
-                "inner join genres as g on g.id = gim.genreId " +
+            // Find the genres in the movie
+            "inner join genres_in_movies as gim on gim.movieId = m.id " +
+            "inner join genres as g on g.id = gim.genreId " +
 
-                // Find ratings for the movie
-                "left join ratings as r on r.movieId = m.id " +
-                "where m.id = ? " +
-                "order by g.name, moviesPlayed desc, smp.name";
+            // Find ratings for the movie
+            "left join ratings as r on r.movieId = m.id " +
+            "where m.id = ? " +
+            "order by g.name, moviesPlayed desc, smp.name";
 
     private DataSource dataSource;
 
@@ -66,8 +66,8 @@ public class SingleMovieServlet extends HttpServlet {
 
             try (ResultSet rs = statement.executeQuery()) {
                 JsonObject jsonObject = new JsonObject();
-                JsonObject genres = new JsonObject();
-                JsonObject stars = new JsonObject();
+                JsonArray genresJsonArray = new JsonArray();
+                JsonArray starsJsonArray = new JsonArray();
 
                 while (rs.next()) {
                     String movieId = rs.getString("m.id");
@@ -91,12 +91,23 @@ public class SingleMovieServlet extends HttpServlet {
                     jsonObject.addProperty("movie_director", movieDirector);
                     jsonObject.addProperty("movie_rating", movieRating);
 
-                    genres.addProperty(genreId, genreName);
-                    stars.addProperty(starId, starName);
+                    JsonObject genreJsonObject = new JsonObject();
+                    genreJsonObject.addProperty("genre_id", genreId);
+                    genreJsonObject.addProperty("genre_name", genreName);
+                    if (!genresJsonArray.contains(genreJsonObject)) {
+                        genresJsonArray.add(genreJsonObject);
+                    }
+
+                    JsonObject starJsonObject = new JsonObject();
+                    starJsonObject.addProperty("star_id", starId);
+                    starJsonObject.addProperty("star_name", starName);
+                    if (!starsJsonArray.contains(starJsonObject)) {
+                        starsJsonArray.add(starJsonObject);
+                    }
                 }
 
-                jsonObject.add("movie_genres", genres);
-                jsonObject.add("movie_stars", stars);
+                jsonObject.add("movie_genres", genresJsonArray);
+                jsonObject.add("movie_stars", starsJsonArray);
 
                 response.getWriter().write(jsonObject.toString());
                 response.setStatus(HttpServletResponse.SC_OK);
