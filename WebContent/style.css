@@ -8,10 +8,6 @@ p {
     text-align: inherit;
 }
 
-td, th {
-    color: ghostwhite;
-}
-
 body {
     background-color: darkgreen;
 }
@@ -22,7 +18,7 @@ ul {
   padding: 0;
 }
 
-form {
+td, th, label, form {
     color: ghostwhite;
 }
 

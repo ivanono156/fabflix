@@ -33,29 +33,26 @@
 <div class="main-page-content">
 
 <h2>Movies</h2>
-    <form id="update_movie_list_form" action="#" method="GET">
-        <label for="display">Movies per page:</label>
-        <select id="display" name="display">
-            <option value="10">10</option>
-            <option value="25">25</option>
-            <option value="50">50</option>
-            <option value="100">100</option>
-        </select>
+    <label for="display">Movies per page:</label>
+    <select id="display" name="display">
+        <option value="10">10</option>
+        <option value="25">25</option>
+        <option value="50">50</option>
+        <option value="100">100</option>
+    </select>
 
-        <label for="sort-order">Sort by:</label>
-        <select id="sort-order" name="sort-order">
-            <option value="title asc, rating asc">Title ↑, Rating ↑</option>
-            <option value="title asc, rating desc">Title ↑, Rating ↓</option>
-            <option value="title desc, rating asc">Title ↓, Rating ↑</option>
-            <option value="title desc, rating desc">Title ↓, Rating ↓</option>
-            <option value="rating asc, title asc">Rating ↑, Title ↑</option>
-            <option value="rating asc, title desc">Rating ↑, Title ↓</option>
-            <option value="rating desc, title asc">Rating ↓, Title ↑</option>
-            <option value="rating desc, title desc">Rating ↓, Title ↓</option>
-        </select>
+    <label for="sort-order">Sort by:</label>
+    <select id="sort-order" name="sort-order">
+        <option value="title asc, rating asc">Title ↑, Rating ↑</option>
+        <option value="title asc, rating desc">Title ↑, Rating ↓</option>
+        <option value="title desc, rating asc">Title ↓, Rating ↑</option>
+        <option value="title desc, rating desc">Title ↓, Rating ↓</option>
+        <option value="rating asc, title asc">Rating ↑, Title ↑</option>
+        <option value="rating asc, title desc">Rating ↑, Title ↓</option>
+        <option value="rating desc, title asc">Rating ↓, Title ↑</option>
+        <option value="rating desc, title desc">Rating ↓, Title ↓</option>
+    </select>
 
-        <button type="submit">Sort</button>
-    </form>
 <!-- Id "star_table" is useful for jQuery to find the html element with id, class here is mapping to Bootstrap defined class CSS -->
 <table id="movie-list-table" class="table table-striped">
     <!-- Create a table header -->

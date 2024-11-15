@@ -60,14 +60,10 @@ function addToCart(submitEvent) {
     });
 }
 
-function updateMovieList(submitEvent) {
-    console.log("updating movie list");
-
-    submitEvent.preventDefault();
-
+function updateMovieList() {
     window.location.href = "movie-list.html?" + createUrlParams(pageNumberKeyName, pageNumber)
-        + "&" + createUrlParams(displayKeyName, $("#display").val())
-        + "&" + createUrlParams(sortOrderKeyName, $("#sort-order").val())
+        + "&" + createUrlParams(displayKeyName, displayOptionElement.val())
+        + "&" + createUrlParams(sortOrderKeyName, sortOrderOptionElement.val())
         + getSearchQueriesAsUrl();
 }
 
@@ -133,36 +129,42 @@ function handleMovieResult(resultData) {
 
     $(".add-to-cart-btn").submit(addToCart);
 
-    $("#sort-order").val(getParameterByName(sortOrderKeyName));
+    sortOrderOptionElement.val(getParameterByName(sortOrderKeyName));
 
-    $("#display").val(getParameterByName(displayKeyName));
+    displayOptionElement.val(getParameterByName(displayKeyName));
 
-    let changePageButton = $("#change-page-button");
+    let changePageButtonElement = $("#change-page-button");
 
     let currentPageNumber = Number(getParameterByName(pageNumberKeyName));
 
     if (currentPageNumber > 1) {
         let prevButtonHTML = "<button id='prev-button'>Previous</button>";
-        changePageButton.append(prevButtonHTML);
-        $("#prev-button").on("click", function () {
+        changePageButtonElement.append(prevButtonHTML);
+        $("#prev-button").on("click", function() {
             changePage(currentPageNumber - 1);
         });
     }
 
-    changePageButton.append("<span>Current Page: " + currentPageNumber + "</span>");
+    changePageButtonElement.append("<span>Current Page: " + currentPageNumber + "</span>");
 
     if (resultData.length == getParameterByName(displayKeyName)) {
         let nextButtonHTML = "<button id='next-button'>Next Page</button>";
-        changePageButton.append(nextButtonHTML);
-        $("#next-button").on("click", function () {
+        changePageButtonElement.append(nextButtonHTML);
+        $("#next-button").on("click", function() {
             changePage(currentPageNumber + 1);
         });
     }
 }
 
-let updateMovieListForm = $("#update_movie_list_form");
-updateMovieListForm.submit(updateMovieList);
+let displayOptionElement = $("#display");
+displayOptionElement.on("change", function() {
+    updateMovieList();
+})
 
+let sortOrderOptionElement = $("#sort-order");
+sortOrderOptionElement.on("change", function() {
+    updateMovieList();
+})
 
 // Once this .js is loaded, following scripts will be executed by the browser
 let searchParams = {}
