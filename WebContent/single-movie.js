@@ -72,7 +72,7 @@ function handleResult(resultData) {
         rowHTML +=
             "<td>"
             // Add a link to browse by genre
-            + '<a href="movie-list.html?page-number=1&display=' + getSessionDisplay() + '&gid=' + genreId + '">'
+            + '<a href="movie-list.html?' + createDefaultMovieListUrl() + '&' + createUrlParams(genreKeyName, genreId) + '">'
             + genres[genreId] // Display genre name
             + '</a>'
             + "</td>";
@@ -94,13 +94,7 @@ function handleResult(resultData) {
     for (const starId in stars) {
         let rowHTML = "";
         rowHTML += "<tr>";
-        rowHTML +=
-            "<td>"
-            // Add a link to each single-star.html page
-            + '<a href="single-star.html?id=' + starId + '">'
-            + stars[starId] // Display star name
-            + '</a>'
-            + "</td>";
+        rowHTML += "<td>" + '<a href="single-star.html?id=' + starId + '">' + stars[starId] + '</a>' + "</td>";
         rowHTML += "</tr>";
 
         // Append the row created to the table body, which will refresh the page

@@ -1,4 +1,10 @@
 <!DOCTYPE html>
+<!-- This example is following frontend and backend separation.
+
+    This .html performs two steps:
+    1. Create a html template skeleton, with all the elements defined (some left empty) and named with ids.
+    2. Load movie-list.js to populate the data into empty elements.
+    -->
 <html lang="en">
 <head>
     <!-- Required meta tags -->
@@ -13,24 +19,18 @@
     <!-- Our CSS file -->
     <link rel="stylesheet" href="design.css">
 
-    <title>Browse Movies</title>
+    <title>Fabflix</title>
 </head>
 <body>
+<div>
+    <ul class="top-nav">
+        <li><a href="meta-data.html" class="active">View Database MetaData</a></li>
+        <li><a href="add-star.html">Add a Star</a></li>
+        <li><a href="add_movie.html">Add a Movie</a></li>
+    </ul>
+</div>
 
-<ul class="top-nav">
-    <li><a href="index.html">Home Page</a></li>
-    <li><a href="search-page.html">Search Page</a></li>
-    <li><a href="browse-page.html" class="active">Browse Page</a></li>
-    <li><a href="shopping-cart.html" class="checkout-btn">Proceed to Checkout</a></li>
-</ul>
-
-<div class="main-page-content">
-
-<h3>Browse By Genres</h3>
-<div id="genres_grid" class="grid-container"></div>
-
-<h3>Browse By Titles</h3>
-<div id="titles_grid" class="grid-container"></div>
+<div id="metadata-content" class="main-page-content">
 
 </div>
 
@@ -38,11 +38,8 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
-
-<!-- Load session data JS file -->
-<script src="session-data.js"></script>
-<script src="browse-page.js"></script>
-
+<script src="meta-data.js"></script>
 </body>
+
 
 </html>

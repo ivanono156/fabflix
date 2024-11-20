@@ -76,6 +76,9 @@ public class SingleMovieServlet extends HttpServlet {
                     String movieYear = rs.getString("m.year");
                     String movieDirector = rs.getString("m.director");
                     String movieRating = rs.getString("r.rating");
+                    if (rs.wasNull()) {
+                        movieRating = "None";
+                    }
 
                     String genreId = rs.getString("g.id");
                     String genreName = rs.getString("g.name");

@@ -1,6 +1,12 @@
 // used in all movie list pages
 const pageNumberKeyName = "page-number";
 const displayKeyName = "display";
+const titleSortOrderKeyName = "sort-by-title";
+const ratingSortOrderKeyName = "sort-by-rating"
+const searchBySortField = "sort_field";
+const searchBySortOrder = "sort_order";
+const searchBySortField2 = "sort_field2";
+const searchBySortOrder2 = "sort_order2";
 // browse page parameters
 const genreKeyName = "gid";
 const titleStartsWithKeyName = "title-starts-with";
@@ -9,28 +15,41 @@ const searchByTitleKeyName = "title_entry";
 const searchByYearKeyName = "year_entry";
 const searchByDirectorKeyName = "director_entry";
 const searchByStarKeyName = "star_entry";
-const searchBySortField = "sort_field";
-const searchBySortOrder = "sort_order";
-const searchBySortField2 = "sort_field2";
-const searchBySortOrder2 = "sort_order2";
-
 
 function getSessionPageNumber() {
-    let sessionPageNumber = sessionStorage.getItem(pageNumberKeyName)
-    if (sessionPageNumber == null) {
-        sessionPageNumber = 1;
-        sessionStorage.setItem(pageNumberKeyName, sessionPageNumber.toString());
+    let pageNumber = sessionStorage.getItem(pageNumberKeyName)
+    if (pageNumber == null) {
+        pageNumber = 1;
+        sessionStorage.setItem(pageNumberKeyName, pageNumber.toString());
     }
-    return parseInt(sessionPageNumber);
+    return parseInt(pageNumber);
 }
 
 function getSessionDisplay() {
-    let sessionDisplay = sessionStorage.getItem(displayKeyName)
-    if (sessionDisplay == null) {
-        sessionDisplay = 25;
-        sessionStorage.setItem(displayKeyName, sessionDisplay.toString());
+    let display = sessionStorage.getItem(displayKeyName)
+    if (display == null) {
+        display = 25;
+        sessionStorage.setItem(displayKeyName, display.toString());
     }
-    return parseInt(sessionDisplay);
+    return parseInt(display);
+}
+
+function getSessionTitleSortOrder() {
+    let titleSortOrder = sessionStorage.getItem(titleSortOrderKeyName);
+    if (titleSortOrder == null) {
+        titleSortOrder = "asc";
+        sessionStorage.setItem(titleSortOrderKeyName, titleSortOrder);
+    }
+    return titleSortOrder;
+}
+
+function getSessionRatingSortOrder() {
+    let ratingSortOrder = sessionStorage.getItem(ratingSortOrderKeyName);
+    if (ratingSortOrder == null) {
+        ratingSortOrder = "desc";
+        sessionStorage.setItem(ratingSortOrderKeyName, ratingSortOrder);
+    }
+    return ratingSortOrder;
 }
 
 function getBrowseByGenreSessionData() {
@@ -64,11 +83,12 @@ function getSearchBySortFieldSessionData(){
 function getSearchBySortOrderSessionData(){
     return sessionStorage.getItem(searchBySortOrder);
 }
-function getSearchBySortFieldSessionData(){
+
+function getSearchBySortField2SessionData(){
     return sessionStorage.getItem(searchBySortField2);
 }
 
-function getSearchBySortOrderSessionData(){
+function getSearchBySortOrder2SessionData(){
     return sessionStorage.getItem(searchBySortOrder2);
 }
 
@@ -78,17 +98,23 @@ function createUrlParams(key, value) {
 }
 
 function getSessionDataAsUrl() {
-    let sessionPageNumber = getSessionPageNumber();
-    let sessionDisplay = getSessionDisplay();
-    let sessionGenreId = getBrowseByGenreSessionData();
-    let sessionTitleStartsWith = getTitleStartsWithSessionData();
+    let pageNumber = getSessionPageNumber();
+    let display = getSessionDisplay();
+    let titleSortOrder = getSessionTitleSortOrder();
+    let ratingSortOrder = getSessionRatingSortOrder();
 
-    let urlString = createUrlParams(pageNumberKeyName, sessionPageNumber) + "&" + createUrlParams(displayKeyName, sessionDisplay)
+    let urlString = createUrlParams(pageNumberKeyName, pageNumber)
+        + "&" + createUrlParams(displayKeyName, display)
+        + "&" + createUrlParams(titleSortOrderKeyName, titleSortOrder)
+        + "&" + createUrlParams(ratingSortOrderKeyName, ratingSortOrder);
 
-    if (sessionGenreId != null) {
-        urlString += "&" + createUrlParams(genreKeyName, sessionGenreId);
-    } else if (sessionTitleStartsWith != null) {
-        urlString += "&" + createUrlParams(titleStartsWithKeyName, sessionTitleStartsWith);
+    let genreId = getBrowseByGenreSessionData();
+    let titleStartsWith = getTitleStartsWithSessionData();
+
+    if (genreId != null) {
+        urlString += "&" + createUrlParams(genreKeyName, genreId);
+    } else if (titleStartsWith != null) {
+        urlString += "&" + createUrlParams(titleStartsWithKeyName, titleStartsWith);
     } else {
         // search page session data
         let title = getSearchByTitleSessionData();
@@ -132,4 +158,11 @@ function getSessionDataAsUrl() {
     }
 
     return urlString;
+}
+
+function createDefaultMovieListUrl() {
+    return createUrlParams(pageNumberKeyName, 1)
+        + "&" + createUrlParams(displayKeyName, getSessionDisplay())
+        + "&" + createUrlParams(titleSortOrderKeyName, getSessionTitleSortOrder())
+        + "&" + createUrlParams(ratingSortOrderKeyName, getSessionRatingSortOrder());
 }

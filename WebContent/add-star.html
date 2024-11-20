@@ -13,31 +13,39 @@
     <!-- Our CSS file -->
     <link rel="stylesheet" href="design.css">
 
-    <title>Add a Star</title>
+    <title>Add Star</title>
 </head>
 <body>
+
+<div>
+    <ul class="top-nav">
+        <li><a href="meta-data.html">View Database MetaData</a></li>
+        <li><a href="add-star.html" class="active">Add a Star</a></li>
+        <li><a href="add-movie.html">Add a Movie</a></li>
+    </ul>
+</div>
+
 <div class="main-page-content">
-    <h3>New Star Details</h3>
-    <div class="add-star-form">
-        <form id="add-star-form" method="post" action="#">
-            <label for="star-name"><b>Star Name</b></label>
-            <input name="star-name" placeholder="Star Name" type="name" id="star-name"><br>
+    <h1>Add a star to the database</h1>
 
-            <label for="birth-year"><b>Birth Year</b></label>
-            <input name="birth-year" placeholder="Birth Year" type="year" id="birth-year"><br>
+    <form id="add-star-form" method="post" action="#">
+        <label for="star-name"><b>Star name:</b></label>
+        <input name="star-name" placeholder="Enter name" type="text" id="star-name">
 
-            <input type="submit" value="add Star">
-        </form>
-    </div>
+        <label for="star-birth-year"><b>Birth year:</b></label>
+        <input name="star-birth-year" placeholder="Enter birth year" type="text" id="star-birth-year">
+
+        <input type="submit" value="Add Star">
+    </form>
+
+    <div id="add-star-message" class="login-form-error-message"></div>
 </div>
 
 <!-- Load jQuery and Bootstrap JS -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
-
-<script src="add_star.js"></script>
+<script src="add-star.js"></script>
 
 </body>
-
 </html>

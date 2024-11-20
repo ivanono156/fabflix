@@ -63,20 +63,35 @@ ul.top-nav li a.active {
 
 .main-page-content {
     margin-top: 60px;
+    padding-bottom: 50px;
 }
 
 .login-form {
-    /*margin: auto;*/
+    margin: auto;
     display: flex;
     justify-content: center;
     text-align: center;
     align-items: center;
-    min-height: 100vh;
+    position: relative;
+    min-height: 50%;
+    max-height: 80%;
+}
+
+.login-form-text, .login-form-error-message {
+    font-size: 40px;
+    color: ghostwhite;
+    text-align: center;
+    justify-content: center;
+}
+
+.login-form-error-message {
+    font-size: 20px;
+    justify-content: normal;
 }
 
 #genres_grid.grid-container {
     display: grid;
-    grid-template-columns: repeat(3, auto);
+    grid-template-columns: repeat(4, auto);
 }
 
 #titles_grid.grid-container {
@@ -102,4 +117,16 @@ ul.top-nav li a.active {
 
 .add-to-cart-btn:hover {
     background-color: lightgrey;
+}
+
+.pagination {
+    color: ghostwhite;
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    background-color: black;
+}
+
+.metadata-table {
+    text-align: center;
 }
