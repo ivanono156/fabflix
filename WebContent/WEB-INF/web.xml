@@ -31,10 +31,17 @@
         </user-data-constraint>
     </security-constraint>
 
-    <!-- Register the DataSource which defined in META-INF/context.xml-->
+    <!-- Register the Read/Write DataSource which defined in META-INF/context.xml-->
     <resource-ref>
-        <description>MySQL DataSource</description>
-        <res-ref-name>jdbc/moviedb</res-ref-name>
+        <description>Read/Write MySQL DataSource</description>
+        <res-ref-name>jdbc/moviedbReadWrite</res-ref-name>
+        <res-type>javax.sql.DataSource</res-type>
+        <res-auth>Container</res-auth>
+    </resource-ref>
+    <!-- Register the Read-Only DataSource which defined in META-INF/context.xml-->
+    <resource-ref>
+        <description>Read-Only MySQL DataSource</description>
+        <res-ref-name>jdbc/moviedbReadOnly</res-ref-name>
         <res-type>javax.sql.DataSource</res-type>
         <res-auth>Container</res-auth>
     </resource-ref>
