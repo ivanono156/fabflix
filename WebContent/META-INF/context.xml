@@ -1,7 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <Context>
-    <!-- Connection to Read/Write MySQL server -->
+    <!-- Localhost connections -->
+    <Environment name="DB_ENV" value="dev" type="java.lang.String"/>
+    <Resource name="jdbc/moviedbReadWrite"
+              auth="Container"
+              driverClassName="com.mysql.cj.jdbc.Driver"
+              type="javax.sql.DataSource"
+              factory = "org.apache.tomcat.jdbc.pool.DataSourceFactory"
+              maxTotal = "100"
+              maxIdle = "30"
+              maxWaitMillis = "10000"
+              username="mytestuser"
+              password="My6$Password"
+              url="jdbc:mysql://localhost:3306/moviedb?autoReconnect=true&amp;allowPublicKeyRetrieval=true&amp;useSSL=false&amp;cachePrepStmts=true"/>
+
+    <Resource name="jdbc/moviedbReadOnly"
+              auth="Container"
+              driverClassName="com.mysql.cj.jdbc.Driver"
+              type="javax.sql.DataSource"
+              factory = "org.apache.tomcat.jdbc.pool.DataSourceFactory"
+              maxTotal = "100"
+              maxIdle = "30"
+              maxWaitMillis = "10000"
+              username="mytestuser"
+              password="My6$Password"
+              url="jdbc:mysql://localhost:3306/moviedb?autoReconnect=true&amp;allowPublicKeyRetrieval=true&amp;useSSL=false&amp;cachePrepStmts=true"/>
+
+    <!-- Remote connections -->
+    <Environment name="DB_ENV" value="prod" type="java.lang.String"/>
     <Resource name="jdbc/moviedbReadWrite"
               auth="Container"
               driverClassName="com.mysql.cj.jdbc.Driver"
@@ -14,7 +41,6 @@
               password="My6$Password"
               url="jdbc:mysql://172.31.20.92:3306/moviedb?autoReconnect=true&amp;allowPublicKeyRetrieval=true&amp;useSSL=false&amp;cachePrepStmts=true"/>
 
-    <!-- Connection to Read-Only MySQL server -->
     <Resource name="jdbc/moviedbReadOnly"
               auth="Container"
               driverClassName="com.mysql.cj.jdbc.Driver"
