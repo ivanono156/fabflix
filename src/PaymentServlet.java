@@ -35,7 +35,7 @@ public class PaymentServlet extends HttpServlet {
     @Override
     public void init(ServletConfig config) {
         try {
-            dataSource = (DataSource) new InitialContext().lookup("java:comp/env/jdbc/moviedbReadWrite");
+            dataSource = (DataSource) new InitialContext().lookup(JdbcConstants.readWriteDataSourceURL);
         } catch (NamingException e) {
             e.printStackTrace();
         }
