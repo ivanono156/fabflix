@@ -10,7 +10,6 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -26,7 +25,7 @@ public class EmployeeLoginServlet extends HttpServlet {
     @Override
     public void init(ServletConfig config) {
         try {
-            dataSource = (DataSource) new InitialContext().lookup("java:comp/env/jdbc/moviedb");
+            dataSource = (DataSource) new InitialContext().lookup("java:comp/env/jdbc/moviedbReadOnly");
         } catch (NamingException e) {
             e.printStackTrace();
         }
