@@ -39,9 +39,15 @@
 Two data sources are created in the context.xml file: read/write operations are sent to "jdbc/moviedbReadWrite", and 
 read-only operations are sent to "jdbc/moviedbReadOnly". These two resources are registered in the web.xml file under 
 the same name. The read/write data source contains a connection to the aws instance that has the master mysql on it, and 
-the read-only data source contains a connection to the aws instance that has the slave mysql on it.
-
-USE TERM "Gond" TO DEMONSTRATE FUZZY SEARCH
+the read-only data source contains a connection to the aws instance that has the slave mysql on it. When a servlet needs
+to read items from the database, such as by using a SELECT statement, the website can send requests to either the master
+or slave SQLs. However, if a servlet needs to write to the database, such as by using an INSERT statement, the requests 
+are sent ONLY to the master SQL.
 
 # Extra Credit - Fuzzy Search
-####  Include a brief explanation of the design and the implementation of your fuzzy Search in README.
+####  Include a brief explanation of the design and the implementation of your fuzzy Search.
+Our fuzzy search uses a combination of full text searching and the LEDA algorithm implemented in the 'edth' user defined
+function from the flamingo library. The edit distance threshold to determine whether two strings are similar is 25% of 
+the length of the user's search query, rounded down, with a minimum threshold of 1 for all queries. For example, a
+search query with a length of 10 characters will have its edit distance threshold set to 2. The fuzzy search takes the 
+union of results returned from full text searching and from the 'edth' function by using an 'or' operator.
