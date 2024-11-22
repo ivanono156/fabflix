@@ -16,7 +16,7 @@
   #### Explain how Connection Pooling is utilized in the Fabflix code.
   #### We use connection pooling by reusing database connections in our serlvets when a request is made. We use this for load balancing between, the master and slave instances that we created. This helps to distribute tasks between the two servers.
   #### Explain how Connection Pooling works with two backend SQL.
-  #### Connection Poolling works by pooling all read/write requests and connecting them to the primary database. All of the read requests get pooled together and get connected to the secondary database.
+  #### Connection Poolling works by pooling all read/write requests and connecting them to the primary database in the Master instance. All of the read requests get pooled together and get connected to the secondary database in the slave instance.
     
 
 # Master/Slave
