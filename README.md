@@ -3,12 +3,16 @@
 
 - #### Names: Ivan Onofre, Carlos Arias
 
-- #### Project 4 Video Demo Link:
-
-- #### Instruction of deployment:
+- #### Project 4 Video Demo Link: https://youtu.be/AdrU0Ggr6wA
 
 - #### Collaborations and Work Distribution:
-
+  - Ivan
+    - Task 1
+    - Fuzzy Search Extra Credit
+    - Task 3
+  - Carlos
+    - Task 2
+    - Task 4
 
 # Connection Pooling
 #### Include the filename/path of all code/configuration files in GitHub of using JDBC Connection Pooling.
