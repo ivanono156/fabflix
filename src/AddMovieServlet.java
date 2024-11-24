@@ -29,41 +29,37 @@ public class AddMovieServlet extends HttpServlet { ;
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
 
-        String movie_title = request.getParameter("movie_title");
-        String movie_year = request.getParameter("movie_year");
-        String movie_director = request.getParameter("movie_director");
-        String movie_star = request.getParameter("star_name");
-        String movie_genre = request.getParameter("movie_genre");
+        String movieTitle = request.getParameter("movie_title");
+        String movieYear = request.getParameter("movie_year");
+        String movieDirector = request.getParameter("movie_director");
+        String starName = request.getParameter("star_name");
+        String genreName = request.getParameter("movie_genre");
 
         try (Connection conn = dataSource.getConnection()) {
             CallableStatement statement = conn.prepareCall("{call add_movie(?,?,?,?,?,?,?,?,?)}");
-            statement.setString(1, movie_title);
-            statement.setInt(2, Integer.parseInt(movie_year));
-            statement.setString(3, movie_director);
-            statement.setString(4, movie_star);
-            statement.setString(5, movie_genre);
+            statement.setString(1, movieTitle);
+            statement.setInt(2, Integer.parseInt(movieYear));
+            statement.setString(3, movieDirector);
+            statement.setString(4, starName);
+            statement.setString(5, genreName);
 
             statement.registerOutParameter(6, Types.VARCHAR);
             statement.registerOutParameter(7, Types.VARCHAR);
             statement.registerOutParameter(8, Types.INTEGER);
             statement.registerOutParameter(9, Types.VARCHAR);
-            System.out.println("About to execute statement");
 
             statement.execute();
 
-            String new_movie_id = statement.getString(6);
-            String new_star_id = statement.getString(7);
-            int new_genre_id = statement.getInt(8);
-            System.out.println(new_genre_id);
+            String newMovieId = statement.getString(6);
+            String newStarId = statement.getString(7);
+            int newGenreId = statement.getInt(8);
             String statusMessage = statement.getString(9);
-            //jsonResponse.addProperty("new_movie_id", new_movie_id);
-            System.out.print("Added movie");
+
             JsonObject responseJsonObject = new JsonObject();
-            responseJsonObject.addProperty("new_movie_id", new_movie_id);
-            responseJsonObject.addProperty("new_star_id", new_star_id);
-            responseJsonObject.addProperty("new_genre_id", new_genre_id);
+            responseJsonObject.addProperty("new_movie_id", newMovieId);
+            responseJsonObject.addProperty("new_star_id", newStarId);
+            responseJsonObject.addProperty("new_genre_id", newGenreId);
             responseJsonObject.addProperty("status_message", statusMessage);
-            //responseJsonObject.addProperty("message", "Added movie successfully");
             response.getWriter().write(responseJsonObject.toString());
             response.setStatus(HttpServletResponse.SC_OK);
         } catch (Exception e) {
@@ -71,7 +67,6 @@ public class AddMovieServlet extends HttpServlet { ;
             jsonObject.addProperty("errorMessage", e.getMessage());
             response.getWriter().write(jsonObject.toString());
             request.getServletContext().log("Error:", e);
-            // Set response status to 500 (Internal Server Error)
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }

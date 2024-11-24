@@ -1,36 +1,27 @@
 let addMovieForm= $("#add-movie-form");
 
 function handleAddMovieResult(resultData) {
-    // Check the status message from the server
-    $("#error-message").text("").hide();
-    $("#success-message").text("").hide();
-    $("#new-movie-id").text("").hide();
-    $("#new-star-id").text("").hide();
-    $("#new-genre-id").text("").hide();
-    console.log("SUCCESS: Movie added!");
-    if(resultData["status_message"] === "Movie already exists"){
-        $("#error-message").text("Movie already exists").show();
-    }
-    else{
-        $("#success-message").text("Movie added successfully!").show();
+    let errorMessageElement = $("#error-message");
+    let successMessageElement = $("#success-message");
+    let movieIdElement = $("#new-movie-id");
+    let starIdElement = $("#new-star-id");
+    let genreIdElement = $("#new-genre-id");
 
-        if (resultData["new_movie_id"]) {
-            $("#new-movie-id").text("New Movie ID: " + resultData["new_movie_id"]).show();
-        }
-        if (resultData["new_star_id"] !== null) {
-            $("#new-star-id").text("Star ID: " + resultData["new_star_id"]).show();
-        }
-        else{
-            $("#new-star-id").text("Existing Star ID: " + resultData["new_star_id"]).show();
-        }
-        if (resultData["new_genre_id"] !== null && resultData["new_genre_id"] !== 0) {
-            $("#new-genre-id").text("Genre ID: " + resultData["new_genre_id"]).show();
-        }
-        else{
-            $("#new-genre-id").text("Existing Genre ID: " + resultData["new_genre_id"]).show();
-        }
+    errorMessageElement.hide();
+    successMessageElement.hide();
+    movieIdElement.hide();
+    starIdElement.hide();
+    genreIdElement.hide();
 
+    if (resultData["status_message"] === "success"){
+        successMessageElement.text("Movie added successfully!").show();
+        movieIdElement.text("Movie ID: " + resultData["new_movie_id"]).show();
+        starIdElement.text("Star ID: " + resultData["new_star_id"]).show();
+        genreIdElement.text("Genre ID: " + resultData["new_genre_id"]).show();
+    } else {
+        errorMessageElement.text("Movie already exists!").show();
     }
+
     addMovieForm[0].reset();
 }
 

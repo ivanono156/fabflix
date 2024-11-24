@@ -1,22 +1,19 @@
 DELIMITER //
 
 CREATE PROCEDURE add_movie(
-    IN movie_title VARCHAR(255),
+    IN movie_title VARCHAR(100),
     IN movie_year INT,
-    IN movie_director VARCHAR(255),
-    IN star_name VARCHAR(255),
-    IN genre_name VARCHAR(255),
+    IN movie_director VARCHAR(100),
+    IN star_name VARCHAR(100),
+    IN genre_name VARCHAR(32),
     OUT new_movie_id VARCHAR(10),
     OUT new_star_id VARCHAR(10),
     OUT new_genre_id INT,
     OUT status_message VARCHAR(255)  -- Added output parameter for status message
 )
 BEGIN
-    DECLARE m_id VARCHAR(10);
     DECLARE movie_id VARCHAR(10);
-    DECLARE s_id VARCHAR(10);
     DECLARE star_id VARCHAR(10);
-    DECLARE g_id INT;
     DECLARE genre_id INT;
 
     -- Check if the movie already exists
@@ -26,56 +23,55 @@ BEGIN
     LIMIT 1;
 
     IF movie_id IS NOT NULL THEN
-        SET status_message = 'Movie already exists';  -- Set the status message
+        -- Set the status message
+        SET status_message = 'failure';
     ELSE
-
-        -- Insert the new movie
+        -- Create and insert the new movie
         SELECT MAX(id) INTO movie_id FROM movies;
-        SET m_id = CONCAT('tt', LPAD(CAST(SUBSTRING(movie_id, 3) AS UNSIGNED) + 2, 7, '0'));
-        WHILE EXISTS (SELECT 1 FROM movies WHERE id = m_id) DO
-                SET m_id = CONCAT('tt', LPAD(CAST(SUBSTRING(m_id, 3) AS UNSIGNED) + 1, 7, '0'));
-            END WHILE;
+        SET new_movie_id = CONCAT('tt', CAST(SUBSTRING(movie_id, 3) AS UNSIGNED) + 1);
 
-        INSERT INTO movies (id, title, year, director)
-        VALUES (m_id, movie_title, movie_year, movie_director);
+        INSERT INTO movies (id, title, year, director, price)
+        VALUES (new_movie_id, movie_title, movie_year, movie_director, floor(10 + rand() * 100 - 10));
 
-        SET new_movie_id = m_id;
-
+        -- Check if the star already exists
         SELECT id INTO star_id
         FROM stars
         WHERE name = star_name
         LIMIT 1;
 
         IF star_id IS NULL THEN
+            -- Create and insert the new star
             SELECT MAX(id) INTO star_id FROM stars;
-            SET s_id = CONCAT('nm', LPAD(CAST(SUBSTRING(star_id, 3) AS UNSIGNED) + 2, 7, '0'));
-            WHILE EXISTS (SELECT 1 FROM stars WHERE id = s_id) DO
-                    SET s_id = CONCAT('nm', LPAD(CAST(SUBSTRING(s_id, 3) AS UNSIGNED) + 1, 7, '0'));
-                END WHILE;
-            SET new_star_id = s_id;
+            SET new_star_id = CONCAT('nm', CAST(SUBSTRING(star_id, 3) AS UNSIGNED) + 1);
+
             INSERT INTO stars (id, name)
-            VALUES (s_id, star_name);
+            VALUES (new_star_id, star_name);
         ELSE
-            SET s_id = star_id;
+            SET new_star_id = star_id;
         END IF;
 
         INSERT INTO stars_in_movies (starID, movieId)
-        VALUES (s_id, movie_id);
+        VALUES (new_star_id, new_movie_id);
 
+        -- Check if the genre exists
         SELECT id INTO genre_id
         FROM genres
         WHERE name = genre_name
         LIMIT 1;
+
         IF genre_id IS NULL THEN
+            -- Create the new genre
             INSERT INTO genres (name)
             VALUES (genre_name);
-            SET genre_id = LAST_INSERT_ID();
+            SET new_genre_id = LAST_INSERT_ID();
+        ELSE
             SET new_genre_id = genre_id;
         END IF;
-        INSERT INTO genres_in_movies (genreId, movieId)
-        VALUES (genre_id, movie_id);
 
-        SET status_message = 'Movie added successfully';  -- Set success message
+        INSERT INTO genres_in_movies (genreId, movieId)
+        VALUES (new_genre_id, new_movie_id);
+
+        SET status_message = 'success';  -- Set success message
     END IF;
 END //
 
