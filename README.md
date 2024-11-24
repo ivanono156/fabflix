@@ -37,6 +37,9 @@ instance. All of the read requests get pooled together and get connected to the 
   - [src/ShoppingCartServlet.java](src/ShoppingCartServlet.java)
   - [src/SingleMovieServlet.java](src/SingleMovieServlet.java)
   - [src/SingleStarServlet.java](src/SingleStarServlet.java)
+  - [src/JdbcConstants.java](src/JdbcConstants.java)
+  - [WebContent/META-INF/context.xml](WebContent/META-INF/context.xml)
+  - [WebContent/WEB-INF/web.xml](WebContent/WEB-INF/web.xml)
 
 #### How read/write requests were routed to Master/Slave SQL?
 Two data sources are created in the context.xml file: read/write operations are sent to "jdbc/moviedbReadWrite", and 
