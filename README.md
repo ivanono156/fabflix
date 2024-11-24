@@ -12,7 +12,7 @@
 
 # Connection Pooling
 #### Include the filename/path of all code/configuration files in GitHub of using JDBC Connection Pooling.
-    
+WebContent/META-INF/context.xml, pom.xml, src/JdbcConstants.java
 #### Explain how Connection Pooling is utilized in the Fabflix code.
 We use connection pooling by reusing database connections in our servlets when a request is made. We use this for load 
 balancing between, the master and slave instances that we created. This helps to distribute tasks between the two servers.
