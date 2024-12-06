@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: fabflix-movies-container # Names the container within the pod as "murphy-movies-container".
-          image: ionofre1/cs122b-fall24-project:v3 # Uses the Docker image "https://hub.docker.com/r/ionofre1/cs122b-fall24-project" for the container.
+          image: ionofre1/cs122b-fall24-project:v4 # Uses the Docker image "https://hub.docker.com/r/ionofre1/cs122b-fall24-project" for the container.
           ports:
             - name: http
               containerPort: 8080 # Exposes port 8080 of the container.
