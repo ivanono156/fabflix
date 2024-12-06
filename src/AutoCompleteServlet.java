@@ -56,8 +56,8 @@ public class AutoCompleteServlet extends HttpServlet {
         try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(fullTextSearchQuery)) {
             preparedStatement.setString(1, booleanModeSearchQuery);
-            preparedStatement.setString(2, searchQuery);
-//            preparedStatement.setInt(3, threshold);
+//            preparedStatement.setString(2, searchQuery);  FUZZY SEARCH
+//            preparedStatement.setInt(3, threshold);   FUZZY SEARCH
 
             JsonArray jsonArray = new JsonArray();
 

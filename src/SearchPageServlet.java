@@ -139,10 +139,10 @@ public class SearchPageServlet extends HttpServlet {
         try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             preparedStatement.setString(1, booleanModeSearchQuery);
-            preparedStatement.setString(2, searchQuery);
+//            preparedStatement.setString(2, searchQuery);  FUZZY SEARCH
 //            preparedStatement.setInt(3, threshold);   FUZZY SEARCH
-            preparedStatement.setInt(3, limit);
-            preparedStatement.setInt(4, offset);
+            preparedStatement.setInt(2, limit);
+            preparedStatement.setInt(3, offset);
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 JsonArray jsonArray = new JsonArray();
