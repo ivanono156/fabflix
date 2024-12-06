@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: fabflix-movies-container # Names the container within the pod as "murphy-movies-container".
-          image: chenliteaching/cs122b-p5-murphy:v1 # Uses the Docker image "https://hub.docker.com/r/chenliteaching/cs122b-p5-murphy" for the container.
+          image: ionofre1/cs122b-fall24-project:v1 # Uses the Docker image "https://hub.docker.com/r/chenliteaching/cs122b-p5-murphy" for the container.
           ports:
             - name: http
               containerPort: 8080 # Exposes port 8080 of the container.
