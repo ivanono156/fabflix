@@ -91,7 +91,7 @@ public class SearchPageServlet extends HttpServlet {
             "inner join stars_in_movies sim ON sim.movieId = m.id " +
             "inner join stars s ON sim.starId = s.id " +
             // Fulltext search
-            "where match (title) against (? in boolean mode) or edth(?, title, ?) " +
+            "where match (title) against (? in boolean mode) " +    //or edth(?, title, ?) " +  FUZZY SEARCH
             "group by m.id, m.title, m.year, m.director, r.rating " +
             // Can order by (rating asc/desc, title asc/desc) or (title asc/desc, rating asc/desc)
             "order by %s " +
@@ -140,9 +140,9 @@ public class SearchPageServlet extends HttpServlet {
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             preparedStatement.setString(1, booleanModeSearchQuery);
             preparedStatement.setString(2, searchQuery);
-            preparedStatement.setInt(3, threshold);
-            preparedStatement.setInt(4, limit);
-            preparedStatement.setInt(5, offset);
+//            preparedStatement.setInt(3, threshold);   FUZZY SEARCH
+            preparedStatement.setInt(3, limit);
+            preparedStatement.setInt(4, offset);
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 JsonArray jsonArray = new JsonArray();
