@@ -19,7 +19,7 @@ import java.util.stream.Stream;
 @WebServlet(name = "AutoCompleteServlet", urlPatterns = "/api/autocomplete")
 public class AutoCompleteServlet extends HttpServlet {
     private static final String fullTextSearchQuery = "select id, title from movies " +
-            "where match (title) against (? in boolean mode) or edth(?, title, ?) " +
+            "where match (title) against (? in boolean mode) " +    //or edth(?, title, ?) " + FUZZY SEARCH
             "limit 10";
 
     private static final double editDistanceThreshold = 0.25;
@@ -57,7 +57,7 @@ public class AutoCompleteServlet extends HttpServlet {
              PreparedStatement preparedStatement = connection.prepareStatement(fullTextSearchQuery)) {
             preparedStatement.setString(1, booleanModeSearchQuery);
             preparedStatement.setString(2, searchQuery);
-            preparedStatement.setInt(3, threshold);
+//            preparedStatement.setInt(3, threshold);
 
             JsonArray jsonArray = new JsonArray();
 

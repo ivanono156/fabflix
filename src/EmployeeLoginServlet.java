@@ -35,14 +35,14 @@ public class EmployeeLoginServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
 
-        try {
-            String gRecaptchaResponse = request.getParameter("g-recaptcha-response");
-            RecaptchaVerifyUtils.verify(gRecaptchaResponse);
-        } catch (Exception e) {
-            JsonObject recaptchaErrorJson = getResponseJsonObject(false, e.getMessage());
-            response.getWriter().write(recaptchaErrorJson.toString());
-            return;
-        }
+//        try {
+//            String gRecaptchaResponse = request.getParameter("g-recaptcha-response");
+//            RecaptchaVerifyUtils.verify(gRecaptchaResponse);
+//        } catch (Exception e) {
+//            JsonObject recaptchaErrorJson = getResponseJsonObject(false, e.getMessage());
+//            response.getWriter().write(recaptchaErrorJson.toString());
+//            return;
+//        }
 
         String email = request.getParameter("employee-email");
         String password = request.getParameter("employee-password");
