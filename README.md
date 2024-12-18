@@ -1,22 +1,15 @@
-# General
-- #### Team#: 997
+# Fabflix Movies - Database & Web Application
 
-- #### Names: Ivan Onofre, Carlos Arias
+### Ivan Onofre & Carlos Arias
 
-- #### Project 5 Video Demo Link: https://youtu.be/JilSckhSOSE
+#### App Description
+Fabflix is a web app that allows users to browse from thousands of movies.
+Users can log into their account, add movies to their cart, and purchase them 
+at checkout. They can browse by genre and by title, or they can search for their
+favorite movies. 
 
-- #### Collaborations and Work Distribution:
-  - Ivan
-    - Task 1
-    - Task 2
-    - Task 3
-  - Carlos
-    - Task 2
-    - Task 3
-    - Task 4
-
-- ## JMeter Throughput for K8s Cluster
-- #### 3 Worker nodes + 2 Fabflix pods
-  - 6,268.219/minute
-- #### 4 Worker nodes + 3 Fabflix pods
-  - 6,976.744/minute
+#### Technologies Used
+The frontend is built using JavaScript, jQuery, and AJAX. Java and JDBC are used
+to connect to and communicate with the MySQL database that contains all the data
+for the Fabflix app. The application is deployed using kubernetes to handle mutliple
+AWS instances.
